@@ -19,9 +19,9 @@ namespace JAMTech.Controllers
         /// <param name="url"></param>
         /// <returns>Video download information</returns>
         [HttpGet]
-        public async Task<string> Get(string url)
+        public async Task<IActionResult> Get(string url)
         {
-            return await Http.GetStringAsync<string>(string.Concat(urlYoutubeDL, "info?url=" + url));
+            return new OkObjectResult(await Http.GetStringAsync<dynamic>(string.Concat(urlYoutubeDL, "info?url=" + url)));
         }
 
         /// <summary>
@@ -30,9 +30,9 @@ namespace JAMTech.Controllers
         /// <returns>Supported services and status</returns>
         [HttpGet]
         [Route("Supported")]
-        public async Task<string> SupportedServices()
+        public async Task<IActionResult> SupportedServices()
         {
-            return await Http.GetStringAsync<string>(string.Concat(urlYoutubeDL, "extractors"));
+            return new OkObjectResult(await Http.GetStringAsync<dynamic>(string.Concat(urlYoutubeDL, "extractors")));
         }
     }
 }
