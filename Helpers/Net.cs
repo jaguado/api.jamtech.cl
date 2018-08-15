@@ -1,0 +1,97 @@
+﻿using System;
+using System.IO;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace API.Helpers
+{
+    /// <summary>
+    /// Provides access to network tools
+    /// </summary>
+    public static class Net
+    {
+
+        /// <summary>
+        /// Gets the number of milliseconds taken to send an Internet Control Message Protocol
+        /// </summary>
+        /// <param name="hostname"></param>
+        /// <param name="timeout"></param>
+        /// <param name="ttl"></param>
+        /// <returns></returns>
+        public static async Task<long> Ping(string hostname, int timeout=12000, int ttl=64)
+        {
+             var pingSender = new Ping();
+            // Create a buffer of 32 bytes of data to be transmitted.  
+            var data = new String('a', 32);
+            var buffer = Encoding.ASCII.GetBytes(data);
+  
+            var options = new PingOptions(ttl, true);
+            var reply = await pingSender.SendPingAsync(hostname, timeout, buffer, options);
+            if (reply == null || reply.Status!=IPStatus.Success) return -1;
+            return reply.RoundtripTime;
+        }
+
+        /// <summary>
+        /// Check if can connect to the specified TCP port on the specified host as an asynchronous operation.
+        /// </summary>
+        /// <param name="hostname"></param>
+        /// <param name="port"></param>
+        /// <param name="timeout"></param>
+        /// <returns></returns>
+        public static async Task<bool> Telnet(string hostname, int port, int timeout = 3000)
+        {
+            return await Task.Run(() =>
+            {
+                using (var tcp = new TcpClient())
+                {
+                    using (var ct = new CancellationTokenSource(timeout))
+                    {
+                        try
+                        {
+                            var connectTask = tcp.ConnectAsync(hostname, port);
+                            Task.WaitAll(new[] { connectTask }, ct.Token);
+                            return connectTask.IsCompletedSuccessfully && tcp.Connected;
+                        }
+                        catch (Exception)
+                        {
+                            return false;
+                        }
+                    }
+                }
+            });
+        }
+
+        /// <summary>
+        /// Generic http request operation similar to curl
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="method"></param>
+        /// <param name="payload"></param>
+        /// <param name="contentType"></param>
+        /// <param name="timeout"></param>
+        /// <param name="useProxy"></param>
+        /// <returns></returns>
+        public static async Task<string> Curl(string url,  string method, string payload, string contentType, int timeout=30000, bool useProxy=false)
+        {
+            var request = WebRequest.CreateHttp(url);
+            if (useProxy)
+                request.Proxy = Http.CreateProxy("");
+            request.Timeout = timeout;
+            request.Method = method;
+            request.ContentType = contentType;
+            if (method != "GET" && !string.IsNullOrEmpty(payload))
+            {
+                var requestStream = await request.GetRequestStreamAsync();
+                var streamWriter = new StreamWriter(requestStream);
+                await streamWriter.WriteAsync(payload);
+            }
+            var response = await request.GetResponseAsync();
+            var stream = new StreamReader(response.GetResponseStream());
+            return await stream.ReadToEndAsync();
+        }
+    }
+}
