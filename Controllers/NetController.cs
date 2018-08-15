@@ -32,17 +32,7 @@ namespace API.Controllers
             }
         }
 
-        private IActionResult HandleException(Exception ex)
-        {
-            Console.Error.WriteLine($"Error ocurred:  {ex.ToString()}{Environment.NewLine}{ex.StackTrace.ToString()}");
-            return StatusCode(500);
-        }
-
-        private IActionResult HandleWebException(WebException ex)
-        {
-            Console.Error.WriteLine($"Error ocurred:  {ex.ToString()}{Environment.NewLine}{ex.StackTrace.ToString()}");
-            return StatusCode((int) ex.Status);
-        }
+       
 
         // Post /curl
         /// <summary>
