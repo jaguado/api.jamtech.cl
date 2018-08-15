@@ -77,7 +77,19 @@ namespace JAMTech
             });
 
             app.UseMvc();
-            app.UseSwagger();
+            app.UseSwagger(c=>
+            {
+                var basepath = "https://api.jamtech.cl"; //TODO improve this solution for basepath on swagger.json
+                c.PreSerializeFilters.Add((swaggerDoc, httpReq) => swaggerDoc.BasePath = basepath);
+                c.PreSerializeFilters.Add((swaggerDoc, httpReq) => {
+                    IDictionary<string, PathItem> paths = new Dictionary<string, PathItem>();
+                    foreach (var path in swaggerDoc.Paths)
+                    {
+                        paths.Add(path.Key.Replace(basepath, "/"), path.Value);
+                    }
+                    swaggerDoc.Paths = paths;
+                });
+            });
             app.UseSwaggerUI(c =>
             {
                 c.DocumentTitle = ApiTitle;
