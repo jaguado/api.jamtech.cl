@@ -34,12 +34,14 @@ namespace API.Controllers
 
         private IActionResult HandleException(Exception ex)
         {
-            throw new NotImplementedException();
+            Console.Error.WriteLine($"Error ocurred:  {ex.ToString()}{Environment.NewLine}{ex.StackTrace.ToString()}");
+            return StatusCode(500);
         }
 
-        private IActionResult HandleWebException(WebException wex)
+        private IActionResult HandleWebException(WebException ex)
         {
-            throw new NotImplementedException();
+            Console.Error.WriteLine($"Error ocurred:  {ex.ToString()}{Environment.NewLine}{ex.StackTrace.ToString()}");
+            return StatusCode((int) ex.Status);
         }
 
         // Post /curl
