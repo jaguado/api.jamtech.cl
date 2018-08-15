@@ -118,15 +118,5 @@ namespace API.Controllers
                 return new Tuple<bool, object>(false, -1);
             }
         }
-
-        /// <summary>
-        /// Requiered for some javascript librarys to allow CORS
-        /// </summary>
-        /// <returns></returns>
-        [HttpOptions]
-        public HttpResponseMessage Options()
-        {
-            return new HttpResponseMessage { StatusCode = HttpStatusCode.OK };
-        }
     }
 }
