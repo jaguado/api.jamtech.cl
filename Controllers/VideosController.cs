@@ -8,7 +8,7 @@ namespace JAMTech.Controllers
     /// <summary>
     /// API to Multiple video services using Youtube-dl
     /// </summary>
-    [Route("api/[controller]")]
+    [Route("v1/[controller]")]
     public class VideosController: Controller
     {
         const string urlYoutubeDL = "https://jamtechvideo.herokuapp.com/api/";
