@@ -28,33 +28,33 @@ namespace JAMTech.Controllers
         /// <param name="levels"></param>
         /// <returns>Files list</returns>
         [HttpGet]
-        public IEnumerable<DownloadResult> Get(string[] urls, string extension, int levels = 0)
+        public async Task<IEnumerable<DownloadResult>> Get(string[] urls, string extension, int levels = 0)
         {
             if (urls == null)
                 throw new MissingFieldException();
 
-            return GetDownloadables(urls, extension, levels);
+            return await GetDownloadables(urls, extension, levels);
         }
 
-        private static List<DownloadResult> GetDownloadables(string[] urls, string extension, int levels)
+        private static async Task<List<DownloadResult>> GetDownloadables(string[] urls, string extension, int levels)
         {
             var downloadResults = new ConcurrentBag<DownloadResult>();
             var tasks = new List<Task>();
             urls.AsParallel().ForAll(url =>
             {
-                var t = new Task(() =>
+                var t = new Task(async () =>
                 {
-                    downloadResults.AddRange(GetDownloadables(url, extension, levels));
+                    downloadResults.AddRange(await GetDownloadables(url, extension, levels));
                 });
                 t.Start();
                 tasks.Add(t);
             });
 
-            Task.WaitAll(tasks.ToArray());
+            await Task.WhenAll(tasks.ToArray());
             return downloadResults.ToList();
         }
 
-        private static IEnumerable<DownloadResult> GetDownloadables(string url, string extension, int levels)
+        private static async Task<IEnumerable<DownloadResult>> GetDownloadables(string url, string extension, int levels)
         {
             var downloadResults = new ConcurrentBag<DownloadResult>();
             var results = GetDownloadables(url, extension).Result.ToList();
@@ -65,9 +65,9 @@ namespace JAMTech.Controllers
             {
                 Parallel.ForEach(results.Where(r => r.IsDirectory),
                 //new ParallelOptions() { MaxDegreeOfParallelism = 1 },
-                directory =>
+                async directory =>
                 {
-                    tempResults.AddRange(GetDownloadables(directory.Url, extension).Result);
+                    tempResults.AddRange(await GetDownloadables(directory.Url, extension));
                 });
                 Console.WriteLine("Level {0}, {1} urls added", i, tempResults.Count);
                 downloadResults.AddRange(tempResults);

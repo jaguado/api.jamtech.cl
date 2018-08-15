@@ -7,7 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-
+using System.Threading.Tasks;
 
 namespace JAMTech.Controllers
 {
@@ -25,16 +25,16 @@ namespace JAMTech.Controllers
         /// <param name="pages">max pages count</param>
         /// <returns>List of torrent files</returns>
         [HttpGet]
-        public IEnumerable<TorrentResult> Get(string search, int pages=1)
+        public async Task<List<TorrentResult>> Get(string search, int pages=1)
         {
-            return FindTorrentsAsync(search, pages).Result;
+            return await FindTorrentsAsync(search, pages);
         }
 
         private const string tpbSearchUrl = @"https://thepiratebay.org/search/{0}/{1}/7/0";
         private const string searchResultDivName = "searchResult";
         private const string detailDivName = "detName";
 
-        private static async System.Threading.Tasks.Task<List<TorrentResult>> FindTorrentsAsync(string movie, int pages)
+        private static async Task<List<TorrentResult>> FindTorrentsAsync(string movie, int pages)
         {
             var torrentResults = new List<TorrentResult>();
             int resultsCount = 1;
@@ -117,7 +117,6 @@ namespace JAMTech.Controllers
 
             return torrentResults;
         }
-
-      
+ 
     }
 }
