@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Swagger;
@@ -33,6 +34,7 @@ namespace JAMTech
             {
                 options.SerializerSettings.ContractResolver = new DefaultContractResolver();
                 options.SerializerSettings.Converters.Add(new StringEnumConverter());
+                options.SerializerSettings.Formatting = Formatting.Indented;
             });
 
             services.AddSwaggerGen(c =>
@@ -79,16 +81,7 @@ namespace JAMTech
             app.UseMvc();
             app.UseSwagger(c=>
             {
-                var basepath = "https://api.jamtech.cl"; //TODO improve this solution for basepath on swagger.json
-                c.PreSerializeFilters.Add((swaggerDoc, httpReq) => swaggerDoc.BasePath = basepath);
-                c.PreSerializeFilters.Add((swaggerDoc, httpReq) => {
-                    IDictionary<string, PathItem> paths = new Dictionary<string, PathItem>();
-                    foreach (var path in swaggerDoc.Paths)
-                    {
-                        paths.Add(path.Key.Replace(basepath, "/"), path.Value);
-                    }
-                    swaggerDoc.Paths = paths;
-                });
+                c.PreSerializeFilters.Add((swaggerDoc, httpReq) => swaggerDoc.Host = httpReq.Host.Value);
             });
             app.UseSwaggerUI(c =>
             {
