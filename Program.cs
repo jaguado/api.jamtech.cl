@@ -10,7 +10,7 @@ namespace API
         public static bool isDev = false;
         public static void Main(string[] args)
         {
-            var url = Environment.GetEnvironmentVariable("url") ?? "http://*:8080";
+            var url = "http://*:" + Environment.GetEnvironmentVariable("PORT");
             Console.Out.WriteLineAsync("Starting web server on " + url);
             BuildWebHost(args, url).Run();
         }

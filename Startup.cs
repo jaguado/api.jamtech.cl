@@ -110,7 +110,7 @@ namespace API
 
         private void CheckEnvironmentVariables()
         {
-            string[] environments = { };
+            string[] environments = { "PORT" };
             foreach (var envName in environments)
             {
                 var envValue = Environment.GetEnvironmentVariable(envName);
