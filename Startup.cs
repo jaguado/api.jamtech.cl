@@ -12,7 +12,7 @@ using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace API
+namespace JAMTech
 { 
     public class Startup
     {

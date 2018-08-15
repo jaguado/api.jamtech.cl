@@ -1,11 +1,11 @@
-﻿using API.Helpers;
+﻿using JAMTech.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace API.Controllers
+namespace JAMTech.Controllers
 {
     [Route("v1/[controller]")]
     public class NetController : CorsController

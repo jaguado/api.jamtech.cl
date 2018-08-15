@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace API.Helpers
+namespace JAMTech.Helpers
 {
     /// <summary>
     /// Provides access to network tools

@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace API.Controllers
+namespace JAMTech.Controllers
 {
     public abstract class CorsController : Controller
     {
@@ -17,13 +17,13 @@ namespace API.Controllers
             return new HttpResponseMessage(HttpStatusCode.OK);
         }
 
-        public IActionResult HandleException(Exception ex)
+        internal IActionResult HandleException(Exception ex)
         {
             Console.Error.WriteLine($"Error ocurred:  {ex.ToString()}{Environment.NewLine}{ex.StackTrace.ToString()}");
             return StatusCode(500, ex.Message);
         }
 
-        public IActionResult HandleWebException(WebException ex)
+        internal IActionResult HandleWebException(WebException ex)
         {
             Console.Error.WriteLine($"Error ocurred:  {ex.ToString()}{Environment.NewLine}{ex.StackTrace.ToString()}");
             return StatusCode((int)ex.Status, ex.Message);

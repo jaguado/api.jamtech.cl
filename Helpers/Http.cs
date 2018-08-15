@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace API.Helpers
+namespace JAMTech.Helpers
 {
     /// <summary>
     /// Http helper class
