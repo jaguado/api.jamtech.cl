@@ -78,6 +78,10 @@ namespace JAMTech
                 await nextMiddleware();
             });
 
+
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+
             app.UseMvc();
             app.UseSwagger(c=>
             {
