@@ -90,7 +90,7 @@ namespace JAMTech
             app.UseSwaggerUI(c =>
             {
                 c.DocumentTitle = ApiTitle;
-                c.SwaggerEndpoint("v1/swagger.json", ApiTitle);
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", ApiTitle);
             });
         }
 
