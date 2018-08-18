@@ -19,8 +19,8 @@
 
   <ItemGroup>
     <PackageReference Include="HtmlAgilityPack" Version="1.8.6" />
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.9" />
-    <PackageReference Include="Microsoft.AspNetCore.Localization" Version="2.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Localization" Version="2.1.1" />
     <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.12.0-beta2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="3.0.0" />
   </ItemGroup>
@@ -58,7 +58,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netcoreapp2.1\JAMTech.xml</DocumentationFile>
+    <DocumentationFile>bin/Release/netcoreapp2.1/linux-x64/JAMTech.xml</DocumentationFile>
     <NoWarn>1701;1702;1705;1006;1591</NoWarn>
   </PropertyGroup>
 
