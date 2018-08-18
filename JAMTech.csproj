@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netcoreapp2.0\API.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\netcoreapp2.1\JAMTech.xml</DocumentationFile>
     <NoWarn>1701;1702;1705;1006;1591</NoWarn>
     <WarningLevel>2</WarningLevel>
     <DefineConstants>TRACE;DEBUG;NETCOREAPP;NETCOREAPP2_1</DefineConstants>
@@ -58,7 +58,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netcoreapp2.0\API.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\netcoreapp2.1\JAMTech.xml</DocumentationFile>
     <NoWarn>1701;1702;1705;1006;1591</NoWarn>
   </PropertyGroup>
 
