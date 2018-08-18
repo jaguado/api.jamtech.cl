@@ -6,3 +6,4 @@
 /bin/Debug/netcoreapp2.0
 /obj
 *.user
+/bin/Debug/netcoreapp2.1
