@@ -59,7 +59,7 @@ namespace JAMTech
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseRequestLocalization(BuildLocalizationOptions());
+            //app.UseRequestLocalization(BuildLocalizationOptions());
 
             // Middleware            
             app.Use(async (context, nextMiddleware) =>
