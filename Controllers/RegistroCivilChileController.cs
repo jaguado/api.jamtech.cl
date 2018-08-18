@@ -35,6 +35,9 @@ namespace JAMTech.Controllers
 
         private static async Task<string> GetIdState(string chileanId, string chileanIdSerialNumber, IdType type)
         {
+            //work around to avoid problems with some valide certificates on linux -> https://github.com/dotnet/corefx/issues/21429
+            ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
+        
             var tempUrl = string.Format(url, chileanId.Replace(".",""), chileanIdSerialNumber, Enum.GetName(typeof(IdType), type));
             var responseBody = await new HttpClient().GetStringAsync(tempUrl);
             var doc = new HtmlAgilityPack.HtmlDocument();
