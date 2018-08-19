@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Swagger;
@@ -33,6 +34,7 @@ namespace JAMTech
             {
                 options.SerializerSettings.ContractResolver = new DefaultContractResolver();
                 options.SerializerSettings.Converters.Add(new StringEnumConverter());
+                options.SerializerSettings.Formatting = Formatting.Indented;
             });
 
             services.AddSwaggerGen(c =>
@@ -57,7 +59,7 @@ namespace JAMTech
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseRequestLocalization(BuildLocalizationOptions());
+            //app.UseRequestLocalization(BuildLocalizationOptions());
 
             // Middleware            
             app.Use(async (context, nextMiddleware) =>
@@ -76,12 +78,19 @@ namespace JAMTech
                 await nextMiddleware();
             });
 
+
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+
             app.UseMvc();
-            app.UseSwagger();
+            app.UseSwagger(c=>
+            {
+                c.PreSerializeFilters.Add((swaggerDoc, httpReq) => swaggerDoc.Host = httpReq.Host.Value);
+            });
             app.UseSwaggerUI(c =>
             {
                 c.DocumentTitle = ApiTitle;
-                c.SwaggerEndpoint("v1/swagger.json", ApiTitle);
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", ApiTitle);
             });
         }
 
