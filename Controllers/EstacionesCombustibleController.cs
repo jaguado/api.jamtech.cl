@@ -18,7 +18,7 @@ namespace JAMTech.Controllers
     /// Encapsulate, extend and provides access to online information available on api.cne.cl
     /// </summary>
     [Route("v1/[controller]")]
-    public class EstacionesCombustibleController : Controller
+    public class EstacionesCombustibleController : CorsController
     {
         static readonly string url = @"http://api.cne.cl/v3/combustibles/{0}/estaciones?token=" + Environment.GetEnvironmentVariable("cne_token");
         const int cacheDurationInHours = 20; //in hours

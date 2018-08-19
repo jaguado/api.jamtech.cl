@@ -73,6 +73,7 @@ namespace JAMTech
                         Console.Out.WriteLineAsync(msg);
                     }
                     context.Response.Headers.Add("X-Robots-Tag", "noindex");
+                    context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
                     return Task.FromResult(0);
                 });
                 await nextMiddleware();
