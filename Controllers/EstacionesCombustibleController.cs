@@ -20,7 +20,7 @@ namespace JAMTech.Controllers
     [Route("v1/[controller]")]
     public class EstacionesCombustibleController : Controller
     {
-        const string url = @"http://api.cne.cl/v3/combustibles/{0}/estaciones?token=OMooZxxRzq";
+        static readonly string url = @"http://api.cne.cl/v3/combustibles/{0}/estaciones?token=" + Environment.GetEnvironmentVariable("cne_token");
         const int cacheDurationInHours = 20; //in hours
         const int skipDataBeforeInMonths = 1; //in months
 
