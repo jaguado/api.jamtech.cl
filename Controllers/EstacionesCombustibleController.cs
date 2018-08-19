@@ -40,14 +40,14 @@ namespace JAMTech.Controllers
                                                   (comuna == 0 || (r.id_comuna != null && r.id_comuna != string.Empty && int.Parse(r.id_comuna.ToString()) == comuna)) &&
                                                   (distributor == "" || (r.distribuidor != null && r.distribuidor.nombre != null && r.distribuidor.nombre == distributor))
                                               );
-            //dynamic filtering
+            
             var filters = Request.Query["filters"];
-            if (filters != string.Empty)
-            {
-                var query = BuildQueryFromRequest(filters, out List<object> values);
-                return new OkObjectResult(filteredResult.AsQueryable().Where(query, values.ToArray()));
-            }
-            return new OkObjectResult(filteredResult);
+            if (filters == string.Empty)
+                return new OkObjectResult(filteredResult);
+
+            //dynamic filtering
+            var query = BuildQueryFromRequest(filters, out List<object> values);
+            return new OkObjectResult(filteredResult.AsQueryable().Where(query, values.ToArray()));
         }
 
         private string BuildQueryFromRequest(Microsoft.Extensions.Primitives.StringValues filters, out List<object> values)
