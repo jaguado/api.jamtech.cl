@@ -35,29 +35,38 @@ namespace JAMTech.Controllers
         [Produces(typeof(List<Models.CombustibleStation>))]
         public async Task<IActionResult> GetStations(CombustibleType type, int region=0, int comuna = 0, string distributor="")
         {
-            var result = await GetDataAsync(type, Request);
-            if (result == null) return new NotFoundResult();
-
-            var filteredResult = result.Where(r => (region == 0 || (r.id_region != null && r.id_region != string.Empty && int.Parse(r.id_region.ToString()) == region)) &&
-                                                  (comuna == 0 || (r.id_comuna != null && r.id_comuna != string.Empty && int.Parse(r.id_comuna.ToString()) == comuna)) &&
-                                                  (distributor == "" || (r.distribuidor != null && r.distribuidor.nombre != null && r.distribuidor.nombre == distributor))
-                                              );
-
-            //dynamic filtering
-            var filters = Request.Query["filters"];
-            if (filters.Any())
+            try
             {
-                var query = BuildQueryFromRequest(filters, out List<object> values);
-                filteredResult = filteredResult.AsQueryable().Where(query, values.ToArray());
+                var result = await GetDataAsync(type, Request);
+                if (result == null) return new NotFoundResult();
+
+                var filteredResult = result.Where(r => (region == 0 || (r.id_region != null && r.id_region != string.Empty && int.Parse(r.id_region.ToString()) == region)) &&
+                                                      (comuna == 0 || (r.id_comuna != null && r.id_comuna != string.Empty && int.Parse(r.id_comuna.ToString()) == comuna)) &&
+                                                      (distributor == "" || (r.distribuidor != null && r.distribuidor.nombre != null && r.distribuidor.nombre == distributor))
+                                                  );
+
+                //dynamic filtering
+                var filters = Request.Query["filters"];
+                if (filters.Any())
+                {
+                    var query = BuildQueryFromRequest(filters, out List<object> values);
+                    filteredResult = filteredResult.AsQueryable().Where(query, values.ToArray());
+                }
+
+                //dynamic ordering
+                var order = Request.Query["order"];
+                if (order.Any())
+                    foreach (var o in order)
+                        filteredResult = filteredResult.AsQueryable().OrderBy(o);
+
+                return new OkObjectResult(filteredResult);
             }
-
-            //dynamic ordering
-            var order = Request.Query["order"];
-            if (order.Any())
-                foreach (var o in order)
-                    filteredResult = filteredResult.AsQueryable().OrderBy(o);
-
-            return new OkObjectResult(filteredResult);
+            catch(Exception ex)
+            {
+                var msg = $"{DateTime.Now.ToString()}|ERROR|{ex.Source}|{ex.Message}|{ex.StackTrace}";
+                await Console.Error.WriteLineAsync(msg);
+                return new StatusCodeResult(500);
+            }
         }
 
         private string BuildQueryFromRequest(Microsoft.Extensions.Primitives.StringValues filters, out List<object> values)
