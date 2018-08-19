@@ -21,16 +21,18 @@ namespace JAMTech.Controllers
     public class EstacionesCombustibleController : Controller
     {
         const string url = @"http://api.cne.cl/v3/combustibles/{0}/estaciones?token=OMooZxxRzq";
-        const int cacheDuration = 20; //hours
+        const int cacheDuration = 20; //in hours
 
         /// <summary>
         /// GET Stations with prices and other useful information
         /// </summary>
+        /// <param name="type">Kind of Combustible</param>
         /// <param name="region">Region Id. Ex: RM = 13</param>
         /// <param name="comuna">Comune Id</param>
         /// <param name="distributor">Distributor Id</param>
         /// <returns></returns>
         [HttpGet]
+        [Produces(typeof(List<Models.CombustibleStation>))]
         public async Task<IActionResult> GetStations(CombustibleType type, int region=0, int comuna = 0, string distributor="")
         {
             var result = await GetDataAsync(type, Request);
