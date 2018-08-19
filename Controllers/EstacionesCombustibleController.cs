@@ -20,8 +20,9 @@ namespace JAMTech.Controllers
     [Route("v1/[controller]")]
     public class EstacionesCombustibleController : Controller
     {
-        const string url = @"http://api.cne.cl/v3/combustibles/{0}/estaciones?token=OMooZxxRzq";
-        const int cacheDuration = 20; //in hours
+        static readonly string url = @"http://api.cne.cl/v3/combustibles/{0}/estaciones?token=" + Environment.GetEnvironmentVariable("cne_token");
+        const int cacheDurationInHours = 20; //in hours
+        const int skipDataBeforeInMonths = 1; //in months
 
         /// <summary>
         /// GET Stations with prices and other useful information
@@ -115,7 +116,7 @@ namespace JAMTech.Controllers
                     var newData = JsonConvert.DeserializeObject<JObject>(await result.Content.ReadAsStringAsync());
                     var stations = JsonConvert.DeserializeObject<List<Models.CombustibleStation>>(newData["data"].ToString());
 
-                    var newValue = new Tuple<DateTime, List<Models.CombustibleStation>>(DateTime.Now.AddHours(cacheDuration), stations);
+                    var newValue = new Tuple<DateTime, List<Models.CombustibleStation>>(DateTime.Now.AddHours(cacheDurationInHours), stations.Where(s=> s.fecha_hora_actualizacion!=null && DateTime.Parse(s.fecha_hora_actualizacion)>DateTime.Now.AddMonths(skipDataBeforeInMonths * -1)).ToList());
                     if (data.Value == null)
                         memStore.Add(typeName, newValue);
                     else
