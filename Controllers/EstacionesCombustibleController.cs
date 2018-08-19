@@ -52,12 +52,8 @@ namespace JAMTech.Controllers
             //dynamic ordering
             var order = Request.Query["order"];
             if (order.Any())
-            {
-                foreach(var o in order)
-                {
+                foreach (var o in order)
                     filteredResult = filteredResult.AsQueryable().OrderBy(o);
-                }
-            }
 
             return new OkObjectResult(filteredResult);
         }
