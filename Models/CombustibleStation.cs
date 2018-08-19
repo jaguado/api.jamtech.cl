@@ -49,14 +49,16 @@ namespace JAMTech.Models
     public class Precios
     {
         [JsonProperty("gasolina 93")]
-        public int gasolina_93 { get; set; }
+        public double gasolina_93 { get; set; }
         [JsonProperty("gasolina 97")]
-        public int gasolina_97 { get; set; }
+        public double gasolina_97 { get; set; }
         [JsonProperty("petroleo diesel")]
-        public int petroleo_diesel { get; set; }
+        public double petroleo_diesel { get; set; }
         [JsonProperty("gasolina 95")]
-        public int gasolina_95 { get; set; }
-        public int kerosene { get; set; }
+        public double gasolina_95 { get; set; }
+        public double kerosene { get; set; }
+        [JsonProperty("glp vehicular")]
+        public string glp_vehicular { get; set; }
     }
 
     public class MetodosDePago
