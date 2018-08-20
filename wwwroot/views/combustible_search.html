@@ -1,0 +1,90 @@
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>Forum</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="index.html">Home</a>
+            </li>
+            <li class="active">
+                <strong>Combustible Search</strong>
+            </li>
+        </ol>
+    </div>
+</div>
+<div class="wrapper wrapper-content" ng-controller="StationsCtrl as main">
+    <div class="row animated fadeInRight">
+        <div class="col-lg-12">
+        <div class="wrapper wrapper-content animated fadeInRight">
+
+        <div class="ibox-content m-b-sm border-bottom">
+            <div class="p-xs">
+                <div class="pull-left m-r-md">
+                    <i class="fas fa-gas-pump text-navy mid-icon"></i>
+                </div>
+                <h2>Combustible stations finder<h2>
+                <span>Powered by http://api.jamtech.cl</span>
+            </div>
+        </div>
+
+        <div class="ibox-content forum-container">
+
+        <div class="forum-title">
+            <div class="pull-right forum-desc">
+                <samll>{{stations.length}} stations found in a {{maxDistance}} meters radius</samll>
+            </div>
+            <br />
+        </div>
+
+        <div class="forum-item active" ng-repeat="station in stations | orderBy:'ubicacion.distancia'">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="forum-icon">
+                        <img ng-src="{{station.distribuidor.logo_svg}}" height="32px" width="32px" alt="{{station.distribuidor.nombre}}" />
+                    </div>
+                    <a class="forum-item-title">{{station.razon_social}}</a>
+                    <br \>
+                    <div class="forum-sub-title">
+                        <b>Otros servicios disponibles:</b>
+                        <span ng-repeat="(key, value) in station.servicios" ng-if="value">
+                            {{key}}
+                        </span>
+                    </div>
+                    <div class="forum-sub-title">
+                        <b>Formas de pago:</b>
+                        <span ng-repeat="(key, value) in station.metodos_de_pago" ng-if="value">
+                            {{key}}
+                        </span>
+                    </div>
+                    <div class="forum-sub-title">
+                        <b>Dirección:</b>
+                        <span>
+                            {{station.direccion_calle}} {{station.direccion_numero}} / {{station.nombre_comuna}}
+                        </span>
+                        <a target="_blank" ng-href="http://www.google.com/maps/place/{{station.ubicacion.latitud}},{{station.ubicacion.longitud}}">&nbsp;¿Como llegar?&nbsp;<i class="fas fa-map-marked-alt"></i></a>
+                        <small>{{station.ubicacion.distancia | number:0}} metros aprox.</small>
+                    </div>
+                    <div class="forum-sub-title">
+                        <b>Horario:</b>
+                        <span>
+                            {{station.horario_atencion}}
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-1 forum-info"  ng-repeat="(key, value) in station.precios" ng-if="value > 0">
+                    <span class="views-number">
+                        {{value | currency : "$" : 0}}
+                    </span>
+                    <div>
+                        <small>{{key}}</small>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">  
+                    <small class="pull-right"><b>Fecha actualizaci&oacute;n:&nbsp;</b>{{station.fecha_hora_actualizacion}}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
