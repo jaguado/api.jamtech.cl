@@ -70,4 +70,5 @@ namespace JAMTech.Models
         [JsonProperty("tarjetas grandes tiendas")]
         public bool tarjetas_grandes_tiendas { get; set; }
     }
+
 }

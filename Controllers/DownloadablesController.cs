@@ -18,7 +18,7 @@ namespace JAMTech.Controllers
     /// Allow to get all directories and files from one or more urls
     /// </summary>
     [Route("v1/[controller]")]
-    public class DownloadablesController : CorsController
+    public class DownloadablesController : BaseController
     {
         /// <summary>
         /// Allow to find downloadables files of a specified extension on one or more urls

@@ -15,7 +15,7 @@ namespace JAMTech.Controllers
     /// API to TPB
     /// </summary>
     [Route("v1/[controller]")]
-    public class TorrentController: CorsController
+    public class TorrentController: BaseController
     {
         // GET: api/Torrent/movie
         /// <summary>

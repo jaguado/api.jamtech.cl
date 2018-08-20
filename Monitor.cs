@@ -39,7 +39,7 @@ namespace JAMTech
 
         private void Run()
         {
-            Console.WriteLine("Starting '{_url}' monitoring at {DateTime.Now}");
+            Console.WriteLine($"Starting '{_url}' monitoring at {DateTime.Now}");
             while (!_exit)
             {
                 Thread.Sleep(_interval);
