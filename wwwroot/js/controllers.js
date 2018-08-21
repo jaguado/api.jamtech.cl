@@ -23,12 +23,19 @@ function StationsCtrl($http, $scope) {
         return $http.get(stationsUrl).then(function(response){
             var tempStations=response.data;
             $scope.searchText = $scope.searchTextTemp;
+
             //add distance
             if($scope.position!=null){
                 tempStations.forEach(function(station) {
                     station.ubicacion.distancia = getDistanceBetweenTwoPointsInMeters(station.ubicacion.latitud, station.ubicacion.longitud, $scope.position.coords.latitude, $scope.position.coords.longitude);
                 });
             }
+
+            //rank prices
+            tempStations.forEach(function(station) {
+                
+            });
+
             //TODO put filter in parameters
             $scope.stations=tempStations.filter(function(station){
                 return station.ubicacion.distancia == null || station.ubicacion.distancia < $scope.maxDistance;
