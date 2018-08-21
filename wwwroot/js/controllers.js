@@ -14,7 +14,7 @@ function MainCtrl() {
 };
 
 function StationsCtrl($http, $scope) {
-    $scope.maxDistance = 10000;
+    $scope.maxDistance = 5000;
     //TODO dynamic url depending of location 
     var stationsUrl = '//jamtechapi.herokuapp.com/v1/CombustibleStations?type=Vehicular&region=13&order=precios.gasolina_95';
     $scope.searchText="";
