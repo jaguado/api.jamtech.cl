@@ -62,11 +62,11 @@ namespace JAMTech.Models
         public string glp_vehicular { get; set; }
 
         [JsonProperty("ranking gasolina 93")]
-        public int ranking_93 { get; set; } = -1;
+        public int ranking_gasolina_93 { get; set; } = -1;
         [JsonProperty("ranking gasolina 95")]
-        public int ranking_95 { get; set; } = -1;
+        public int ranking_gasolina_95 { get; set; } = -1;
         [JsonProperty("ranking gasolina 97")]
-        public int ranking_97 { get; set; } = -1;
+        public int ranking_gasolina_97 { get; set; } = -1;
         [JsonProperty("ranking kerosene")]
         public int ranking_kerosene { get; set; } = -1;
         [JsonProperty("ranking petroleo diesel")]

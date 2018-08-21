@@ -112,11 +112,11 @@ namespace JAMTech.Controllers
             foreach (var station in filteredResult)
             {
                 if (station.precios.gasolina_93 > 0)
-                    station.precios.ranking_93 = Array.IndexOf(ranking93, station.precios.gasolina_93) + 1;
+                    station.precios.ranking_gasolina_93 = Array.IndexOf(ranking93, station.precios.gasolina_93) + 1;
                 if (station.precios.gasolina_95 > 0)
-                    station.precios.ranking_95 = Array.IndexOf(ranking95, station.precios.gasolina_95) + 1;
+                    station.precios.ranking_gasolina_95 = Array.IndexOf(ranking95, station.precios.gasolina_95) + 1;
                 if (station.precios.gasolina_97 > 0)
-                    station.precios.ranking_97 = Array.IndexOf(ranking97, station.precios.gasolina_97) + 1;
+                    station.precios.ranking_gasolina_97 = Array.IndexOf(ranking97, station.precios.gasolina_97) + 1;
                 if (station.precios.kerosene > 0)
                     station.precios.ranking_kerosene = Array.IndexOf(rankingKerosene, station.precios.kerosene) + 1;
                 if (station.precios.petroleo_diesel > 0)
