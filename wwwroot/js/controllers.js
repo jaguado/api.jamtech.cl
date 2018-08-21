@@ -68,7 +68,13 @@ function getDistanceBetweenTwoPointsInMeters (lat1,lon1,lat2,lon2) {
     return d;
 };
 
+
 angular
     .module('inspinia')
     .controller('MainCtrl', MainCtrl)
     .controller('StationsCtrl', StationsCtrl)
+    .filter('capitalize', function() {
+        return function(input) {
+          return (!!input) ? input.charAt(0).toUpperCase() + input.substr(1).toLowerCase() : '';
+        }
+    });
