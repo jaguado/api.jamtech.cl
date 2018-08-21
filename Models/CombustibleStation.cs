@@ -49,14 +49,16 @@ namespace JAMTech.Models
 
     public class Precios
     {
-        [JsonProperty("gasolina 93")]
+        [JsonProperty("gasolina 93", Order = 1)]
         public double gasolina_93 { get; set; }
-        [JsonProperty("gasolina 97")]
-        public double gasolina_97 { get; set; }
-        [JsonProperty("gasolina 95")]
+        [JsonProperty("gasolina 95", Order = 2)]
         public double gasolina_95 { get; set; }
-        [JsonProperty("petroleo diesel")]
+        [JsonProperty("gasolina 97", Order = 3)]
+        public double gasolina_97 { get; set; }
+
+        [JsonProperty("petroleo diesel", Order =4)]
         public double petroleo_diesel { get; set; }
+        [JsonProperty(Order = 5)]
         public double kerosene { get; set; }
         [JsonProperty("glp vehicular")]
         public string glp_vehicular { get; set; }
