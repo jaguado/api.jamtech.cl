@@ -40,9 +40,12 @@ function StationsCtrl($http, $scope) {
             console.log('position', position);
             $scope.searchStations();
           });
+        },
+        function(error) {
+            //load stations without location
+            $scope.searchStations();
         });
     };
-    $scope.searchStations();   
 }
 
 function deg2rad(deg) {
