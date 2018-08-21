@@ -75,4 +75,15 @@ angular
         return function(input) {
           return (!!input) ? input.charAt(0).toUpperCase() + input.substr(1).toLowerCase() : '';
         }
+     })
+    .filter('toArray', function () {
+        'use strict';
+        return function (obj) {
+            if (!(obj instanceof Object)) {
+                return obj;
+            }
+            return Object.keys(obj).map(function (key) {
+                return Object.defineProperty(obj[key], '$key', {__proto__: null, value: key});
+            });
+        }
     });
