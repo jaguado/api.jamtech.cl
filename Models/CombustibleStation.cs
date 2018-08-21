@@ -17,6 +17,7 @@ namespace JAMTech.Models
     {
         public double latitud { get; set; }
         public double longitud { get; set; }
+        public double distancia { get; set; }
     }
 
     public class Servicios

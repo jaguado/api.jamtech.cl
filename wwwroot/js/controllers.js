@@ -14,33 +14,20 @@ function MainCtrl() {
 };
 
 function StationsCtrl($http, $scope) {
-    $scope.maxDistance = 5000;
+    $scope.maxDistance = 10000;
     //TODO dynamic url depending of location 
     var stationsUrl = '//jamtechapi.herokuapp.com/v1/CombustibleStations?type=Vehicular&region=13&order=precios.gasolina_95';
     $scope.searchText="";
     $scope.stations=[];
 
     $scope.searchStations = function() {
+        if($scope.position!=null){
+            stationsUrl += '&lat=' + $scope.position.coords.latitude +'&lng=' + $scope.position.coords.longitude;
+            stationsUrl += '&filters=ubicacion.distancia<' + $scope.maxDistance; 
+        }
         return $http.get(stationsUrl).then(function(response){
-            var tempStations=response.data;
+            $scope.stations=response.data;
             $scope.searchText = $scope.searchTextTemp;
-
-            //add distance
-            if($scope.position!=null){
-                tempStations.forEach(function(station) {
-                    station.ubicacion.distancia = getDistanceBetweenTwoPointsInMeters(station.ubicacion.latitud, station.ubicacion.longitud, $scope.position.coords.latitude, $scope.position.coords.longitude);
-                });
-            }
-
-            //rank prices
-            tempStations.forEach(function(station) {
-                
-            });
-
-            //TODO put filter in parameters
-            $scope.stations=tempStations.filter(function(station){
-                return station.ubicacion.distancia == null || station.ubicacion.distancia < $scope.maxDistance;
-            });
             console.log('searchStations', $scope.stations);
             return true;
         });

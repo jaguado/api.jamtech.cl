@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using JAMTech.Extensions;
+using JAMTech.Helpers.Geo;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -51,8 +52,18 @@ namespace JAMTech.Controllers
                                                        (distributor == string.Empty || (r.distribuidor != null && r.distribuidor.nombre != null && r.distribuidor.nombre == distributor))
                                                   );
 
+                //add distance
+                var lat = Request.Query["lat"].ToString();
+                var lng = Request.Query["lng"].ToString();
+                if (lat != string.Empty && lng != string.Empty)
+                    AddDistance(filteredResult, double.Parse(lat), double.Parse(lng));
+
+              
                 //dynamic filtering
                 filteredResult = FilterResult(filteredResult);
+
+                //add prices ranking
+                AddRanking(filteredResult);
 
                 //dynamic ordering
                 filteredResult = OrderResult(filteredResult);
@@ -112,6 +123,18 @@ namespace JAMTech.Controllers
                     station.precios.ranking_diesel = Array.IndexOf(rankingDiesel, station.precios.petroleo_diesel) + 1;
             }
         }
+        private static void AddDistance(IEnumerable<Models.CombustibleStation> filteredResult, double lat, double lng)
+        {
+            foreach (var station in filteredResult)
+            {
+                station.ubicacion.distancia = new Coordinates(station.ubicacion.latitud, station.ubicacion.longitud)
+                 .DistanceTo(
+                     new Coordinates(lat, lng),
+                     UnitOfLength.Kilometers
+                 ) * 1000; //meters
+
+            }
+        }
 
         private static async Task<List<Models.CombustibleStation>> GetStationsWithCache(CombustibleType type, HttpRequest context)
         {
@@ -128,8 +151,7 @@ namespace JAMTech.Controllers
                     var stations = JsonConvert.DeserializeObject<List<Models.CombustibleStation>>(newData["data"].ToString());
 
                     var newValue = new Tuple<DateTime, List<Models.CombustibleStation>>(DateTime.Now.AddHours(cacheDurationInHours), stations.Where(s => s.fecha_hora_actualizacion != null && DateTime.Parse(s.fecha_hora_actualizacion) > DateTime.Now.AddMonths(skipDataBeforeInMonths * -1)).ToList());
-                    //add prices ranking
-                    AddRanking(newValue.Item2);
+
                     if (data.Value == null)
                         memStore.Add(typeName, newValue);
                     else
