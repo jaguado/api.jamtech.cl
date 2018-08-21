@@ -1,0 +1,85 @@
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-9">
+        <h2>Smart Search</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="index.html">Home</a>
+            </li>
+            <li class="active">
+                <strong>Smart Search</strong>
+            </li>
+        </ol>
+    </div>
+</div>
+<div class="wrapper wrapper-content animated fadeInRight" ng-controller="StationsCtrl as main">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <h2>
+                        2,160 results found for: <span class="text-navy">“{{searchText}}”</span>
+                    </h2>
+                    <small>Request time ({time} seconds)</small>
+
+                    <div class="search-form">
+                        <form>
+                            <div class="input-group">
+                                <input type="text" placeholder="Bencina cerca" name="search" class="form-control input-lg" ng-model="searchTextTemp">
+
+                                <div class="input-group-btn">
+                                    <button class="btn btn-lg btn-primary" type="button" ng-click="searchStations()" ng-keypress="($event.which === 13)?searchStations():0">
+                                        Search
+                                    </button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+
+                    <div class="wrapper wrapper-content">
+                        <div class="row">
+                            <div class="col-lg-10 col-lg-offset-1">
+                                <slick init-onload=true data=stations class="slick_demo_2" infinite="true" slides-to-show="5" slides-to-scroll="3" center-mode="true"
+                                responsive="[ { breakpoint: 1024, settings: { slidesToShow: 3, slidesToScroll: 1, infinite: true, dots: true } }, { breakpoint: 600, settings: { slidesToShow: 2, slidesToScroll: 2 } }, { breakpoint: 480, settings: { slidesToShow: 1, slidesToScroll: 1 } } ]" >
+                                    <div ng-repeat="station in stations">
+                                        <div class="ibox-content" >
+                                            <img ng-src="{{station.distribuidor.logo_svg}}" height="32px" width="32px" />
+                                            <br \>
+                                            <p>{{station.razon_social}}</p>
+                                            <p>Precios</p>
+                                            <div ng-repeat="(key, value) in station.precios">
+                                                <div class="row" ng-if="value > 0" >
+                                                    <b>{{key}}:</b> {{value}}
+                                                </div>
+                                            </div>
+                                            <p>Formas de Pago</p>
+                                            <div ng-repeat="(key, value) in station.metodos_de_pago">
+                                                <div class="row" ng-if="value" >
+                                                    <b>{{key}}</b>
+                                                </div>
+                                            </div>
+                                            <p>Servicios</p>
+                                            <div ng-repeat="(key, value) in station.servicios">
+                                                <div class="row" ng-if="value" >
+                                                    <b>{{key}}</b>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>    
+                                </slick>                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Additional style only for demo purpose -->
+<style>
+    .slick_demo_2 .ibox-content {
+        margin: 0 10px;
+    }
+</style>

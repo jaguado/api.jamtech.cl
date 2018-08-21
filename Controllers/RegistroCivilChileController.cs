@@ -12,7 +12,7 @@ namespace JAMTech.Controllers
     /// Encapsulate and provides access to online service on RegistroCivil.cl
     /// </summary>
     [Route("v1/[controller]")]
-    public class RegistroCivilChileController : Controller
+    public class RegistroCivilChileController : BaseController
     {
         const string url = @"https://portal.sidiv.registrocivil.cl/usuarios-portal/pages/DocumentRequestStatus.xhtml?RUN={0}&type={2}&serial={1}";
         const string resultTableId = "tableResult";

@@ -17,6 +17,7 @@ namespace JAMTech.Models
     {
         public double latitud { get; set; }
         public double longitud { get; set; }
+        public double distancia { get; set; }
     }
 
     public class Servicios
@@ -59,6 +60,17 @@ namespace JAMTech.Models
         public double kerosene { get; set; }
         [JsonProperty("glp vehicular")]
         public string glp_vehicular { get; set; }
+
+        [JsonProperty("ranking gasolina 93")]
+        public int ranking_gasolina_93 { get; set; } = -1;
+        [JsonProperty("ranking gasolina 95")]
+        public int ranking_gasolina_95 { get; set; } = -1;
+        [JsonProperty("ranking gasolina 97")]
+        public int ranking_gasolina_97 { get; set; } = -1;
+        [JsonProperty("ranking kerosene")]
+        public int ranking_kerosene { get; set; } = -1;
+        [JsonProperty("ranking petroleo diesel")]
+        public int ranking_diesel { get; set; } = -1;
     }
 
     public class MetodosDePago
@@ -70,4 +82,5 @@ namespace JAMTech.Models
         [JsonProperty("tarjetas grandes tiendas")]
         public bool tarjetas_grandes_tiendas { get; set; }
     }
+
 }

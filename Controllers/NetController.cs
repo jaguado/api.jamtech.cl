@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace JAMTech.Controllers
 {
     [Route("v1/[controller]")]
-    public class NetController : CorsController
+    public class NetController : BaseController
     {
         //TODO convert to ASYNC
         // Post /ping
