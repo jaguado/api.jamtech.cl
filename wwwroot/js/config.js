@@ -7,7 +7,7 @@
  *
  */
 function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
-    $urlRouterProvider.otherwise("/index/combustible");
+    $urlRouterProvider.otherwise("/combustible");
 
     $ocLazyLoadProvider.config({
         // Set to true if you want to see what and when is dynamically loaded
@@ -41,6 +41,11 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         })
         .state('index.combustible', {
             url: "/combustible",
+            templateUrl: "views/combustible_search.html",
+            data: { pageTitle: 'Combustible Search' }
+        })
+        .state('combustible', {
+            url: "/standalone/combustible",
             templateUrl: "views/combustible_search.html",
             data: { pageTitle: 'Combustible Search' }
         })
