@@ -23,7 +23,7 @@
                         <i class="fas fa-gas-pump text-navy mid-icon"></i>
                     </div>
                     <h2>Combustible stations finder<h2>
-                    <span>Powered by http://api.jamtech.cl</span>
+                    <small>Powered by http://api.jamtech.cl</small>
                 </div>
             </div>
 
@@ -39,7 +39,7 @@
             <div class="forum-item active" ng-repeat="station in stations | orderBy:'ubicacion.distancia'">
                 <div class="row">
                     <!--Station description -->
-                    <div class="col-md-6">
+                    <div class="col-lg-6">
                         <div class="forum-icon">
                             <img ng-src="{{station.distribuidor.logo_svg}}" height="32px" width="32px" alt="{{station.distribuidor.nombre}}" />
                         </div>
@@ -70,7 +70,29 @@
                             </span>
                         </div>
                         <br />
-                        <div class="forum-sub-title">
+                    </div>
+                    <!-- Prices -->
+                    <div class="col-lg-6 text-center">
+                        <div class="row">
+                            <div class="col-md-3"  ng-repeat="(key, value) in station.precios" ng-if="value > 0">
+                                    <span class="views-number">
+                                        <br />
+                                        <br />
+                                        {{value | currency : "$" : 0}}
+                                        <br />
+                                        <small>{{key | capitalize}}</small>
+                                    </span>
+                            </div>
+                            <br />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">  
+                        <small class="pull-left"><b>Fecha actualizaci&oacute;n&nbsp;</b><br />{{station.fecha_hora_actualizacion}}</small>
+                    </div>
+                    <div class="col-lg-6">  
+                        <div class="pull-right">
                             <a target="_blank" ng-href="http://www.google.com/maps/place/{{station.ubicacion.latitud}},{{station.ubicacion.longitud}}">
                                 <i class="fas fa-map-marked-alt"></i>
                                 ¿Como llegar?
@@ -79,28 +101,7 @@
                             <small>{{station.ubicacion.distancia | number:0}} metros aprox.</small>
                         </div>
                     </div>
-                    <br />
-                    <!-- Prices -->
-                    <div class="col-md-6 text-center">
-                        <div class="row">
-                            <div class="col-sm-3"  ng-repeat="(key, value) in station.precios" ng-if="value > 0">
-                                    <span class="views-number">
-                                        <br />
-                                        {{value | currency : "$" : 0}}
-                                        <br />
-                                        <br />
-                                        <small>{{key | capitalize}}</small>
-                                    </span>
-                            </div>
-                        </div>
-                    </div>
                 </div>
-                <div class="row">
-                        <div class="col-12">  
-                            <br />
-                            <small class="pull-right"><b>Fecha actualizaci&oacute;n&nbsp;</b><br />{{station.fecha_hora_actualizacion}}</small>
-                        </div>
-                    </div>
             </div>
         </div>
     </div>
