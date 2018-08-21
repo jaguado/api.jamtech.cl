@@ -74,14 +74,17 @@
                     <!-- Prices -->
                     <div class="col-lg-6 text-center">
                         <div class="row">
-                            <div class="col-md-3"  ng-repeat="(key, value) in station.precios" ng-if="value > 0">
+                            <div class="col-md-3"  ng-repeat="(key, value) in station.precios" ng-if="value > 0 && !key.startsWith('ranking')">
                                     <span class="views-number">
                                         <br />
                                         <br />
                                         {{value | currency : "$" : 0}}
                                         <br />
                                         <small>{{key | capitalize}}</small>
+                                        <br />
+                                        <br />
                                     </span>
+                                    <span><b>Rank</b><br />{{station.precios['ranking ' + key]}}</span>
                             </div>
                             <br />
                         </div>
