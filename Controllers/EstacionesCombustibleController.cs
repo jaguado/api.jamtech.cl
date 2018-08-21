@@ -46,19 +46,20 @@ namespace JAMTech.Controllers
                 var result = await GetStationsWithCache(type, Request);
                 if (result == null) return new NotFoundResult();
 
-                var filteredResult = result.Where(r => (region == 0 || (r.id_region != null && r.id_region.ToString() == region.ToString().PadLeft(2,'0'))) &&
+                var filteredResult = result.Where(r => (region == 0 || (r.id_region != null && r.id_region.ToString() == region.ToString().PadLeft(2, '0'))) &&
                                                        (comuna == 0 || (r.id_comuna != null && r.id_comuna.ToString() == comuna.ToString().PadLeft(2, '0'))) &&
                                                        (distributor == string.Empty || (r.distribuidor != null && r.distribuidor.nombre != null && r.distribuidor.nombre == distributor))
                                                   );
 
                 //dynamic filtering
                 filteredResult = FilterResult(filteredResult);
+
                 //dynamic ordering
                 filteredResult = OrderResult(filteredResult);
-
+                
                 return new OkObjectResult(filteredResult);
             }
-            catch(WebException wex)
+            catch (WebException wex)
             {
                 return HandleWebException(wex);
             }
@@ -67,6 +68,51 @@ namespace JAMTech.Controllers
                 return HandleException(ex);
             }
         }
+
+        private static void AddRanking(IEnumerable<Models.CombustibleStation> filteredResult)
+        {
+            var ranking = new Dictionary<string, List<double>>();
+            ranking.Add("gasolina 93", new List<double>());
+            ranking.Add("gasolina 95", new List<double>());
+            ranking.Add("gasolina 97", new List<double>());
+            ranking.Add("kerosene", new List<double>());
+            ranking.Add("petroleo diesel", new List<double>());
+
+            foreach (var station in filteredResult)
+            {
+                if(station.precios.gasolina_93>0)
+                    ranking["gasolina 93"].Add(station.precios.gasolina_93);
+                if (station.precios.gasolina_95 > 0)
+                    ranking["gasolina 95"].Add(station.precios.gasolina_95);
+                if (station.precios.gasolina_97 > 0)
+                    ranking["gasolina 97"].Add(station.precios.gasolina_97);
+                if (station.precios.kerosene > 0)
+                    ranking["kerosene"].Add(station.precios.kerosene);
+                if (station.precios.petroleo_diesel > 0)
+                    ranking["petroleo diesel"].Add(station.precios.petroleo_diesel);
+            }
+
+            var ranking93 = ranking["gasolina 93"].Distinct().OrderBy(o => o).ToArray();
+            var ranking95 = ranking["gasolina 95"].Distinct().OrderBy(o => o).ToArray();
+            var ranking97 = ranking["gasolina 97"].Distinct().OrderBy(o => o).ToArray();
+            var rankingKerosene = ranking["kerosene"].Distinct().OrderBy(o => o).ToArray();
+            var rankingDiesel = ranking["petroleo diesel"].Distinct().OrderBy(o => o).ToArray();
+
+            foreach (var station in filteredResult)
+            {
+                if (station.precios.gasolina_93 > 0)
+                    station.precios.ranking_93 = Array.IndexOf(ranking93, station.precios.gasolina_93) + 1;
+                if (station.precios.gasolina_95 > 0)
+                    station.precios.ranking_95 = Array.IndexOf(ranking95, station.precios.gasolina_95) + 1;
+                if (station.precios.gasolina_97 > 0)
+                    station.precios.ranking_97 = Array.IndexOf(ranking97, station.precios.gasolina_97) + 1;
+                if (station.precios.kerosene > 0)
+                    station.precios.ranking_kerosene = Array.IndexOf(rankingKerosene, station.precios.kerosene) + 1;
+                if (station.precios.petroleo_diesel > 0)
+                    station.precios.ranking_diesel = Array.IndexOf(rankingDiesel, station.precios.petroleo_diesel) + 1;
+            }
+        }
+
         private static async Task<List<Models.CombustibleStation>> GetStationsWithCache(CombustibleType type, HttpRequest context)
         {
             const string name = "estaciones";
@@ -82,6 +128,8 @@ namespace JAMTech.Controllers
                     var stations = JsonConvert.DeserializeObject<List<Models.CombustibleStation>>(newData["data"].ToString());
 
                     var newValue = new Tuple<DateTime, List<Models.CombustibleStation>>(DateTime.Now.AddHours(cacheDurationInHours), stations.Where(s => s.fecha_hora_actualizacion != null && DateTime.Parse(s.fecha_hora_actualizacion) > DateTime.Now.AddMonths(skipDataBeforeInMonths * -1)).ToList());
+                    //add prices ranking
+                    AddRanking(newValue.Item2);
                     if (data.Value == null)
                         memStore.Add(typeName, newValue);
                     else
