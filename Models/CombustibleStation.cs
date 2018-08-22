@@ -49,28 +49,32 @@ namespace JAMTech.Models
 
     public class Precios
     {
-        [JsonProperty("gasolina 93")]
+        [JsonProperty("gasolina 93", Order = 1)]
         public double gasolina_93 { get; set; }
-        [JsonProperty("gasolina 97")]
-        public double gasolina_97 { get; set; }
-        [JsonProperty("petroleo diesel")]
-        public double petroleo_diesel { get; set; }
-        [JsonProperty("gasolina 95")]
+        [JsonProperty("gasolina 95", Order = 2)]
         public double gasolina_95 { get; set; }
+        [JsonProperty("gasolina 97", Order = 3)]
+        public double gasolina_97 { get; set; }
+
+        [JsonProperty("petroleo diesel", Order =4)]
+        public double petroleo_diesel { get; set; }
+        [JsonProperty(Order = 5)]
         public double kerosene { get; set; }
         [JsonProperty("glp vehicular")]
         public string glp_vehicular { get; set; }
 
         [JsonProperty("ranking gasolina 93")]
-        public int ranking_gasolina_93 { get; set; } = -1;
+        public int ranking_gasolina_93 { get; set; } = 99;
         [JsonProperty("ranking gasolina 95")]
-        public int ranking_gasolina_95 { get; set; } = -1;
+        public int ranking_gasolina_95 { get; set; } = 99;
         [JsonProperty("ranking gasolina 97")]
-        public int ranking_gasolina_97 { get; set; } = -1;
+        public int ranking_gasolina_97 { get; set; } = 99;
         [JsonProperty("ranking kerosene")]
-        public int ranking_kerosene { get; set; } = -1;
+        public int ranking_kerosene { get; set; } = 99;
         [JsonProperty("ranking petroleo diesel")]
-        public int ranking_diesel { get; set; } = -1;
+        public int ranking_diesel { get; set; } = 99;
+        [JsonProperty("ranking glp vehicular")]
+        public int ranking_glp_vehicular { get; set; } = 99;
     }
 
     public class MetodosDePago

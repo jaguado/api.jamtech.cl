@@ -22,7 +22,8 @@ namespace JAMTech.Controllers
     public class CombustibleStationsController : BaseController
     {
         static readonly string url = @"https://api.cne.cl/v3/combustibles/{0}/{1}?token=" + Environment.GetEnvironmentVariable("cne_token");
-        
+        static readonly string urlRegions = @"https://apis.digital.gob.cl/dpa/regiones";
+
         const int cacheDurationInHours = 20; //in hours
         const int skipDataBeforeInMonths = 1; //in months
         
@@ -68,7 +69,9 @@ namespace JAMTech.Controllers
                 //dynamic ordering
                 filteredResult = OrderResult(filteredResult);
                 
-                return new OkObjectResult(filteredResult);
+                if(Request.Query["getall"]!=string.Empty)
+                    return new OkObjectResult(filteredResult);
+                return new OkObjectResult(filteredResult.Take(1000));
             }
             catch (WebException wex)
             {
@@ -88,6 +91,7 @@ namespace JAMTech.Controllers
             ranking.Add("gasolina 97", new List<double>());
             ranking.Add("kerosene", new List<double>());
             ranking.Add("petroleo diesel", new List<double>());
+            ranking.Add("glp vehicular", new List<double>());
 
             foreach (var station in filteredResult)
             {
@@ -101,6 +105,8 @@ namespace JAMTech.Controllers
                     ranking["kerosene"].Add(station.precios.kerosene);
                 if (station.precios.petroleo_diesel > 0)
                     ranking["petroleo diesel"].Add(station.precios.petroleo_diesel);
+                if (station.precios.glp_vehicular != null && station.precios.glp_vehicular != "")
+                    ranking["glp vehicular"].Add(double.Parse(station.precios.glp_vehicular));
             }
 
             var ranking93 = ranking["gasolina 93"].Distinct().OrderBy(o => o).ToArray();
@@ -108,6 +114,8 @@ namespace JAMTech.Controllers
             var ranking97 = ranking["gasolina 97"].Distinct().OrderBy(o => o).ToArray();
             var rankingKerosene = ranking["kerosene"].Distinct().OrderBy(o => o).ToArray();
             var rankingDiesel = ranking["petroleo diesel"].Distinct().OrderBy(o => o).ToArray();
+            var rankingGlp= ranking["glp vehicular"].Distinct().OrderBy(o => o).ToArray();
+
 
             foreach (var station in filteredResult)
             {
@@ -121,6 +129,8 @@ namespace JAMTech.Controllers
                     station.precios.ranking_kerosene = Array.IndexOf(rankingKerosene, station.precios.kerosene) + 1;
                 if (station.precios.petroleo_diesel > 0)
                     station.precios.ranking_diesel = Array.IndexOf(rankingDiesel, station.precios.petroleo_diesel) + 1;
+                if (station.precios.glp_vehicular != null && station.precios.glp_vehicular != "")
+                    station.precios.ranking_glp_vehicular = Array.IndexOf(rankingGlp, double.Parse(station.precios.glp_vehicular)) + 1;
             }
         }
         private static void AddDistance(IEnumerable<Models.CombustibleStation> filteredResult, double lat, double lng)
@@ -201,6 +211,45 @@ namespace JAMTech.Controllers
                             {
                                 if(!memStoreFilters.ContainsKey(name))
                                     memStoreFilters.Add(name, result.data);
+                            }
+                        }
+                    }
+                }
+                return new OkObjectResult(memStoreFilters[name]);
+            }
+            catch (WebException wex)
+            {
+                return HandleWebException(wex);
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
+
+        /// <summary>
+        /// GET Regions
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("Regions")]
+        public async Task<IActionResult> GetRegions()
+        {
+            try
+            {
+                var name = "regions";
+                var cache = memStoreFilters.ContainsKey(name);
+                if (!cache)
+                {
+                    var response = await GetResponse(urlRegions);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var result = await response.Content.ReadAsAsync<dynamic>();
+                        if (result != null)
+                        {
+                            lock (memStoreFilters)
+                            {
+                                if (!memStoreFilters.ContainsKey(name))
+                                    memStoreFilters.Add(name, result);
                             }
                         }
                     }

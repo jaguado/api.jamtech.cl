@@ -6,7 +6,10 @@
 /**
  * MainCtrl - controller
  */
-function MainCtrl() {
+
+ var baseApiUrl='//jamtechapi.herokuapp.com/v1/';
+
+ function MainCtrl() {
 
     this.userName = 'Example user';
     this.helloText = 'Welcome in SeedProject';
@@ -15,17 +18,56 @@ function MainCtrl() {
 
 function StationsCtrl($http, $scope) {
     $scope.maxDistance = 5000;
-    //TODO dynamic url depending of location 
-    var stationsUrl = '//jamtechapi.herokuapp.com/v1/CombustibleStations?type=Vehicular&region=13&order=precios.ranking_gasolina_95';
+    var stationsUrl = baseApiUrl + 'CombustibleStations?order=precios.ranking_gasolina_95';
+    var regionsUrl  = baseApiUrl + 'CombustibleStations/Regions';
+
     $scope.searchText="";
-    $scope.stations=[];
+    $scope.region=null; //all is the default //TODO read from cookie or calculate by location
+    $scope.combustible='Vehicular';
+    $scope.regions = [];
+    $scope.stations=null;
+    $scope.showLocationWarning=false;
+
+    $scope.setCombustible = function(val){
+        console.log('setCombustible', val);
+        $scope.combustible=val;
+        $scope.searchStations();
+    };
+
+    $scope.getRegionName = function(){
+        if($scope.region!=null)
+            return $scope.region.nombre;
+        else
+            return 'Todas';
+    }
+    $scope.setRegion = function(val){
+        console.log('setRegion', val);
+        $scope.region=val;
+        $scope.searchStations();
+    };
+    $scope.loadRegions = function() {
+        return $http.get(regionsUrl).then(function(response){
+            $scope.regions=response.data;
+            console.log('loadRegions', $scope.regions);
+            return true;
+        });
+    };
+    $scope.loadRegions();
 
     $scope.searchStations = function() {
+        var tempStationsUrl = stationsUrl;
+        tempStationsUrl += '&type=' + $scope.combustible;
+        tempStationsUrl += '&region=';
+        if($scope.region!=null)
+            tempStationsUrl += $scope.region.codigo;
+        else
+            tempStationsUrl += '0';
+
         if($scope.position!=null){
-            stationsUrl += '&lat=' + $scope.position.coords.latitude +'&lng=' + $scope.position.coords.longitude;
-            stationsUrl += '&filters=ubicacion.distancia<' + $scope.maxDistance; 
+            tempStationsUrl += '&lat=' + $scope.position.coords.latitude +'&lng=' + $scope.position.coords.longitude;
+            tempStationsUrl += '&filters=ubicacion.distancia<' + $scope.maxDistance; 
         }
-        return $http.get(stationsUrl).then(function(response){
+        return $http.get(tempStationsUrl).then(function(response){
             $scope.stations=response.data;
             $scope.searchText = $scope.searchTextTemp;
             console.log('searchStations', $scope.stations);
@@ -37,6 +79,7 @@ function StationsCtrl($http, $scope) {
         navigator.geolocation.getCurrentPosition(function(position){
           $scope.$apply(function(){
             $scope.position = position;
+            $scope.showLocationWarning=false;
             console.log('position', position);
             $scope.searchStations();
           });
@@ -44,6 +87,7 @@ function StationsCtrl($http, $scope) {
         function(error) {
             //load stations without location
             $scope.searchStations();
+            $scope.showLocationWarning=true;
         });
     };
 }
@@ -74,5 +118,16 @@ angular
     .filter('capitalize', function() {
         return function(input) {
           return (!!input) ? input.charAt(0).toUpperCase() + input.substr(1).toLowerCase() : '';
+        }
+     })
+    .filter('toArray', function () {
+        'use strict';
+        return function (obj) {
+            if (!(obj instanceof Object)) {
+                return obj;
+            }
+            return Object.keys(obj).map(function (key) {
+                return Object.defineProperty(obj[key], '$key', {__proto__: null, value: key});
+            });
         }
     });
