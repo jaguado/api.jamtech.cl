@@ -130,7 +130,7 @@ namespace JAMTech.Controllers
                 if (station.precios.petroleo_diesel > 0)
                     station.precios.ranking_diesel = Array.IndexOf(rankingDiesel, station.precios.petroleo_diesel) + 1;
                 if (station.precios.glp_vehicular != "")
-                    station.precios.ranking_glp_vehicular = Array.IndexOf(rankingDiesel, station.precios.petroleo_diesel) + 1;
+                    station.precios.ranking_glp_vehicular = Array.IndexOf(rankingGlp, double.Parse(station.precios.glp_vehicular)) + 1;
             }
         }
         private static void AddDistance(IEnumerable<Models.CombustibleStation> filteredResult, double lat, double lng)
