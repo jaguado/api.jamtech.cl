@@ -25,7 +25,7 @@ function StationsCtrl($http, $scope) {
     $scope.region=null; //all is the default //TODO read from cookie or calculate by location
     $scope.combustible='Vehicular';
     $scope.regions = [];
-    $scope.stations= [];
+    $scope.stations=null;
     $scope.showLocationWarning=false;
 
     $scope.setCombustible = function(val){

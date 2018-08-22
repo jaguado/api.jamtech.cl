@@ -41,7 +41,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-1">
+                        <div class="col-sm-4">
                                 <div class="btn-group dropdown" uib-dropdown="">
                                     <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle="" aria-haspopup="true" aria-expanded="false">
                                         {{combustible}} <span class="caret"></span>
@@ -59,8 +59,6 @@
                                         </li>
                                     </ul>
                                 </div>
-                            </div>
-                        <div class="col-sm-1">
                             <div class="btn-group dropdown" uib-dropdown="">
                                 <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle="" aria-haspopup="true" aria-expanded="false">
                                     {{getRegionName()}} <span class="caret"></span>
@@ -75,6 +73,16 @@
                                     <li><a href="#" ng-click="setRegion(null)">Regiones</a></li>
                                 </ul>
                             </div>
+                        </div>
+                        <div class="col-sm-8">
+                            <div class="pull-right" ng-show="false">
+                                    <b>Ranking precios</b>
+                                 <div class="row text-center">
+                                     <span class="badge badge-primary">1</span>
+                                     <span class="badge badge-success">2</span>
+                                     <span class="badge">3</span>
+                                 </div>
+                            </div>   
                         </div>
                     </div>
                 <div class="forum-item active" ng-repeat="station in stations | orderBy:'ubicacion.distancia'">                   
@@ -122,7 +130,9 @@
                                             <p>{{value | currency : "$" : 0}}</p>
                                             <p><small>{{key | capitalize}}</small></p>
                                            </span>
-                                        <span><b>R:</b>&nbsp;{{station.precios['ranking ' + key]}}</span>
+                                        <span ng-show="station.precios['ranking ' + key] < 3" class="badge" ng-class="{'badge-primary': station.precios['ranking ' + key] == 1 , 'badge-success': station.precios['ranking ' + key] == 2}">
+                                            <b>{{station.precios['ranking ' + key]}}</b>
+                                        </span>
                                 </div>
                                 <br />
                             </div>
@@ -145,7 +155,7 @@
                         </div>
                     </div>
                 </div>
-                <small class="pull-right"><b>{{stations.length}}</b> estaciones encontradas en un radio de <b>{{maxDistance}}</b> metros</small>
+                <small class="pull-right" ng-show="stations!=null"><b>{{stations.length}}</b> estaciones encontradas en un radio de <b>{{maxDistance}}</b> metros</small>
             </div>
     </div>
 </div>
