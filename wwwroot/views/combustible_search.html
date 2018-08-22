@@ -33,7 +33,11 @@
                                 <i class="fa fa-warning"></i> Location Warning 
                             </div>
                             <div class="panel-body">
-                                <p>We didn't have access to your location so we cannot identify where you are and show you only relevant information.<br />Please grant access to your location for more accurate information.</p>
+                                <p>
+                                    We don't have access to your location so we cannot identify where you are to show you only relevant information.
+                                    <br />Please share your location for more accurate information.
+                                    <br />In other case the loading time will increase considerably.
+                                </p>
                             </div>
                         </div>
                     <div class="row">
@@ -111,7 +115,7 @@
                             <small class="pull-left"><b>Fecha actualizaci&oacute;n&nbsp;</b><br />{{station.fecha_hora_actualizacion}}</small>
                         </div>
                         <div class="col-lg-6">  
-                            <div class="pull-right">
+                            <div class="pull-right" ng-show="!showLocationWarning">
                                 <a target="_blank" ng-href="http://www.google.com/maps/place/{{station.ubicacion.latitud}},{{station.ubicacion.longitud}}">
                                     <i class="fas fa-map-marked-alt"></i>
                                     ¿Como llegar?
