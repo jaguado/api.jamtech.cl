@@ -24,7 +24,6 @@ namespace JAMTech
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            CheckEnvironmentVariables();
         }
 
         public IConfiguration Configuration { get; }
@@ -51,7 +50,9 @@ namespace JAMTech
                 }
             });
 
-            services.Configure<GzipCompressionProviderOptions>(options => options.Level = System.IO.Compression.CompressionLevel.Optimal);
+            services.Configure<GzipCompressionProviderOptions>(options =>
+                options.Level = System.IO.Compression.CompressionLevel.Fastest);
+
             services.AddResponseCompression(options =>
             {
                 options.MimeTypes = new[]
@@ -148,19 +149,6 @@ namespace JAMTech
             };
 
             return options;
-        }
-
-        private void CheckEnvironmentVariables()
-        {
-            string[] environments = { "PORT" };
-            foreach (var envName in environments)
-            {
-                var envValue = Environment.GetEnvironmentVariable(envName);
-                if (envValue == null)
-                {
-                    throw new ApplicationException($"Environment variable {envName} not found");
-                }
-            }
         }
     }
 }

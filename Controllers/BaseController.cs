@@ -11,6 +11,7 @@ namespace JAMTech.Controllers
     public abstract class BaseController : Controller
     {
         public string[] Operators = new[] { "==", "!=", "<", ">", "<>", "<=", ">=" };
+        const int defaultLimit = 100;
 
         /// <summary>
         /// Allows cors support
@@ -58,6 +59,20 @@ namespace JAMTech.Controllers
                 filteredResult = filteredResult.AsQueryable().Where(query, values.ToArray());
             }
             return filteredResult;
+        }
+        internal IActionResult LimitedObjectResult<T>(IEnumerable<T> filteredResult)
+        {
+            if (int.TryParse(Request.Query["offset"], out int offset))
+                filteredResult = filteredResult.Skip(offset);
+            
+            if (int.TryParse(Request.Query["limit"], out int limit))
+            {
+                if (limit == 0)
+                    return new OkObjectResult(filteredResult);
+                else
+                    return new OkObjectResult(filteredResult.Take(limit));
+            }
+            return new OkObjectResult(filteredResult.Take(defaultLimit));
         }
         private string BuildQueryFromRequest(Microsoft.Extensions.Primitives.StringValues filters, out List<object> values)
         {

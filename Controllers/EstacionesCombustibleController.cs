@@ -59,7 +59,7 @@ namespace JAMTech.Controllers
                 if (lat != string.Empty && lng != string.Empty)
                     AddDistance(filteredResult, double.Parse(lat), double.Parse(lng));
 
-              
+
                 //dynamic filtering
                 filteredResult = FilterResult(filteredResult);
 
@@ -69,9 +69,7 @@ namespace JAMTech.Controllers
                 //dynamic ordering
                 filteredResult = OrderResult(filteredResult);
                 
-                if(Request.Query["getall"]!=string.Empty)
-                    return new OkObjectResult(filteredResult);
-                return new OkObjectResult(filteredResult.Take(1000));
+                return LimitedObjectResult(filteredResult);
             }
             catch (WebException wex)
             {
@@ -82,6 +80,8 @@ namespace JAMTech.Controllers
                 return HandleException(ex);
             }
         }
+
+
 
         private static void AddRanking(IEnumerable<Models.CombustibleStation> filteredResult)
         {
