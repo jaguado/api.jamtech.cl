@@ -91,6 +91,7 @@ namespace JAMTech.Controllers
             ranking.Add("gasolina 97", new List<double>());
             ranking.Add("kerosene", new List<double>());
             ranking.Add("petroleo diesel", new List<double>());
+            ranking.Add("glp vehicular", new List<double>());
 
             foreach (var station in filteredResult)
             {
@@ -104,6 +105,8 @@ namespace JAMTech.Controllers
                     ranking["kerosene"].Add(station.precios.kerosene);
                 if (station.precios.petroleo_diesel > 0)
                     ranking["petroleo diesel"].Add(station.precios.petroleo_diesel);
+                if (station.precios.glp_vehicular != "")
+                    ranking["glp vehicular"].Add(double.Parse(station.precios.glp_vehicular));
             }
 
             var ranking93 = ranking["gasolina 93"].Distinct().OrderBy(o => o).ToArray();
@@ -111,6 +114,8 @@ namespace JAMTech.Controllers
             var ranking97 = ranking["gasolina 97"].Distinct().OrderBy(o => o).ToArray();
             var rankingKerosene = ranking["kerosene"].Distinct().OrderBy(o => o).ToArray();
             var rankingDiesel = ranking["petroleo diesel"].Distinct().OrderBy(o => o).ToArray();
+            var rankingGlp= ranking["glp vehicular"].Distinct().OrderBy(o => o).ToArray();
+
 
             foreach (var station in filteredResult)
             {
@@ -124,6 +129,8 @@ namespace JAMTech.Controllers
                     station.precios.ranking_kerosene = Array.IndexOf(rankingKerosene, station.precios.kerosene) + 1;
                 if (station.precios.petroleo_diesel > 0)
                     station.precios.ranking_diesel = Array.IndexOf(rankingDiesel, station.precios.petroleo_diesel) + 1;
+                if (station.precios.glp_vehicular != "")
+                    station.precios.ranking_glp_vehicular = Array.IndexOf(rankingDiesel, station.precios.petroleo_diesel) + 1;
             }
         }
         private static void AddDistance(IEnumerable<Models.CombustibleStation> filteredResult, double lat, double lng)

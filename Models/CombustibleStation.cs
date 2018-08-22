@@ -73,6 +73,8 @@ namespace JAMTech.Models
         public int ranking_kerosene { get; set; } = -1;
         [JsonProperty("ranking petroleo diesel")]
         public int ranking_diesel { get; set; } = -1;
+        [JsonProperty("ranking glp vehicular")]
+        public int ranking_glp_vehicular { get; set; } = -1;
     }
 
     public class MetodosDePago
