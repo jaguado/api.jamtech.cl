@@ -105,7 +105,7 @@ namespace JAMTech.Controllers
                     ranking["kerosene"].Add(station.precios.kerosene);
                 if (station.precios.petroleo_diesel > 0)
                     ranking["petroleo diesel"].Add(station.precios.petroleo_diesel);
-                if (station.precios.glp_vehicular != "")
+                if (station.precios.glp_vehicular != null && station.precios.glp_vehicular != "")
                     ranking["glp vehicular"].Add(double.Parse(station.precios.glp_vehicular));
             }
 
@@ -129,7 +129,7 @@ namespace JAMTech.Controllers
                     station.precios.ranking_kerosene = Array.IndexOf(rankingKerosene, station.precios.kerosene) + 1;
                 if (station.precios.petroleo_diesel > 0)
                     station.precios.ranking_diesel = Array.IndexOf(rankingDiesel, station.precios.petroleo_diesel) + 1;
-                if (station.precios.glp_vehicular != "")
+                if (station.precios.glp_vehicular != null && station.precios.glp_vehicular != "")
                     station.precios.ranking_glp_vehicular = Array.IndexOf(rankingGlp, double.Parse(station.precios.glp_vehicular)) + 1;
             }
         }
