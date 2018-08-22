@@ -49,7 +49,7 @@ namespace JAMTech.Filters
             if (order.Any())
                 foreach (var o in order)
                     filteredResult = filteredResult.AsQueryable().OrderBy(o);
-            return filteredResult;
+            return filteredResult.AsQueryable();
         }
         public static IEnumerable<T> FilterResult<T>(IEnumerable<T> filteredResult, HttpRequest Request)
         {
@@ -59,7 +59,21 @@ namespace JAMTech.Filters
                 var query = BuildQueryFromRequest(filters, out List<object> values);
                 filteredResult = filteredResult.AsQueryable().Where(query, values.ToArray());
             }
-            return filteredResult;
+            return filteredResult.AsQueryable();
+        }
+        internal IEnumerable<T> LimitObjectResult<T>(IEnumerable<T> filteredResult, HttpRequest Request)
+        {
+            if (int.TryParse(Request.Query["offset"], out int offset))
+                filteredResult = filteredResult.Skip(offset);
+
+            if (int.TryParse(Request.Query["limit"], out int limit))
+            {
+                if (limit == 0)
+                    return filteredResult;
+                else
+                    return filteredResult.Take(limit);
+            }
+            return filteredResult.Take(defaultLimit);
         }
         private static string BuildQueryFromRequest(Microsoft.Extensions.Primitives.StringValues filters, out List<object> values)
         {
@@ -87,19 +101,6 @@ namespace JAMTech.Filters
             }
             return query;
         }
-        internal IEnumerable<T> LimitObjectResult<T>(IEnumerable<T> filteredResult, HttpRequest Request)
-        {
-            if (int.TryParse(Request.Query["offset"], out int offset))
-                filteredResult = filteredResult.Skip(offset);
-
-            if (int.TryParse(Request.Query["limit"], out int limit))
-            {
-                if (limit == 0)
-                    return filteredResult;
-                else
-                    return filteredResult.Take(limit);
-            }
-            return filteredResult.Take(defaultLimit);
-        }
+        
     }
 }
