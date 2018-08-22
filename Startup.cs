@@ -110,9 +110,16 @@ namespace JAMTech
             {
                 OnPrepareResponse = ctx =>
                 {
-                    const int durationInSeconds = 60 * 60 * 24;
-                    ctx.Context.Response.Headers[HeaderNames.CacheControl] =
-                        "public,max-age=" + durationInSeconds;
+                    const int durationInSeconds = 0; // 60 * 60 * 24;
+                    if (durationInSeconds == 0)
+                    {
+                        ctx.Context.Response.Headers[HeaderNames.CacheControl] = "no-cache, no-store, must-revalidate";
+                    }
+                    else
+                        ctx.Context.Response.Headers[HeaderNames.CacheControl] = "public,max-age=" + durationInSeconds;
+                    
+
+
                 }
             });
 
