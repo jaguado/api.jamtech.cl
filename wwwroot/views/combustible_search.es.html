@@ -4,10 +4,10 @@
             <h2>JAM Tech.cl</h2>
             <ol class="breadcrumb">
                 <li>
-                    <a href="index.html">Home</a>
+                    <a href="index.html">Inicio</a>
                 </li>
                 <li class="active">
-                    <strong>Combustible Stations Finder</strong>
+                    <strong>Buscador de estaciones de combustible</strong>
                 </li>
             </ol>
         </div>
@@ -23,20 +23,20 @@
                         <i class="fas fa-gas-pump text-navy mid-icon"></i>
                     </div>
                     <br />
-                    <h2>Combustible Stations<h2>
-                    <span class="pull-right"><small>Powered by <a target="_blank" href="http://api.jamtech.cl/swagger"><b>http://api.jamtech.cl</b></a></small></span>
+                    <h2>Estaciones de combustible<h2>
+                    <span class="pull-right"><small>Soportado por&nbsp;<a target="_blank" href="http://api.jamtech.cl/swagger"><b>http://api.jamtech.cl</b></a></small></span>
                 </div>
             </div>
             <div class="ibox-content forum-container">
                     <div class="panel panel-warning" ng-show="showLocationWarning">
                             <div class="panel-heading">
-                                <i class="fa fa-warning"></i> Location Warning 
+                                <i class="fa fa-warning"></i> Alerta de ubicaci&oacute;n 
                             </div>
                             <div class="panel-body">
                                 <p>
-                                    We don't have access to your location so we cannot identify where you are to show you only relevant information.
-                                    <br />Please share your location for more accurate information.
-                                    <br />In other case the loading time will increase considerably.
+                                    No tenemos acceso a tu ubicaci&oacute;n por lo que no podemos identificar donde est&aacute;s para darte informaci&oacute;n relevante.
+                                    <br />Compartenos tu ubicaci&oacute;n para recibir informaci&oacute;n m&aacute;s precisa.
+                                    <br />En caso contrario el tiempo de carga aumentar&aacute; considerablemente.
                                 </p>
                             </div>
                         </div>
@@ -68,25 +68,25 @@
                             <a class="forum-item-title">{{station.razon_social | capitalize}}</a>
                             <br \>
                             <div class="forum-sub-title">
-                                <b>Other services:</b>
+                                <b>Otros servicios disponibles:</b>
                                 <span ng-repeat="(key, value) in station.servicios" ng-if="value">
                                     {{key | capitalize}}
                                 </span>
                             </div>
                             <div class="forum-sub-title">
-                                <b>Payment:</b>
+                                <b>Formas de pago:</b>
                                 <span ng-repeat="(key, value) in station.metodos_de_pago" ng-if="value">
                                     {{key | capitalize}}
                                 </span>
                             </div>
                             <div class="forum-sub-title">
-                                <b>Address:</b>
+                                <b>Dirección:</b>
                                 <span>
                                     {{station.direccion_calle}} {{station.direccion_numero}} / {{station.nombre_comuna}}
                                 </span>
                             </div>
                             <div class="forum-sub-title">
-                                <b>Time:</b>
+                                <b>Horario:</b>
                                 <span>
                                     {{station.horario_atencion}}
                                 </span>
@@ -112,21 +112,21 @@
                     <div class="row">
                         <br />
                         <div class="col-lg-6">  
-                            <small class="pull-left"><b>Updated on&nbsp;</b><br />{{station.fecha_hora_actualizacion}}</small>
+                            <small class="pull-left"><b>Fecha actualizaci&oacute;n&nbsp;</b><br />{{station.fecha_hora_actualizacion}}</small>
                         </div>
                         <div class="col-lg-6">  
                             <div class="pull-right" ng-show="!showLocationWarning">
                                 <a target="_blank" ng-href="http://www.google.com/maps/place/{{station.ubicacion.latitud}},{{station.ubicacion.longitud}}">
                                     <i class="fas fa-map-marked-alt"></i>
-                                    How i get there?
+                                    ¿C&oacute;mo llegar?
                                 </a>
                                 <br/>
-                                <small>{{station.ubicacion.distancia | number:0}} meters aprox.</small>
+                                <small>{{station.ubicacion.distancia | number:0}} metros aprox.</small>
                             </div>
                         </div>
                     </div>
                 </div>
-                <small class="pull-right"><b>{{stations.length}}</b> stations found in a <b>{{maxDistance}}</b> meters radius</small>
+                <small class="pull-right"><b>{{stations.length}}</b> estaciones encontradas en un radio de <b>{{maxDistance}}</b> metros</small>
             </div>
     </div>
 </div>

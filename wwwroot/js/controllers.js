@@ -8,7 +8,8 @@
  */
 
  var baseApiUrl='//jamtechapi.herokuapp.com/v1/';
-function MainCtrl() {
+
+ function MainCtrl() {
 
     this.userName = 'Example user';
     this.helloText = 'Welcome in SeedProject';

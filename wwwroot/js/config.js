@@ -41,12 +41,12 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         })
         .state('index.combustible', {
             url: "/combustible",
-            templateUrl: "views/combustible_search.html",
+            templateUrl: "views/combustible_search.es.html",
             data: { pageTitle: 'Combustible Search' }
         })
         .state('combustible', {
             url: "/standalone/combustible",
-            templateUrl: "views/combustible_search.html",
+            templateUrl: "views/combustible_search.es.html",
             data: { pageTitle: 'Combustible Search' }
         })
         .state('index.projects', {
