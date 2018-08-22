@@ -69,7 +69,9 @@ namespace JAMTech.Controllers
                 //dynamic ordering
                 filteredResult = OrderResult(filteredResult);
                 
-                return new OkObjectResult(filteredResult);
+                if(Request.Query["getall"]!=string.Empty)
+                    return new OkObjectResult(filteredResult);
+                return new OkObjectResult(filteredResult.Take(1000));
             }
             catch (WebException wex)
             {
