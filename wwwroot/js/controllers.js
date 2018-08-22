@@ -19,7 +19,7 @@
 function StationsCtrl($http, $scope) {
     $scope.maxDistance = 5000;
     var stationsUrl = baseApiUrl + 'CombustibleStations?';
-    var regionsUrl  = baseApiUrl + 'CombustibleStations/Regions';
+    var regionsUrl  = baseApiUrl + 'CombustibleStations/Regiones';
 
     $scope.searchText="";
     $scope.region=null; //all is the default //TODO read from cookie or calculate by location

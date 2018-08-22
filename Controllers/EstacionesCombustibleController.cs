@@ -22,7 +22,7 @@ namespace JAMTech.Controllers
     public class CombustibleStationsController : BaseController
     {
         static readonly string url = @"https://api.cne.cl/v3/combustibles/{0}/{1}?token=" + Environment.GetEnvironmentVariable("cne_token");
-        static readonly string urlRegions = @"https://apis.digital.gob.cl/dpa/regiones";
+        static readonly string urlRegions = @"https://apis.digital.gob.cl/dpa/";
 
         const int cacheDurationInHours = 20; //in hours
         const int skipDataBeforeInMonths = 1; //in months
@@ -192,7 +192,7 @@ namespace JAMTech.Controllers
         /// GET different kind of vehicle filters
         /// </summary>
         /// <returns></returns>
-        [HttpGet("Vehicular/Filters")]
+        [HttpGet("Vehicular/Filtros")]
         public async Task<IActionResult> GetFilters()
         {
             try
@@ -231,29 +231,80 @@ namespace JAMTech.Controllers
         /// GET Regions
         /// </summary>
         /// <returns></returns>
-        [HttpGet("Regions")]
+        [HttpGet("Regiones")]
         public async Task<IActionResult> GetRegions()
         {
             try
             {
-                var name = "regions";
-                var cache = memStoreFilters.ContainsKey(name);
-                if (!cache)
+                var name = "regiones";
+                await GetGenericByName(name);
+                return new OkObjectResult(memStoreFilters[name]);
+            }
+            catch (WebException wex)
+            {
+                return HandleWebException(wex);
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
+
+        private static async Task GetGenericByName(string name)
+        {
+            var cache = memStoreFilters.ContainsKey(name);
+            if (!cache)
+            {
+                var response = await GetResponse(urlRegions + name);
+                if (response.IsSuccessStatusCode)
                 {
-                    var response = await GetResponse(urlRegions);
-                    if (response.IsSuccessStatusCode)
+                    var result = await response.Content.ReadAsAsync<dynamic>();
+                    if (result != null)
                     {
-                        var result = await response.Content.ReadAsAsync<dynamic>();
-                        if (result != null)
+                        lock (memStoreFilters)
                         {
-                            lock (memStoreFilters)
-                            {
-                                if (!memStoreFilters.ContainsKey(name))
-                                    memStoreFilters.Add(name, result);
-                            }
+                            if (!memStoreFilters.ContainsKey(name))
+                                memStoreFilters.Add(name, result);
                         }
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// GET Provincias
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("Provincias")]
+        public async Task<IActionResult> GetProvincias()
+        {
+            try
+            {
+                var name = "provincias";
+                await GetGenericByName(name);
+                return new OkObjectResult(memStoreFilters[name]);
+            }
+            catch (WebException wex)
+            {
+                return HandleWebException(wex);
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
+
+        /// <summary>
+        /// GET Comunas
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("Comunas")]
+        public async Task<IActionResult> GetComunas()
+        {
+            try
+            {
+                var name = "comunas";
+                await GetGenericByName(name);
                 return new OkObjectResult(memStoreFilters[name]);
             }
             catch (WebException wex)
