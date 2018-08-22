@@ -89,43 +89,45 @@
                     <div class="row">
                         <!--Station description -->
                         <div class="col-lg-6">
-                            <div class="forum-icon">
-                                <img ng-src="{{station.distribuidor.logo_svg}}" height="32px" width="32px" alt="{{station.distribuidor.nombre}}" />
-                            </div>
-                            <a class="forum-item-title">{{station.razon_social | capitalize}}</a>
-                            <br \>
-                            <div class="forum-sub-title">
-                                <b>Otros servicios disponibles:</b>
-                                <span ng-repeat="(key, value) in station.servicios" ng-if="value">
-                                    {{key | capitalize}}
-                                </span>
-                            </div>
-                            <div class="forum-sub-title">
-                                <b>Formas de pago:</b>
-                                <span ng-repeat="(key, value) in station.metodos_de_pago" ng-if="value">
-                                    {{key | capitalize}}
-                                </span>
-                            </div>
-                            <div class="forum-sub-title">
-                                <b>Dirección:</b>
-                                <span>
-                                    {{station.direccion_calle}} {{station.direccion_numero}} / {{station.nombre_comuna}}
-                                </span>
-                            </div>
-                            <div class="forum-sub-title">
-                                <b>Horario:</b>
-                                <span>
-                                    {{station.horario_atencion}}
-                                </span>
-                            </div>
-                            <br />
+                            <div class="row">
+                                <div class="col-sm-8">
+                                    <a class="forum-item-title">{{station.razon_social | capitalize}}</a>
+                                    <div>
+                                        <b>Otros servicios disponibles:</b>
+                                        <span ng-repeat="(key, value) in station.servicios" ng-if="value">
+                                            {{key | capitalize}}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <b>Formas de pago:</b>
+                                        <span ng-repeat="(key, value) in station.metodos_de_pago" ng-if="value">
+                                            {{key | capitalize}}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <b>Dirección:</b>
+                                        <span>
+                                            {{station.direccion_calle}} {{station.direccion_numero}} / {{station.nombre_comuna}}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <b>Horario:</b>
+                                        <span>
+                                            {{station.horario_atencion}}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 text-center">
+                                    <br />
+                                    <img ng-src="{{station.distribuidor.logo_horizontal_svg}}" height="65px" width="185px" lt="{{station.distribuidor.nombre}}" />
+                                </div>
+                            </div>       
                         </div>
                         <!-- Prices -->
                         <div class="col-lg-6 text-center">
                             <div class="row">
                                 <div class="col-sm-3"  ng-repeat="(key, value) in station.precios" ng-if="value > 0 && !key.startsWith('ranking')">
                                         <span class="views-number">
-                                            <br />
                                             <br />
                                             <p>{{value | currency : "$" : 0}}</p>
                                             <p><small>{{key | capitalize}}</small></p>
