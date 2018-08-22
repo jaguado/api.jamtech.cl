@@ -59,17 +59,12 @@ namespace JAMTech.Controllers
                 if (lat != string.Empty && lng != string.Empty)
                     AddDistance(filteredResult, double.Parse(lat), double.Parse(lng));
 
-
-                //dynamic filtering
-                filteredResult = FilterResult(filteredResult);
+                //filter before add ranking to be consistent //TODO avoid double filtering 
+                filteredResult = Filters.BaseResultFilter.FilterResult(filteredResult, HttpContext.Request);
 
                 //add prices ranking
                 AddRanking(filteredResult);
-
-                //dynamic ordering
-                filteredResult = OrderResult(filteredResult);
-                
-                return LimitedObjectResult(filteredResult);
+                return new OkObjectResult(filteredResult);
             }
             catch (WebException wex)
             {
