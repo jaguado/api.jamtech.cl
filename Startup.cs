@@ -1,4 +1,5 @@
 ﻿using JAMTech.Filters;
+using JAMTech.Providers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
@@ -60,6 +61,7 @@ namespace JAMTech
 
             services.AddResponseCompression(options =>
             {
+                options.Providers.Add<BrotliCompressionProvider>();
                 options.MimeTypes = new[]
                 {
                     // Default
