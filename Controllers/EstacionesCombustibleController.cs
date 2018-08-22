@@ -22,7 +22,8 @@ namespace JAMTech.Controllers
     public class CombustibleStationsController : BaseController
     {
         static readonly string url = @"https://api.cne.cl/v3/combustibles/{0}/{1}?token=" + Environment.GetEnvironmentVariable("cne_token");
-        
+        static readonly string urlRegions = @"https://apis.digital.gob.cl/dpa/regiones";
+
         const int cacheDurationInHours = 20; //in hours
         const int skipDataBeforeInMonths = 1; //in months
         
@@ -201,6 +202,45 @@ namespace JAMTech.Controllers
                             {
                                 if(!memStoreFilters.ContainsKey(name))
                                     memStoreFilters.Add(name, result.data);
+                            }
+                        }
+                    }
+                }
+                return new OkObjectResult(memStoreFilters[name]);
+            }
+            catch (WebException wex)
+            {
+                return HandleWebException(wex);
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
+
+        /// <summary>
+        /// GET Regions
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("Regions")]
+        public async Task<IActionResult> GetRegions()
+        {
+            try
+            {
+                var name = "regions";
+                var cache = memStoreFilters.ContainsKey(name);
+                if (!cache)
+                {
+                    var response = await GetResponse(urlRegions);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var result = await response.Content.ReadAsAsync<dynamic>();
+                        if (result != null)
+                        {
+                            lock (memStoreFilters)
+                            {
+                                if (!memStoreFilters.ContainsKey(name))
+                                    memStoreFilters.Add(name, result);
                             }
                         }
                     }
