@@ -18,18 +18,23 @@
 
 function StationsCtrl($http, $scope) {
     $scope.maxDistance = 5000;
-    var stationsUrl = baseApiUrl + 'CombustibleStations?order=precios.ranking_gasolina_95';
+    var stationsUrl = baseApiUrl + 'CombustibleStations?';
     var regionsUrl  = baseApiUrl + 'CombustibleStations/Regions';
 
     $scope.searchText="";
     $scope.region=null; //all is the default //TODO read from cookie or calculate by location
     $scope.combustible='Vehicular';
+    $scope.orderBy='precios.ranking_gasolina_95';
     $scope.regions = [];
     $scope.stations=null;
     $scope.showLocationWarning=false;
 
     $scope.setCombustible = function(val){
         console.log('setCombustible', val);
+        if(val=='Vehicular')
+            $scope.orderBy='precios.ranking_gasolina_95';
+        else
+            $scope.orderBy='precios.ranking_kerosene';
         $scope.combustible=val;
         $scope.searchStations();
     };
@@ -57,6 +62,7 @@ function StationsCtrl($http, $scope) {
     $scope.searchStations = function() {
         var tempStationsUrl = stationsUrl;
         tempStationsUrl += '&type=' + $scope.combustible;
+        tempStationsUrl += '&order=' + $scope.orderBy;
         tempStationsUrl += '&region=';
         if($scope.region!=null)
             tempStationsUrl += $scope.region.codigo;
