@@ -28,36 +28,55 @@
                 </div>
             </div>
             <div class="ibox-content forum-container">
-                    <div class="panel panel-warning" ng-show="showLocationWarning">
-                            <div class="panel-heading">
-                                <i class="fa fa-warning"></i> Alerta de ubicaci&oacute;n 
-                            </div>
-                            <div class="panel-body">
-                                <p>
-                                    No tenemos acceso a tu ubicaci&oacute;n por lo que no podemos identificar donde est&aacute;s para darte informaci&oacute;n relevante.
-                                    <br />Compartenos tu ubicaci&oacute;n para recibir informaci&oacute;n m&aacute;s precisa.
-                                    <br />En caso contrario el tiempo de carga aumentar&aacute; considerablemente.
-                                </p>
-                            </div>
+                <div class="panel panel-warning" ng-show="showLocationWarning">
+                        <div class="panel-heading">
+                            <i class="fa fa-warning"></i> Alerta de ubicaci&oacute;n 
                         </div>
+                        <div class="panel-body">
+                            <p>
+                                No tenemos acceso a tu ubicaci&oacute;n por lo que no podemos identificar donde est&aacute;s para darte informaci&oacute;n relevante.
+                                <br />Compartenos tu ubicaci&oacute;n para recibir informaci&oacute;n m&aacute;s precisa.
+                                <br />En caso contrario el tiempo de carga aumentar&aacute; considerablemente.
+                            </p>
+                        </div>
+                    </div>
                     <div class="row">
-                            <div class="col">
+                        <div class="col-sm-1">
                                 <div class="btn-group dropdown" uib-dropdown="">
                                     <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle="" aria-haspopup="true" aria-expanded="false">
-                                        {{getRegionName()}} <span class="caret"></span>
+                                        {{combustible}} <span class="caret"></span>
                                     </button>
                                     <ul role="menu" uib-dropdown-menu="" class="dropdown-menu">
-                                        <li ng-repeat="region in regions" ng-model="region">
-                                            <a href="#" ng-click="setRegion(region)">
-                                                {{region.nombre}}
+                                        <li>
+                                            <a href="#" ng-click="setCombustible('Vehicular')">
+                                                Vehicular
                                             </a>
                                         </li>
-                                        <li class="divider"></li>
-                                        <li><a href="#" ng-click="setRegion(null)">All</a></li>
+                                        <li>
+                                            <a href="#" ng-click="setCombustible('Calefaccion')">
+                                                Calefaccion
+                                            </a>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>
+                        <div class="col-sm-1">
+                            <div class="btn-group dropdown" uib-dropdown="">
+                                <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle="" aria-haspopup="true" aria-expanded="false">
+                                    {{getRegionName()}} <span class="caret"></span>
+                                </button>
+                                <ul role="menu" uib-dropdown-menu="" class="dropdown-menu">
+                                    <li ng-repeat="region in regions" ng-model="region">
+                                        <a href="#" ng-click="setRegion(region)">
+                                            {{region.nombre}}
+                                        </a>
+                                    </li>
+                                    <li class="divider"></li>
+                                    <li><a href="#" ng-click="setRegion(null)">Regiones</a></li>
+                                </ul>
+                            </div>
                         </div>
+                    </div>
                 <div class="forum-item active" ng-repeat="station in stations | orderBy:'ubicacion.distancia'">                   
                     <div class="row">
                         <!--Station description -->
