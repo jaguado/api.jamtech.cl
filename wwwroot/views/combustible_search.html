@@ -28,7 +28,33 @@
                 </div>
             </div>
             <div class="ibox-content forum-container">
-                <div class="forum-item active" ng-repeat="station in stations | orderBy:'ubicacion.distancia'">
+                    <div class="panel panel-warning" ng-show="showLocationWarning">
+                            <div class="panel-heading">
+                                <i class="fa fa-warning"></i> Location Warning 
+                            </div>
+                            <div class="panel-body">
+                                <p>We didn't have access to your location so we cannot identify where you are and show you only relevant information.<br />Please grant access to your location for more accurate information.</p>
+                            </div>
+                        </div>
+                    <div class="row">
+                            <div class="col">
+                                <div class="btn-group dropdown" uib-dropdown="">
+                                    <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle="" aria-haspopup="true" aria-expanded="false">
+                                        {{getRegionName()}} <span class="caret"></span>
+                                    </button>
+                                    <ul role="menu" uib-dropdown-menu="" class="dropdown-menu">
+                                        <li ng-repeat="region in regions" ng-model="region">
+                                            <a href="#" ng-click="setRegion(region)">
+                                                {{region.nombre}}
+                                            </a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li><a href="#" ng-click="setRegion(null)">All</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                <div class="forum-item active" ng-repeat="station in stations | orderBy:'ubicacion.distancia'">                   
                     <div class="row">
                         <!--Station description -->
                         <div class="col-lg-6">
