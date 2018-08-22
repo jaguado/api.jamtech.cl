@@ -17,7 +17,7 @@
 };
 
 function StationsCtrl($http, $scope) {
-    $scope.maxDistance = 5000;
+    $scope.maxDistance = 10000; //in meters
     var stationsUrl = baseApiUrl + 'CombustibleStations?';
     var regionsUrl  = baseApiUrl + 'CombustibleStations/Regiones';
 
