@@ -13,6 +13,8 @@ namespace JAMTech.Filters
     public class BaseResultFilter : IActionFilter
     {
         const int defaultLimit = 100;
+        public static string[] Operators = new[] { "==", "!=", "<", ">", "<>", "<=", ">=" };
+
         public void OnActionExecuting(ActionExecutingContext context)
         {
             // do something before the action executes
@@ -23,36 +25,24 @@ namespace JAMTech.Filters
             // do something after the action executes
             var request = context.HttpContext.Request;
             var resultResponse = context.Result as OkObjectResult;
-            LimitResult(context, request, resultResponse);
+            FilterOrderLimitResult(context, request, resultResponse);
         }
 
-        private void LimitResult(ActionExecutedContext context, HttpRequest request, OkObjectResult resultResponse)
+        private void FilterOrderLimitResult(ActionExecutedContext context, HttpRequest request, OkObjectResult resultResponse)
         {
             if (resultResponse != null)
             {
                 var result = resultResponse.Value as IEnumerable<object>;
                 if (result != null)
-                    context.Result = new OkObjectResult(LimitObjectResult(result, request));
+                {
+                    var newObject = FilterResult(result, request);
+                    newObject = OrderResult(newObject, request);
+                    newObject = LimitObjectResult(newObject, request);
+                    context.Result = new OkObjectResult(newObject);
+                }
             }
         }
-        private void OrderResult(ActionExecutedContext context, HttpRequest request, OkObjectResult resultResponse)
-        {
-            if (resultResponse != null)
-            {
-                var result = resultResponse.Value as IEnumerable<object>;
-                if (result != null)
-                    context.Result = new OkObjectResult(OrderResult(result, request));
-            }
-        }
-        private void FilterResult(ActionExecutedContext context, HttpRequest request, OkObjectResult resultResponse)
-        {
-            if (resultResponse != null)
-            {
-                var result = resultResponse.Value as IEnumerable<object>;
-                if (result != null)
-                    context.Result = new OkObjectResult(FilterResult(result, request));
-            }
-        }
+
         public static IEnumerable<T> OrderResult<T>(IEnumerable<T> filteredResult, HttpRequest Request)
         {
             var order = Request.Query["order"];
@@ -61,7 +51,6 @@ namespace JAMTech.Filters
                     filteredResult = filteredResult.AsQueryable().OrderBy(o);
             return filteredResult;
         }
-
         public static IEnumerable<T> FilterResult<T>(IEnumerable<T> filteredResult, HttpRequest Request)
         {
             var filters = Request.Query["filters"];
@@ -72,8 +61,6 @@ namespace JAMTech.Filters
             }
             return filteredResult;
         }
-
-        public static string[] Operators = new[] { "==", "!=", "<", ">", "<>", "<=", ">=" };
         private static string BuildQueryFromRequest(Microsoft.Extensions.Primitives.StringValues filters, out List<object> values)
         {
             var query = "";
@@ -100,7 +87,6 @@ namespace JAMTech.Filters
             }
             return query;
         }
-
         internal IEnumerable<T> LimitObjectResult<T>(IEnumerable<T> filteredResult, HttpRequest Request)
         {
             if (int.TryParse(Request.Query["offset"], out int offset))
