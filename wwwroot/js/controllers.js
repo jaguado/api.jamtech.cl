@@ -31,8 +31,22 @@ function StationsCtrl($http, $scope) {
     $scope.stations=null;
     $scope.showLocationWarning=false;
 
+    function loadFromLocalStorage(){
+        var fuel =  localStorage.getItem('fuel');
+        if(fuel!=null)
+            $scope.fuel = fuel;
+        var region =  localStorage.getItem('region');
+        if(region!=null)
+            $scope.region = region;
+        var combustible =  localStorage.getItem('combustible');
+        if(combustible!=null)
+            $scope.combustible = combustible;
+    }
+    loadFromLocalStorage();
+
     $scope.setFuel = function (val){
         $scope.fuel=val;
+        localStorage.setItem('fuel', val);
         $scope.searchStations();
     }
     $scope.setCombustible = function(val){
@@ -42,6 +56,13 @@ function StationsCtrl($http, $scope) {
         else
             $scope.orderBy='precios.ranking_kerosene';
         $scope.combustible=val;
+        localStorage.setItem('combustible', val);
+        $scope.searchStations();
+    };
+    $scope.setRegion = function(val){
+        console.log('setRegion', val);
+        $scope.region=val;
+        localStorage.setItem('region', val);
         $scope.searchStations();
     };
 
@@ -57,11 +78,6 @@ function StationsCtrl($http, $scope) {
         else
             return 'Todas las regiones';
     }
-    $scope.setRegion = function(val){
-        console.log('setRegion', val);
-        $scope.region=val;
-        $scope.searchStations();
-    };
     $scope.loadRegions = function() {
         return $http.get(regionsUrl).then(function(response){
             $scope.regions=response.data;
