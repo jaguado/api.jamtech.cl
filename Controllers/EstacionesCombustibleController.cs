@@ -59,7 +59,7 @@ namespace JAMTech.Controllers
                 if (lat != string.Empty && lng != string.Empty)
                     AddDistance(filteredResult, double.Parse(lat), double.Parse(lng));
 
-                //filter before add ranking to be consistent //TODO avoid double filtering 
+                //filter before add ranking
                 filteredResult = Filters.BaseResultFilter.FilterResult(filteredResult, HttpContext.Request);
 
                 //add prices ranking
@@ -149,7 +149,7 @@ namespace JAMTech.Controllers
             if (data.Value == null || data.Value.Item1 < DateTime.Now) //check expiration
             {
                 var tempUrl = string.Format(url, Enum.GetName(typeof(CombustibleType), type).ToLower(), name);
-                var result = await GetResponse(tempUrl);
+                var result = await Helpers.Net.GetResponse(tempUrl);
                 if (result.IsSuccessStatusCode)
                 {
                     var newData = JsonConvert.DeserializeObject<JObject>(await result.Content.ReadAsStringAsync());
@@ -172,16 +172,7 @@ namespace JAMTech.Controllers
             return null;
         }
 
-        private static async Task<HttpResponseMessage> GetResponse(string tempUrl)
-        {
-            var handler = new HttpClientHandler()
-            {
-                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
-            };
-            var result = await new HttpClient(handler).GetAsync(tempUrl);
-            return result;
-        }
-
+       
 
         /// <summary>
         /// GET different kind of vehicle filters
@@ -196,7 +187,7 @@ namespace JAMTech.Controllers
                 var cache = memStoreFilters.ContainsKey(name);
                 if (!cache) { 
                     var tempUrl = string.Format(url, name, "filtros");
-                    var response = await GetResponse(tempUrl);
+                    var response = await Helpers.Net.GetResponse(tempUrl);
                     if (response.IsSuccessStatusCode)
                     {
                         var result = await response.Content.ReadAsAsync<dynamic>();
@@ -232,7 +223,7 @@ namespace JAMTech.Controllers
             try
             {
                 var name = "regiones";
-                await GetGenericByName(name);
+                await LoadGenericByName(name);
                 return new OkObjectResult(memStoreFilters[name]);
             }
             catch (WebException wex)
@@ -245,12 +236,12 @@ namespace JAMTech.Controllers
             }
         }
 
-        private static async Task GetGenericByName(string name)
+        private static async Task LoadGenericByName(string name)
         {
             var cache = memStoreFilters.ContainsKey(name);
             if (!cache)
             {
-                var response = await GetResponse(urlRegions + name);
+                var response = await Helpers.Net.GetResponse(urlRegions + name);
                 if (response.IsSuccessStatusCode)
                 {
                     var result = await response.Content.ReadAsAsync<dynamic>();
@@ -276,8 +267,8 @@ namespace JAMTech.Controllers
             try
             {
                 var name = "provincias";
-                await GetGenericByName(name);
-                return new OkObjectResult(memStoreFilters[name]);
+                await LoadGenericByName(name);
+                return new OkObjectResult(GetFromMemStore(name));
             }
             catch (WebException wex)
             {
@@ -287,6 +278,11 @@ namespace JAMTech.Controllers
             {
                 return HandleException(ex);
             }
+        }
+
+        private static dynamic GetFromMemStore(string name)
+        {
+            return memStoreFilters[name];
         }
 
         /// <summary>
@@ -299,7 +295,7 @@ namespace JAMTech.Controllers
             try
             {
                 var name = "comunas";
-                await GetGenericByName(name);
+                await LoadGenericByName(name);
                 return new OkObjectResult(memStoreFilters[name]);
             }
             catch (WebException wex)

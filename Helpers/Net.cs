@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
@@ -93,5 +94,16 @@ namespace JAMTech.Helpers
             var stream = new StreamReader(response.GetResponseStream());
             return await stream.ReadToEndAsync();
         }
+
+        public static async Task<HttpResponseMessage> GetResponse(string tempUrl)
+        {
+            var handler = new HttpClientHandler()
+            {
+                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+            };
+            var result = await new HttpClient(handler).GetAsync(tempUrl);
+            return result;
+        }
+
     }
 }
