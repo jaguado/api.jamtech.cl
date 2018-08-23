@@ -48,7 +48,8 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-4">
+                        <div class="col-sm-6">
+                                Filtros:
                                 <div class="btn-group dropdown" uib-dropdown="">
                                     <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle="" aria-haspopup="true" aria-expanded="false">
                                         {{combustible}} <span class="caret"></span>
@@ -77,11 +78,25 @@
                                         </a>
                                     </li>
                                     <li class="divider"></li>
-                                    <li><a href="#" ng-click="setRegion(null)">Regiones</a></li>
+                                    <li><a href="#" ng-click="setRegion(null)">Todas</a></li>
                                 </ul>
                             </div>
+                            <br >
+                            Orden:
+                            <div class="btn-group dropdown" uib-dropdown="">
+                                    <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle="" aria-haspopup="true" aria-expanded="false">
+                                        {{getFuelType()}} <span class="caret"></span>
+                                    </button>
+                                    <ul role="menu" uib-dropdown-menu="" class="dropdown-menu">
+                                        <li ng-repeat="fuel in fuelTypes" ng-model="fuel">
+                                            <a href="#" ng-click="setFuel(fuel)">
+                                                {{fuel}}
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
                         </div>
-                        <div class="col-sm-8">
+                        <div class="col-sm-6">
                             <div class="pull-right" ng-show="false">
                                     <b>Ranking precios</b>
                                  <div class="row text-center">

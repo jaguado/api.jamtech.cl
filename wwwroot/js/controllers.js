@@ -23,12 +23,18 @@ function StationsCtrl($http, $scope) {
 
     $scope.searchText="";
     $scope.region=null; //all is the default //TODO read from cookie or calculate by location
+    $scope.fuel='gasolina_95';
+    $scope.fuelTypes = ["gasolina_93","gasolina_95","gasolina_97","diesel","kerosene","glp_vehicular"];
     $scope.combustible='Vehicular';
     $scope.orderBy='precios.ranking_gasolina_95';
     $scope.regions = [];
     $scope.stations=null;
     $scope.showLocationWarning=false;
 
+    $scope.setFuel = function (val){
+        $scope.fuel=val;
+        $scope.searchStations();
+    }
     $scope.setCombustible = function(val){
         console.log('setCombustible', val);
         if(val=='Vehicular')
@@ -39,11 +45,17 @@ function StationsCtrl($http, $scope) {
         $scope.searchStations();
     };
 
+    $scope.getFuelType = function(){
+        if($scope.fuel!=null)
+            return $scope.fuel;
+        else
+            return 'Todos los tipos';
+    }
     $scope.getRegionName = function(){
         if($scope.region!=null)
             return $scope.region.nombre;
         else
-            return 'Todas';
+            return 'Todas las regiones';
     }
     $scope.setRegion = function(val){
         console.log('setRegion', val);
@@ -60,6 +72,10 @@ function StationsCtrl($http, $scope) {
     $scope.loadRegions();
 
     $scope.searchStations = function() {
+        //refresh order by
+        if($scope.fuel!=null)
+            $scope.orderBy='precios.ranking_' + $scope.fuel;
+
         var tempStationsUrl = stationsUrl;
         tempStationsUrl += '&type=' + $scope.combustible;
         tempStationsUrl += '&order=' + $scope.orderBy;
