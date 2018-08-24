@@ -106,6 +106,7 @@ namespace JAMTech.Controllers
                 price.price,
                 price.ppu,
                 price.status_load,
+                source = "jumbo",
                 ranking = addRanking ? Array.IndexOf(ranking, price.price) + 1 : 0
             });
             if(addRanking)

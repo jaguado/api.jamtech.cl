@@ -53,7 +53,8 @@ namespace JAMTech.Controllers
                     image=p.images,
                     thumb=p.images,
                     description=p.title,
-                    price=p.price_value           
+                    price=p.price_value,
+                    source="knasta"
                 });
                 return new OkObjectResult(commonFormat);
             }
