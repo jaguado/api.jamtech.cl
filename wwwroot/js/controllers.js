@@ -9,11 +9,17 @@
 
  var baseApiUrl='//jamtechapi.herokuapp.com/v1/';
 
- function MainCtrl() {
+ function MainCtrl($scope) {
 
     this.userName = 'Visit';
     this.helloText = 'Welcome to JAM Tech.cl';
     this.descriptionText = '';
+
+
+    $scope.minimalize = function(){
+        $("body").toggleClass("mini-navbar");
+    }
+    $scope.minimalize();
 };
 
 function ProductsCtrl($http, $scope) {

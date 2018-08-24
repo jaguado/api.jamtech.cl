@@ -2,24 +2,16 @@
     <div class="sidebar-collapse">
         <ul side-navigation class="nav metismenu" id="side-menu">
             <li class="nav-header">
+                    <div class="profile-element" ng-click="minimalize()">
+                        &nbsp;
+                        <br />
+                    </div>
 
-                <div class="profile-element" uib-dropdown>
-                    <a uib-dropdown-toggle href>
-                            <span class="clear" >
-                                <span class="block m-t-xs">
-                                    <strong class="font-bold">&nbsp;</strong>
-                             </span>
-                            </span>
-                    </a>
-                    <ul uib-dropdown-menu="" class="animated fadeInRight m-t-xs">
-                        <li><a href="">Logout</a></li>
-                    </ul>
+                <div class="logo-element" ng-click="minimalize()">
+                    <small>JAM</small>
                 </div>
-                <div class="logo-element">
-                    JAM<br /><small>Tech.cl</small>
-                </div>
-
             </li>
+            
             <li ui-sref-active="active">
                 <a ui-sref="index.combustible"><i class="fas fa-gas-pump"></i> <span class="nav-label">Buscar combustible</span></a>
             </li>
