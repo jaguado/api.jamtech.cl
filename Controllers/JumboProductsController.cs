@@ -18,7 +18,7 @@ namespace JAMTech.Controllers
         const string urlProduct = "https://jumbo-ondemand.prod.2brains.cl/api/v2/locals/{0}/products/{1}";
         const string urlSearch = "https://jumbo-ondemand.prod.2brains.cl/api/v2/locals/{0}/products/search/{1}";
         readonly int[] defaultLocals = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }; //TODO add dynamically depending location and other stuff
-        readonly int[] defaultPages = { 1, 2 };
+        readonly int[] defaultPages = { 1 };
 
         /// <summary>
         /// Find products in a jumbo local
@@ -27,10 +27,14 @@ namespace JAMTech.Controllers
         /// <param name="local"></param>
         /// <returns></returns>
         [HttpGet]
-        public IActionResult FindProducts(string product, int local=2)
+        public async Task<IActionResult> FindProducts(string product, int pages=1, int local = 2)
         {
             try
             {
+                var tasks = defaultPages;
+                if (pages > 1)
+                    tasks = Enumerable.Range(1, pages).ToArray();
+
                 var result = defaultPages.Select(page => GetResultAsync(string.Format(urlSearch, local, $"{product}?page={page}")))
                                          .Select(m => m)
                                          .ToArray();
