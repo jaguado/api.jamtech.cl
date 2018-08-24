@@ -38,7 +38,7 @@ namespace JAMTech.Controllers
                 var result = defaultPages.Select(page => GetResultAsync(string.Format(urlSearch, local, $"{product}?page={page}")))
                                          .Select(m => m)
                                          .ToArray();
-                Task.WaitAll(result);
+                await Task.WhenAll(result);
                 var flattenResults = result.Select(m => m.Result).SelectMany(m => m);
                 var formatted = GetFormattedResult(flattenResults);
                 return new OkObjectResult(formatted);
@@ -60,13 +60,12 @@ namespace JAMTech.Controllers
         /// <returns></returns>
         [HttpGet("{productId}/compare")]
         [Produces(typeof(List<Models.Product>))]
-        public IActionResult CompareProducts(int productId)
+        public async Task<IActionResult> CompareProductsAsync(int productId)
         {
             try
             {
                 var results = defaultLocals.Select(local => Helpers.Net.GetResponse(string.Format(urlProduct, local, productId))).ToArray();
-                Task.WaitAll(results);
-
+                await Task.WhenAll(results);
                 var finalResults = results.Select(s => s.Result)
                                    .Where(r => r.IsSuccessStatusCode)
                                    .Select(async r => await r.Content.ReadAsStringAsync())
@@ -94,8 +93,6 @@ namespace JAMTech.Controllers
 
         private static dynamic GetFormattedResult(IEnumerable<Models.Product> result, bool addRanking=false)
         {
-            //TODO in cases when addRanking, return distinct prices with all locals with that price
-
             var ranking = addRanking ? GetRanking(result): null;
             var temp = result.SelectMany(r => r.price, (producto, price) => new
             {

@@ -266,7 +266,7 @@ namespace JAMTech.Helpers
         public static async Task<T> GetStringAsync<T>(string url, int timeOut = _defaultRequestTimeout, string proxy = _defaultRequestProxy, string authorization = _defaultRequestAuthorization, Dictionary<string, string> otherHeaders = null) where T : class
         {
             var httpResponse = await GetStringAsync(url, timeOut, proxy, authorization, otherHeaders) as HttpWebResponse;
-            // TODO: Handle more explicitly the different status codes, especially the ones associated to authorization
+            // TODO Handle more explicitly the different status codes, especially the ones associated to authorization
             if (httpResponse.StatusCode == HttpStatusCode.OK)
             {
                 using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))

@@ -36,7 +36,7 @@ namespace JAMTech.Controllers
 
 
         //TODO move this to knasta controller
-        private static Uri referrer = new Uri("https://knasta.cl"); //TODO obfuscate
+        private static Uri referrer = new Uri("https://knasta.cl");
         const string url = "https://knasta.cl/api/products?p=all&page={1}&q={0}&app_version=2.8.12";
         private static async Task<IActionResult> FindProductsKnastaAsync(string product, int page = 1)
         {    
