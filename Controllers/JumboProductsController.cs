@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Dynamic;
 
 namespace JAMTech.Controllers
 {
@@ -109,13 +110,25 @@ namespace JAMTech.Controllers
             if(addRanking)
             {
                 //group by ranking and return distinct prices with all locals with that price
-                return temp.GroupBy(t => t.ranking)
-                                    .Select((rank, product) => new
-                                    {
-                                        ranking = rank.Key,
-                                        product = rank.First(),
-                                        locals = rank.Select(s => s.local_id)
-                                    });
+                var tempResult = new List<dynamic>();
+                foreach (var rank in temp.GroupBy(t => t.ranking))
+                {
+                    var p = rank.First();
+                    dynamic tempRank = new ExpandoObject();
+                    tempRank.product_id = p.product_id;
+                    tempRank.product_type = p.product_type;
+                    tempRank.brand = p.brand;
+                    tempRank.image = p.image;
+                    tempRank.thumb = p.thumb;
+                    tempRank.description = p.description;
+                    tempRank.price = p.price;
+                    tempRank.ppu = p.ppu;
+                    tempRank.status_load = p.status_load;
+                    tempRank.ranking = p.ranking;
+                    tempRank.local_ids = rank.Select(s => s.local_id);
+                    tempResult.Add(tempRank);
+                }
+                return tempResult;
             }
             return temp.OrderBy(r => r.ranking);
         }
