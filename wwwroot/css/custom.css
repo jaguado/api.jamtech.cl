@@ -1,3 +1,9 @@
 .center-block {
     float: none !important
 }
+.product-imitation-small {
+    text-align: center;
+    padding: 50px 0;
+    color: #bebec3;
+    font-weight: 600;
+  }

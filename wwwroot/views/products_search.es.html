@@ -27,67 +27,87 @@
                                 <i class="fas fa-shopping-cart text-navy mid-icon"></i>
                             </div>
                             <br />
-                            <h2>Busqueda de productos en Jumbo.cl<h2>
+                            <h2>Busqueda de productos</h2>
                             <span class="pull-right">
-                                <p><b><small>Mantenido por&nbsp;<a target="_blank" href="http://www.jamtech.cl/">http://www.jamtech.cl</a></small></b></p>
+                                <b>
+                                    <small>Mantenido por&nbsp;
+                                        <br />
+                                        <a target="_blank" href="http://www.jamtech.cl/">http://www.jamtech.cl</a>
+                                    </small>
+                                </b>
                             </span>
                         </div>
                     </div>
-            <div class="ibox-content forum-container">
-                <div class="panel panel-warning" ng-show="showLocationWarning">
-                        <div class="panel-heading">
-                            <i class="fa fa-warning"></i> Alerta de ubicaci&oacute;n 
-                        </div>
-                        <div class="panel-body">
-                            <p>
-                                No tenemos acceso a tu ubicaci&oacute;n por lo que no podemos identificar donde est&aacute;s para darte informaci&oacute;n relevante.
-                                <br />Compartenos tu ubicaci&oacute;n para recibir informaci&oacute;n m&aacute;s precisa.
-                                <br />En caso contrario el tiempo de carga aumentar&aacute; considerablemente.
-                            </p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="input-group">
-                            <input type="text" placeholder="Ej: Queso mantecoso" name="search" class="form-control input-lg" ng-model="textToSearch" focus-me="true" ng-keypress="($event.which === 13)?searchProduct(textToSearch):0">
-                            <div class="input-group-btn">
-                                <button class="btn btn-lg btn-primary" type="submit" ng-click="searchProduct(textToSearch)">
-                                    Buscar
-                                </button>
+                    <div class="ibox-content forum-container">
+                        <div class="panel panel-warning" ng-show="showLocationWarning">
+                            <div class="panel-heading">
+                                <i class="fa fa-warning"></i> Alerta de ubicaci&oacute;n
+                            </div>
+                            <div class="panel-body">
+                                <p>
+                                    No tenemos acceso a tu ubicaci&oacute;n por lo que no podemos identificar donde est&aacute;s para darte informaci&oacute;n
+                                    relevante.
+                                    <br />Compartenos tu ubicaci&oacute;n para recibir informaci&oacute;n m&aacute;s precisa.
+                                    <br />En caso contrario el tiempo de carga aumentar&aacute; considerablemente.
+                                </p>
                             </div>
                         </div>
-                    <br />      
-                    </div>
-                    <div class="row">
-                        <div class="forum-item active">                   
-                            <div class="row">
-                                <!--Product description -->
-                                <div class="col-sm-3" ng-repeat="product in products">
-                                    <div class="text-center" ng-click="viewProduct(product)">
-                                        <a class="forum-item-title">{{product.product_type | capitalize}} {{product.brand | capitalize}}</a>
-                                        <div>
-                                            <b>{{product.description | capitalize}}</b>
-                                        </div>
-                                        <br />
-                                        <img ng-src="{{product.thumb}}" alt="{{product.product_type}}" style="max-height: 80px; max-width: 80px;" />
-                                        <br />
-                                        <br />
-                                        <span  class="views-number">  
-                                                <p>{{product.price | currency : "$" : 0}}</p>
-                                        </span>
-                                        <small>{{product.ppu}}</small>
-                                        <div ng-show="view == 'Compare'">
-                                            <br />
-                                            <span ng-show="product.ranking > 0 && product.ranking < 4" class="badge" ng-class="{'badge-primary': product.ranking == 1 , 'badge-success': product.ranking == 2}">
-                                                <b>{{product.ranking}}</b>
-                                            </span>
-                                        </div>
-                                    </div> 
-                                    <br />                          
+                        <div class="row">
+                            <div class="input-group">
+                                <input type="text" placeholder="Ej: Queso mantecoso" name="search" class="form-control input-lg" ng-model="textToSearch"
+                                    focus-me="true" ng-keypress="($event.which === 13)?searchProduct(textToSearch):0">
+                                <div class="input-group-btn">
+                                    <button class="btn btn-lg btn-primary" type="submit" ng-click="searchProduct(textToSearch)">
+                                        Buscar
+                                    </button>
                                 </div>
-                            </div>       
+                            </div>
+                            <br />
                         </div>
-                        <small class="pull-right" ng-show="products!=null"><b>{{products.length}}</b> productos encontrados</small>
+                        <div class="row">
+                            <div class="forum-item active">
+                                <!-- new  version -->
+                                <div class="row" ng-repeat="productGroup in products | chunkBy:4">
+                                    <!--Product description -->
+                                    <div class="col-sm-3" ng-repeat="product in productGroup">
+                                        <div class="ibox">
+                                            <div class="ibox-content product-box">
+                                                <div class="product-imitation-small">
+                                                    <img ng-src="{{product.thumb}}" alt="{{product.product_type}}" style="max-height: 80px; max-width: 80px;" />
+                                                </div>
+                                                <div class="product-desc">
+                                                    <span class="product-price">
+                                                        {{product.price | currency : "$" : 0}}
+                                                    </span>
+                                                    <small class="text-muted"> {{product.product_type | capitalize}} {{product.brand | capitalize}}</small>
+                                                    <a href="#" class="product-name">{{product.description | capitalize}}</a>
+                                                    <div class="small m-t-xs">
+                                                        {{product.ppu}}
+                                                    </div>
+                                                    <div class="m-t text-righ">
+                                                        <button href="#" class="btn btn-xs btn-outline btn-primary" ng-click="viewProduct(product)">Ver por local
+                                                            <i class="fa fa-long-arrow-right"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div class="pull-right" ng-show="view == 'Compare'">
+                                                        <br />
+                                                        <span ng-show="product.ranking > 0 && product.ranking < 4" class="badge" ng-class="{'badge-primary': product.ranking == 1 , 'badge-success': product.ranking == 2}">
+                                                            <!--<b>{{product.ranking}}</b>-->
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--End Product description -->
+                                </div>
+                            </div>
+                            <small class="pull-right" ng-show="products!=null">
+                                <b>{{products.length}}</b> productos encontrados</small>
+                        </div>
                     </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
