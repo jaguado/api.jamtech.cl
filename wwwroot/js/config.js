@@ -7,7 +7,7 @@
  *
  */
 function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
-    $urlRouterProvider.otherwise("/standalone/combustible");
+    $urlRouterProvider.otherwise("/index/combustible");
 
     $ocLazyLoadProvider.config({
         // Set to true if you want to see what and when is dynamically loaded
@@ -21,24 +21,6 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
             url: "/index",
             templateUrl: "views/common/content.html",
         })
-        .state('index.combustible2', {
-            url: "/combustible2",
-            templateUrl: "views/slick.html",
-            data: { pageTitle: 'Combustible Search' },
-            resolve: {
-                loadPlugin: function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
-                            files: ['css/plugins/slick/slick.css','css/plugins/slick/slick-theme.css','js/plugins/slick/slick.min.js']
-                        },
-                        {
-                            name: 'slick',
-                            files: ['js/plugins/slick/angular-slick.min.js']
-                        }
-                    ]);
-                }
-            }
-        })
         .state('index.combustible', {
             url: "/combustible",
             templateUrl: "views/combustible_search.es.html",
@@ -48,6 +30,16 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
             url: "/standalone/combustible",
             templateUrl: "views/combustible_search.es.html",
             data: { pageTitle: 'Combustible Search' }
+        })
+        .state('index.products', {
+            url: "/products",
+            templateUrl: "views/products_search.es.html",
+            data: { pageTitle: 'Products Search' }
+        })
+        .state('products', {
+            url: "/standalone/products",
+            templateUrl: "views/products_search.es.html",
+            data: { pageTitle: 'Products Search' }
         })
         .state('index.projects', {
             url: "/projects",

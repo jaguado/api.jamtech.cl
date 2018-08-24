@@ -11,11 +11,62 @@
 
  function MainCtrl() {
 
-    this.userName = 'Example user';
-    this.helloText = 'Welcome in SeedProject';
-    this.descriptionText = 'It is an application skeleton for a typical AngularJS web app. You can use it to quickly bootstrap your angular webapp projects and dev environment for these projects.';
+    this.userName = 'Visit';
+    this.helloText = 'Welcome to JAM Tech.cl';
+    this.descriptionText = '';
 };
 
+function ProductsCtrl($http, $scope) {
+    var searchUrl = baseApiUrl + 'JumboProducts?limit=10&product=';
+    var compareUrl  = baseApiUrl + 'JumboProducts/{productId}/compare';
+  
+    $scope.view = 'Search';
+    $scope.textToSearch=null;
+    $scope.position=null;
+    $scope.showLocationWarning=false;
+    $scope.products=[];
+    $scope.searchProduct = function(product) {
+        console.log('searchProduct', product);
+        $scope.textToSearch=product;
+        var url = searchUrl + product;
+
+        //get stations from api.jamtech.cl
+        return $http.get(url).then(function(response){
+            console.log('searchProduct', response.data);
+            $scope.products=response.data;
+            $scope.view = 'Search';
+            return true;
+        });
+    };
+    //$scope.searchProduct('vino');
+
+    $scope.viewProduct = function(product) {
+        console.log('viewProduct', product);
+
+        var url = compareUrl.replace('{productId}', product.product_id);
+        //get stations from api.jamtech.cl
+        return $http.get(url).then(function(response){
+            console.log('viewProduct', response.data);
+            $scope.products=response.data;
+            $scope.view = 'Compare';
+            return true;
+        });
+    };
+
+    //try to read geolocation from browser
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position){
+          $scope.$apply(function(){
+            $scope.position = position;
+            $scope.showLocationWarning=false;
+            console.log('position', position);
+          });
+        },
+        function(error) {
+            $scope.showLocationWarning=true;
+        });
+    };
+}
 function StationsCtrl($http, $scope) {
     
     var stationsUrl = baseApiUrl + 'CombustibleStations?';
@@ -148,6 +199,11 @@ function StationsCtrl($http, $scope) {
     };
 }
 
+
+
+
+
+// End of controllers
 //math operations used to calculate distnace between two points
 function deg2rad(deg) {
     return deg * (Math.PI/180)
@@ -191,5 +247,6 @@ angular
     .module('inspinia')
     .controller('MainCtrl', MainCtrl)
     .controller('StationsCtrl', StationsCtrl)
+    .controller('ProductsCtrl', ProductsCtrl)
     .filter('capitalize', Capitalize) 
     .filter('toArray', toArray);

@@ -49,24 +49,24 @@
                     </div>
                     <div class="row">
                         <div class="col-sm-6">
-                                Filtros:
-                                <div class="btn-group dropdown" uib-dropdown="">
-                                    <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle="" aria-haspopup="true" aria-expanded="false">
-                                        {{combustible}} <span class="caret"></span>
-                                    </button>
-                                    <ul role="menu" uib-dropdown-menu="" class="dropdown-menu">
-                                        <li>
-                                            <a href="#" ng-click="setCombustible('Vehicular')">
-                                                Vehicular
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="#" ng-click="setCombustible('Calefaccion')">
-                                                Calefaccion
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
+                            Filtros:
+                            <div class="btn-group dropdown" uib-dropdown="">
+                                <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle="" aria-haspopup="true" aria-expanded="false">
+                                    {{combustible}} <span class="caret"></span>
+                                </button>
+                                <ul role="menu" uib-dropdown-menu="" class="dropdown-menu">
+                                    <li>
+                                        <a href="#" ng-click="setCombustible('Vehicular')">
+                                            Vehicular
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#" ng-click="setCombustible('Calefaccion')">
+                                            Calefaccion
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                             <div class="btn-group dropdown" uib-dropdown="">
                                 <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle="" aria-haspopup="true" aria-expanded="false">
                                     {{getRegionName()}} <span class="caret"></span>
@@ -193,5 +193,6 @@
                 </div>
                 <small class="pull-right" ng-show="stations!=null"><b>{{stations.length}}</b> estaciones encontradas en un radio de <b>{{maxDistance}}</b> metros</small>
             </div>
+        </div>
     </div>
 </div>

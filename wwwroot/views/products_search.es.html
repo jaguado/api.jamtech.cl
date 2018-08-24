@@ -1,0 +1,93 @@
+<div class="gray-bg">
+    <div class="row wrapper border-bottom white-bg page-heading">
+        <div class="col-lg-12">
+            <div>
+                <br />
+                <img class="pull-right" src="img/favicon/apple-icon-60x60.png" alt="logo" />
+            </div>
+            <h2>JAM Tech.cl</h2>
+            <ol class="breadcrumb">
+                <li>
+                    <a href="index.html">Inicio</a>
+                </li>
+                <li class="active">
+                    <strong>Busca en Jumbo.cl</strong>
+                </li>
+            </ol>
+            <br />
+        </div>
+    </div>
+    <div class="wrapper wrapper-content" ng-controller="ProductsCtrl as main">
+        <div class="row animated fadeInRight">
+            <div class="col-lg-12">
+                <div class="wrapper wrapper-content animated fadeInRight">
+                    <div class="ibox-content m-b-sm border-bottom">
+                        <div class="p-xs">
+                            <div class="pull-left m-r-md">
+                                <i class="fas fa-shopping-cart text-navy mid-icon"></i>
+                            </div>
+                            <br />
+                            <h2>Busqueda de productos en Jumbo.cl<h2>
+                            <span class="pull-right">
+                                <p><b><small>Mantenido por&nbsp;<a target="_blank" href="http://www.jamtech.cl/">http://www.jamtech.cl</a></small></b></p>
+                            </span>
+                        </div>
+                    </div>
+            <div class="ibox-content forum-container">
+                <div class="panel panel-warning" ng-show="showLocationWarning">
+                        <div class="panel-heading">
+                            <i class="fa fa-warning"></i> Alerta de ubicaci&oacute;n 
+                        </div>
+                        <div class="panel-body">
+                            <p>
+                                No tenemos acceso a tu ubicaci&oacute;n por lo que no podemos identificar donde est&aacute;s para darte informaci&oacute;n relevante.
+                                <br />Compartenos tu ubicaci&oacute;n para recibir informaci&oacute;n m&aacute;s precisa.
+                                <br />En caso contrario el tiempo de carga aumentar&aacute; considerablemente.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-group">
+                            <input type="text" placeholder="Ej: Queso mantecoso" name="search" class="form-control input-lg" ng-model="textToSearch" focus-me="true" ng-keypress="($event.which === 13)?searchProduct(textToSearch):0">
+                            <div class="input-group-btn">
+                                <button class="btn btn-lg btn-primary" type="submit" ng-click="searchProduct(textToSearch)">
+                                    Buscar
+                                </button>
+                            </div>
+                        </div>
+                    <br />      
+                    </div>
+                    <div class="row">
+                        <div class="forum-item active">                   
+                            <div class="row">
+                                <!--Product description -->
+                                <div class="col-sm-3" ng-repeat="product in products">
+                                    <div class="text-center" ng-click="viewProduct(product)">
+                                        <a class="forum-item-title">{{product.product_type | capitalize}} {{product.brand | capitalize}}</a>
+                                        <div>
+                                            <b>{{product.description | capitalize}}</b>
+                                        </div>
+                                        <br />
+                                        <img ng-src="{{product.thumb}}" alt="{{product.product_type}}" style="max-height: 80px; max-width: 80px;" />
+                                        <br />
+                                        <br />
+                                        <span  class="views-number">  
+                                                <p>{{product.price | currency : "$" : 0}}</p>
+                                        </span>
+                                        <small>{{product.ppu}}</small>
+                                        <div ng-show="view == 'Compare'">
+                                            <br />
+                                            <span ng-show="product.ranking > 0 && product.ranking < 4" class="badge" ng-class="{'badge-primary': product.ranking == 1 , 'badge-success': product.ranking == 2}">
+                                                <b>{{product.ranking}}</b>
+                                            </span>
+                                        </div>
+                                    </div> 
+                                    <br />                          
+                                </div>
+                            </div>       
+                        </div>
+                        <small class="pull-right" ng-show="products!=null"><b>{{products.length}}</b> productos encontrados</small>
+                    </div>
+        </div>
+    </div>
+</div>

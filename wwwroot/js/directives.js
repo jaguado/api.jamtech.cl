@@ -176,4 +176,20 @@ angular
     .directive('sideNavigation', sideNavigation)
     .directive('iboxTools', iboxTools)
     .directive('minimalizaSidebar', minimalizaSidebar)
-    .directive('iboxToolsFullScreen', iboxToolsFullScreen);
+    .directive('iboxToolsFullScreen', iboxToolsFullScreen)
+    .directive('focusMe', function($timeout) {
+    return {
+        scope: { trigger: '@focusMe' },
+        link: function(scope, element) {
+        scope.$watch('trigger', function(value) {
+            if(value === "true") { 
+            $timeout(function() {
+                element[0].focus(); 
+            });
+            }
+        });
+        }
+    };
+    });
+
+    
