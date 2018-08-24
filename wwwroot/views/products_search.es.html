@@ -11,7 +11,7 @@
                     <a href="index.html">Inicio</a>
                 </li>
                 <li class="active">
-                    <strong>Busca en Jumbo.cl</strong>
+                    <strong>Buscador de productos</strong>
                 </li>
             </ol>
             <br />
@@ -75,7 +75,7 @@
                                                         {{product.price | currency : "$" : 0}}
                                                     </span>
                                                     <small class="text-muted"> {{ product | getBrand | capitalize | truncate: 25: '...'}}</small>
-                                                    <a href="#" class="product-name">{{product.description | capitalize | truncate: 35: '...'}}</a>
+                                                    <a class="product-name">{{product.description | capitalize | truncate: 35: '...'}}</a>
                                                     <div class="small m-t-xs">
                                                         {{product.ppu}}
                                                     </div>
