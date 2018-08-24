@@ -81,7 +81,19 @@
                                     <li><a href="#" ng-click="setRegion(null)">Todas</a></li>
                                 </ul>
                             </div>
-                            <br >
+                            <div class="btn-group dropdown" uib-dropdown="">
+                                    <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle="" aria-haspopup="true" aria-expanded="false">
+                                        {{maxDistance}} mts <span class="caret"></span>
+                                    </button>
+                                    <ul role="menu" uib-dropdown-menu="" class="dropdown-menu">
+                                        <li ng-repeat="distance in distances" ng-model="maxDistance">
+                                            <a href="#" ng-click="setDistance(distance)">
+                                                {{distance}} mts
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            <br />
                             Orden:
                             <div class="btn-group dropdown" uib-dropdown="">
                                     <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle="" aria-haspopup="true" aria-expanded="false">

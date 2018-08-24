@@ -17,20 +17,24 @@
 };
 
 function StationsCtrl($http, $scope) {
-    $scope.maxDistance = 10000; //in meters
+    
     var stationsUrl = baseApiUrl + 'CombustibleStations?';
     var regionsUrl  = baseApiUrl + 'CombustibleStations/Regiones';
 
-    $scope.searchText="";
+
+    //defaults
+    $scope.maxDistance = 10000; //in meters
     $scope.region=null; //all is the default //TODO read from cookie or calculate by location
     $scope.fuel='gasolina_95';
     $scope.fuelTypes = ["gasolina_93","gasolina_95","gasolina_97","diesel","kerosene","glp_vehicular"];
+    $scope.distances = [1000,5000,10000,15000,20000,50000,100000];
     $scope.combustible='Vehicular';
     $scope.orderBy='precios.ranking_gasolina_95';
     $scope.regions = [];
     $scope.stations=null;
     $scope.showLocationWarning=false;
 
+    /// Load parameters from local storage
     function loadFromLocalStorage(){
         var fuel =  localStorage.getItem('fuel');
         if(fuel!=null)
@@ -41,9 +45,18 @@ function StationsCtrl($http, $scope) {
         var combustible =  localStorage.getItem('combustible');
         if(combustible!=null)
             $scope.combustible = combustible;
+        var distance =  localStorage.getItem('distance');
+        if(distance!=null)
+            $scope.maxDistance = distance;
     }
     loadFromLocalStorage();
 
+
+    $scope.setDistance = function (val){
+        $scope.maxDistance=val;
+        localStorage.setItem('distance', val);
+        $scope.searchStations();
+    }
     $scope.setFuel = function (val){
         $scope.fuel=val;
         localStorage.setItem('fuel', val);
@@ -92,6 +105,7 @@ function StationsCtrl($http, $scope) {
         if($scope.fuel!=null)
             $scope.orderBy='precios.ranking_' + $scope.fuel;
 
+        //add filters
         var tempStationsUrl = stationsUrl;
         tempStationsUrl += '&type=' + $scope.combustible;
         tempStationsUrl += '&order=' + $scope.orderBy;
@@ -101,10 +115,13 @@ function StationsCtrl($http, $scope) {
         else
             tempStationsUrl += '0';
 
+        //add position
         if($scope.position!=null){
             tempStationsUrl += '&lat=' + $scope.position.coords.latitude +'&lng=' + $scope.position.coords.longitude;
             tempStationsUrl += '&filters=ubicacion.distancia<' + $scope.maxDistance; 
         }
+
+        //get stations from api.jamtech.cl
         return $http.get(tempStationsUrl).then(function(response){
             $scope.stations=response.data;
             $scope.searchText = $scope.searchTextTemp;
@@ -113,6 +130,7 @@ function StationsCtrl($http, $scope) {
         });
     };
 
+    //try to read geolocation from browser
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position){
           $scope.$apply(function(){
@@ -130,6 +148,7 @@ function StationsCtrl($http, $scope) {
     };
 }
 
+//math operations used to calculate distnace between two points
 function deg2rad(deg) {
     return deg * (Math.PI/180)
 }
@@ -148,24 +167,29 @@ function getDistanceBetweenTwoPointsInMeters (lat1,lon1,lat2,lon2) {
     return d;
 };
 
+function Capitalize() {
+    return function(input) {
+        return (!!input) ? input.charAt(0).toUpperCase() + input.substr(1).toLowerCase() : '';
+    }
+};
 
+
+function toArray() {
+    'use strict';
+    return function (obj) {
+        if (!(obj instanceof Object)) {
+            return obj;
+        }
+        return Object.keys(obj).map(function (key) {
+            return Object.defineProperty(obj[key], '$key', {__proto__: null, value: key});
+        });
+    }
+};
+
+//angular js - load controllers, filters and other stuff
 angular
     .module('inspinia')
     .controller('MainCtrl', MainCtrl)
     .controller('StationsCtrl', StationsCtrl)
-    .filter('capitalize', function() {
-        return function(input) {
-          return (!!input) ? input.charAt(0).toUpperCase() + input.substr(1).toLowerCase() : '';
-        }
-     })
-    .filter('toArray', function () {
-        'use strict';
-        return function (obj) {
-            if (!(obj instanceof Object)) {
-                return obj;
-            }
-            return Object.keys(obj).map(function (key) {
-                return Object.defineProperty(obj[key], '$key', {__proto__: null, value: key});
-            });
-        }
-    });
+    .filter('capitalize', Capitalize) 
+    .filter('toArray', toArray);
