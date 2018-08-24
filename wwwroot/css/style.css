@@ -314,6 +314,13 @@ body.mini-navbar .navbar-default .nav > li > .nav-second-level li a {
   display: none;
   padding: 18px 0;
 }
+.logo-element-custom {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  padding: 18px 0;
+}
 .pace-done .navbar-static-side,
 .pace-done .nav-header,
 .pace-done li.active,
