@@ -29,12 +29,7 @@
                             <br />
                             <h2>Busqueda de productos</h2>
                             <span class="pull-right">
-                                <b>
-                                    <small>Mantenido por&nbsp;
-                                        <br />
-                                        <a target="_blank" href="http://www.jamtech.cl/">http://www.jamtech.cl</a>
-                                    </small>
-                                </b>
+                                <brand-url />
                             </span>
                         </div>
                     </div>
@@ -79,21 +74,22 @@
                                                     <span class="product-price">
                                                         {{product.price | currency : "$" : 0}}
                                                     </span>
-                                                    <small class="text-muted"> {{product.product_type | capitalize}} {{product.brand | capitalize}}</small>
-                                                    <a href="#" class="product-name">{{product.description | capitalize}}</a>
+                                                    <small class="text-muted"> {{ product | getBrand | capitalize | truncate: 25: '...'}}</small>
+                                                    <a href="#" class="product-name">{{product.description | capitalize | truncate: 35: '...'}}</a>
                                                     <div class="small m-t-xs">
                                                         {{product.ppu}}
                                                     </div>
-                                                    <div class="m-t text-righ">
+                                                    <div class="m-t text-righ" ng-show="view != 'Compare'">
                                                         <button href="#" class="btn btn-xs btn-outline btn-primary" ng-click="viewProduct(product)">Ver por local
                                                             <i class="fa fa-long-arrow-right"></i>
                                                         </button>
                                                     </div>
                                                     <div class="pull-right" ng-show="view == 'Compare'">
-                                                        <br />
+                                                       <!-- <br />
                                                         <span ng-show="product.ranking > 0 && product.ranking < 4" class="badge" ng-class="{'badge-primary': product.ranking == 1 , 'badge-success': product.ranking == 2}">
-                                                            <!--<b>{{product.ranking}}</b>-->
+                                                            <b>{{product.ranking}}</b>
                                                         </span>
+                                                        -->
                                                     </div>
                                                 </div>
                                             </div>
@@ -103,7 +99,7 @@
                                 </div>
                             </div>
                             <small class="pull-right" ng-show="products!=null">
-                                <b>{{products.length}}</b> productos encontrados</small>
+                                <b>{{products.length}}</b> producto{{products.length>1 ? 's' : ''}} encontrado{{products.length>1 ? 's' : ''}}</small>
                         </div>
                     </div>
                 </div>

@@ -88,7 +88,7 @@ function StationsCtrl($http, $scope) {
     $scope.combustible='Vehicular';
     $scope.orderBy='precios.ranking_gasolina_95';
     $scope.regions = [];
-    $scope.stations=null;
+    $scope.stations=[];
     $scope.showLocationWarning=false;
 
     /// Load parameters from local storage
@@ -248,6 +248,13 @@ function toArray() {
     }
 };
 
+function getProductBrandType(){
+    return function(product){
+        return  product.product_type + ' ' + product.brand;
+    }
+}
+
+
 //angular js - load controllers, filters and other stuff
 angular
     .module('inspinia')
@@ -255,4 +262,5 @@ angular
     .controller('StationsCtrl', StationsCtrl)
     .controller('ProductsCtrl', ProductsCtrl)
     .filter('capitalize', Capitalize) 
-    .filter('toArray', toArray);
+    .filter('toArray', toArray)
+    .filter('getBrand', getProductBrandType);

@@ -24,6 +24,13 @@ function pageTitle($rootScope, $timeout) {
     }
 }
 
+
+function brandUrl(){
+    return {
+        template : "<b><small>Mantenido por&nbsp;<br /><a target=\"_blank\" href=\"http://www.jamtech.cl/\">http://www.jamtech.cl</a></small></b>"
+    };
+}
+
 /**
  * sideNavigation - Directive for run metsiMenu on sidebar navigation
  */
@@ -173,6 +180,7 @@ function minimalizaSidebar($timeout) {
 angular
     .module('inspinia')
     .directive('pageTitle', pageTitle)
+    .directive('brandUrl', brandUrl)
     .directive('sideNavigation', sideNavigation)
     .directive('iboxTools', iboxTools)
     .directive('minimalizaSidebar', minimalizaSidebar)
