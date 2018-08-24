@@ -64,11 +64,11 @@
                                 <!-- new  version -->
                                 <div class="row" ng-repeat="productGroup in products | chunkBy:4">
                                     <!--Product description -->
-                                    <div class="col-sm-3" ng-repeat="product in productGroup">
-                                        <div class="ibox">
+                                    <div class="col-md-3" ng-repeat="product in productGroup">
+                                        <div class="ibox" height="400px">
                                             <div class="ibox-content product-box">
                                                 <div class="product-imitation-small">
-                                                    <img ng-src="{{product.thumb}}" alt="{{product.product_type}}" style="max-height: 80px; max-width: 80px;" />
+                                                    <img ng-src="{{product.thumb}}" alt="{{product.product_type}}" style="max-height: 100px; max-width: 100px;" />
                                                 </div>
                                                 <div class="product-desc">
                                                     <span class="product-price">
@@ -79,7 +79,7 @@
                                                     <div class="small m-t-xs">
                                                         {{product.ppu}}
                                                     </div>
-                                                    <div class="m-t text-righ" ng-show="view != 'Compare'">
+                                                    <div class="m-t text-righ" ng-show="view != 'Compare' && product.ppu!=null">
                                                         <button href="#" class="btn btn-xs btn-outline btn-primary" ng-click="viewProduct(product)">Ver por local
                                                             <i class="fa fa-long-arrow-right"></i>
                                                         </button>

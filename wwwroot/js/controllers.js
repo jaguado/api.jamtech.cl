@@ -23,7 +23,7 @@
 };
 
 function ProductsCtrl($http, $scope) {
-    var searchUrl = baseApiUrl + 'JumboProducts?product=';
+    var searchUrl = baseApiUrl + 'Products?pages=1&product=';
     var compareUrl  = baseApiUrl + 'JumboProducts/{productId}/compare';
   
     $scope.view = 'Search';
