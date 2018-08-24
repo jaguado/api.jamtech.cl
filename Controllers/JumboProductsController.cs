@@ -89,8 +89,10 @@ namespace JAMTech.Controllers
 
         private static dynamic GetFormattedResult(IEnumerable<Models.Product> result, bool addRanking=false)
         {
+            //TODO in cases when addRanking, return distinct prices with all locals with that price
+
             var ranking = addRanking ? GetRanking(result): null;
-            return result.SelectMany(r => r.price, (producto, price) => new
+            var temp = result.SelectMany(r => r.price, (producto, price) => new
             {
                 producto.product_id,
                 producto.product_type,
@@ -103,8 +105,19 @@ namespace JAMTech.Controllers
                 price.ppu,
                 price.status_load,
                 ranking = addRanking ? Array.IndexOf(ranking, price.price) + 1 : 0
-            })
-            .OrderBy(r => r.ranking);
+            });
+            if(addRanking)
+            {
+                //group by ranking and return distinct prices with all locals with that price
+                return temp.GroupBy(t => t.ranking)
+                                    .Select((rank, product) => new
+                                    {
+                                        ranking = rank.Key,
+                                        product = rank.First(),
+                                        locals = rank.Select(s => s.local_id)
+                                    });
+            }
+            return temp.OrderBy(r => r.ranking);
         }
         private static int[] GetRanking(IEnumerable<Models.Product> filteredResult)
         {
