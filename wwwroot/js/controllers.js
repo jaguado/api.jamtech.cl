@@ -81,6 +81,7 @@ function StationsCtrl($http, $scope) {
 
     //defaults
     $scope.maxDistance = 10000; //in meters
+    $scope.distributor=null;
     $scope.region=null; //all is the default //TODO read from cookie or calculate by location
     $scope.fuel='gasolina_95';
     $scope.fuelTypes = ["gasolina_93","gasolina_95","gasolina_97","diesel","kerosene","glp_vehicular"];
@@ -105,10 +106,23 @@ function StationsCtrl($http, $scope) {
         var distance =  localStorage.getItem('distance');
         if(distance!=null)
             $scope.maxDistance = distance;
+        var distributor =  localStorage.getItem('distributor');
+        if(distributor!=null)
+            $scope.distributor = distributor;
     }
     loadFromLocalStorage();
 
-
+    $scope.setDistributor = function(val){
+        $scope.distributor = val;
+        localStorage.setItem('distributor', val);
+        $scope.searchStations();
+    }
+    $scope.getDistributors = function(){
+        if($scope.stations!=null){
+            var result= $scope.stations.map(m=> m.distribuidor.nombre).filter(onlyUnique);
+            return result;
+        }
+    }
     $scope.setDistance = function (val){
         $scope.maxDistance=val;
         localStorage.setItem('distance', val);
@@ -135,7 +149,6 @@ function StationsCtrl($http, $scope) {
         localStorage.setItem('region', val);
         $scope.searchStations();
     };
-
     $scope.getFuelType = function(){
         if($scope.fuel!=null)
             return $scope.fuel;
@@ -147,6 +160,12 @@ function StationsCtrl($http, $scope) {
             return $scope.region.nombre;
         else
             return 'Todas las regiones';
+    }
+    $scope.getDistributorName = function(){
+        if($scope.distributor!=null)
+            return $scope.distributor;
+        else
+            return 'Todas las marcas';
     }
     $scope.loadRegions = function() {
         return $http.get(regionsUrl).then(function(response){
@@ -171,6 +190,9 @@ function StationsCtrl($http, $scope) {
             tempStationsUrl += $scope.region.codigo;
         else
             tempStationsUrl += '0';
+        
+        if($scope.distributor!=null)
+            tempStationsUrl += '&distributor=' + $scope.distributor;
 
         //add position
         if($scope.position!=null){
@@ -254,6 +276,9 @@ function getProductBrandType(){
     }
 }
 
+function onlyUnique(value, index, self) { 
+    return self.indexOf(value) === index;
+}
 
 //angular js - load controllers, filters and other stuff
 angular

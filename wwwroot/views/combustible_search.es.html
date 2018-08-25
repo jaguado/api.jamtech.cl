@@ -49,7 +49,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-sm-6">
+                            <div class="col-sm-6" style="vertical-align: middle">
                                 Filtros:
                                 <div class="btn-group dropdown" uib-dropdown="">
                                     <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle="" aria-haspopup="true" aria-expanded="false">
@@ -88,6 +88,23 @@
                                 </div>
                                 <div class="btn-group dropdown" uib-dropdown="">
                                     <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle="" aria-haspopup="true" aria-expanded="false">
+                                        {{getDistributorName()}}
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul role="menu" uib-dropdown-menu="" class="dropdown-menu">
+                                        <li ng-repeat="brand in getDistributors()" ng-model="distributor">
+                                            <a href="#" ng-click="setDistributor(brand)">
+                                                {{brand}}
+                                            </a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li>
+                                            <a href="#" ng-click="setDistributor(null)">Todas</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="btn-group dropdown" uib-dropdown="">
+                                    <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle="" aria-haspopup="true" aria-expanded="false">
                                         {{maxDistance}} mts
                                         <span class="caret"></span>
                                     </button>
@@ -99,16 +116,17 @@
                                         </li>
                                     </ul>
                                 </div>
-                                <br /> Orden:
-                                <div class="btn-group dropdown" uib-dropdown="">
+                                <br />
+                                Orden:
+                                <div class="btn-group dropdown"  style="vertical-align: middle" uib-dropdown="">
                                     <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle="" aria-haspopup="true" aria-expanded="false">
-                                        {{getFuelType()}}
+                                        {{getFuelType() | capitalize}}
                                         <span class="caret"></span>
                                     </button>
                                     <ul role="menu" uib-dropdown-menu="" class="dropdown-menu">
                                         <li ng-repeat="fuel in fuelTypes" ng-model="fuel">
                                             <a href="#" ng-click="setFuel(fuel)">
-                                                {{fuel}}
+                                                {{fuel | capitalize}}
                                             </a>
                                         </li>
                                     </ul>
