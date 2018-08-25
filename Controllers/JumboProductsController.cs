@@ -102,7 +102,8 @@ namespace JAMTech.Controllers
 
         public static IDictionary<int, string> locals = null;
         private static dynamic GetFormattedResultAsync(IEnumerable<Models.Product> result, bool addRanking=false)
-        {                   
+        {
+            if (result == null) return null;
             var ranking = addRanking ? GetRanking(result): null;
             var temp = result.SelectMany(r => r.price, (producto, price) => new
             {
