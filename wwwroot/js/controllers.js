@@ -95,26 +95,26 @@ function StationsCtrl($http, $scope) {
     /// Load parameters from local storage
     function loadFromLocalStorage(){
         var fuel =  localStorage.getItem('fuel');
-        if(fuel!=null)
+        if(fuel)
             $scope.fuel = fuel;
         var region =  localStorage.getItem('region');
-        if(region!=null)
-            $scope.region = region;
+        if(region)
+            $scope.region = JSON.parse(region);
         var combustible =  localStorage.getItem('combustible');
-        if(combustible!=null)
+        if(combustible)
             $scope.combustible = combustible;
         var distance =  localStorage.getItem('distance');
-        if(distance!=null)
+        if(distance)
             $scope.maxDistance = distance;
         var distributor =  localStorage.getItem('distributor');
-        if(distributor!=null)
+        if(distributor)
             $scope.distributor = distributor;
     }
     loadFromLocalStorage();
 
     $scope.setDistributor = function(val){
         $scope.distributor = val;
-        localStorage.setItem('distributor', val);
+        localStorage.setItem('distributor', val!=null ? val : '');
         $scope.searchStations();
     }
     $scope.getDistributors = function(){
@@ -125,12 +125,12 @@ function StationsCtrl($http, $scope) {
     }
     $scope.setDistance = function (val){
         $scope.maxDistance=val;
-        localStorage.setItem('distance', val);
+        localStorage.setItem('distance', val!=null ? val: '');
         $scope.searchStations();
     }
     $scope.setFuel = function (val){
         $scope.fuel=val;
-        localStorage.setItem('fuel', val);
+        localStorage.setItem('fuel', val!=null ? val : '');
         $scope.searchStations();
     }
     $scope.setCombustible = function(val){
@@ -140,13 +140,13 @@ function StationsCtrl($http, $scope) {
         else
             $scope.orderBy='precios.ranking_kerosene';
         $scope.combustible=val;
-        localStorage.setItem('combustible', val);
+        localStorage.setItem('combustible', val!=null ? val : '');
         $scope.searchStations();
     };
     $scope.setRegion = function(val){
         console.log('setRegion', val);
         $scope.region=val;
-        localStorage.setItem('region', val);
+        localStorage.setItem('region', val!=null ? JSON.stringify(val) : '');
         $scope.searchStations();
     };
     $scope.getFuelType = function(){
@@ -162,7 +162,7 @@ function StationsCtrl($http, $scope) {
             return 'Todas las regiones';
     }
     $scope.getDistributorName = function(){
-        if($scope.distributor!=null)
+        if($scope.distributor)
             return $scope.distributor;
         else
             return 'Todas las marcas';
