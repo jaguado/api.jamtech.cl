@@ -17,6 +17,7 @@ namespace JAMTech.Controllers
     {
         const string urlProduct = "https://jumbo-ondemand.prod.2brains.cl/api/v2/locals/{0}/products/{1}";
         const string urlSearch = "https://jumbo-ondemand.prod.2brains.cl/api/v2/locals/{0}/products/search/{1}";
+        const string urlLocals = "https://jumbo-ondemand.prod.2brains.cl/api/v2/locals/";
         readonly int[] defaultLocals = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }; //TODO add dynamically depending location and other stuff
         readonly int[] defaultPages = { 1 };
 
@@ -40,7 +41,7 @@ namespace JAMTech.Controllers
                                          .ToArray();
                 await Task.WhenAll(result);
                 var flattenResults = result.Select(m => m.Result).SelectMany(m => m);
-                var formatted = GetFormattedResult(flattenResults);
+                var formatted = GetFormattedResultAsync(flattenResults);
                 return new OkObjectResult(formatted);
             }
             catch (WebException wex)
@@ -78,7 +79,7 @@ namespace JAMTech.Controllers
                                 .Where(r => r.active && r.price.Any()) //only active products with price
                                 .AsQueryable<Models.Product>(); //this allow dynamic filtering and ordering
 
-                var result = GetFormattedResult(aggResult, true);
+                var result = GetFormattedResultAsync(aggResult, true);
                 return new OkObjectResult(result);
             }
             catch (WebException wex)
@@ -91,8 +92,10 @@ namespace JAMTech.Controllers
             }
         }
 
-        private static dynamic GetFormattedResult(IEnumerable<Models.Product> result, bool addRanking=false)
-        {
+
+        public static IDictionary<int, string> locals = null;
+        private static dynamic GetFormattedResultAsync(IEnumerable<Models.Product> result, bool addRanking=false)
+        {                   
             var ranking = addRanking ? GetRanking(result): null;
             var temp = result.SelectMany(r => r.price, (producto, price) => new
             {
@@ -103,6 +106,7 @@ namespace JAMTech.Controllers
                 producto.thumb,
                 producto.description,
                 price.local_id,
+                local = locals[price.local_id],
                 price.price,
                 price.ppu,
                 price.status_load,
@@ -128,6 +132,7 @@ namespace JAMTech.Controllers
                     tempRank.status_load = p.status_load;
                     tempRank.ranking = p.ranking;
                     tempRank.local_ids = rank.Select(s => s.local_id);
+                    tempRank.locals = rank.Select(s => s.local);
                     tempResult.Add(tempRank);
                 }
                 return tempResult;
@@ -150,6 +155,17 @@ namespace JAMTech.Controllers
                 var content = await result.Content.ReadAsStringAsync();
                 var productsResult = JsonConvert.DeserializeObject<JObject>(content)["products"].ToString();
                 return JsonConvert.DeserializeObject<List<Models.Product>>(productsResult);
+            }
+            return null;
+        }
+        internal static async Task<Dictionary<int, string>> GetLocalsAsync()
+        {
+            var result = await Helpers.Net.GetResponse(urlLocals);
+            if (result.IsSuccessStatusCode && locals==null)
+            {
+                var content = await result.Content.ReadAsStringAsync();
+                var localsResult = JsonConvert.DeserializeObject <Models.JumboLocals>(content);
+                return localsResult.locals.ToDictionary(l => l.local_id, l => l.local_name);
             }
             return null;
         }

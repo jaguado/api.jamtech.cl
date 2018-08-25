@@ -16,6 +16,7 @@ namespace JAMTech
                 var monitor = new Monitor(monitoringUrl, Monitor.AvailableMethods.GET, int.Parse(monitoringInterval), 200);
             }
 
+            Controllers.JumboProductsController.locals = Controllers.JumboProductsController.GetLocalsAsync().Result;
             var url = "http://*:" + Environment.GetEnvironmentVariable("PORT") ?? throw new ApplicationException("'PORT' variable must be defined");
             Console.WriteLine("Starting web server on " + url);
             BuildWebHost(args, url).Run();
