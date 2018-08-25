@@ -21,6 +21,13 @@ namespace JAMTech.Controllers
         readonly int[] defaultLocals = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }; //TODO add dynamically depending location and other stuff
         readonly int[] defaultPages = { 1 };
 
+
+        public JumboProductsController()
+        {
+            //load parameters
+            locals = Controllers.JumboProductsController.GetLocalsAsync().Result;
+        }
+
         /// <summary>
         /// Find products in a jumbo local
         /// </summary>
@@ -93,7 +100,7 @@ namespace JAMTech.Controllers
         }
 
 
-        public static IDictionary<int, string> locals = Controllers.JumboProductsController.GetLocalsAsync().Result;
+        public static IDictionary<int, string> locals = null;
         private static dynamic GetFormattedResultAsync(IEnumerable<Models.Product> result, bool addRanking=false)
         {                   
             var ranking = addRanking ? GetRanking(result): null;

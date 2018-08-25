@@ -14,7 +14,8 @@ namespace JAMTech.Controllers
     [Route("v1/[controller]")]
     public class ProductsController : BaseController
     {
-        private JumboProductsController jumboController = new JumboProductsController();
+        private static JumboProductsController jumboController = new JumboProductsController();
+
         [HttpGet]
         public async Task<IActionResult> FindProductsAsync(string product, int pages=1)
         {
