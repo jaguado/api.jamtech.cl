@@ -15,6 +15,7 @@
                 </li>
             </ol>
             <br />
+            <a href="#/standalone/products"><small>Pantalla Completa</small>&nbsp;<i class="fas fa-arrows-alt"></i></a>
         </div>
     </div>
     <div class="wrapper wrapper-content" ng-controller="ProductsCtrl as main">
@@ -49,7 +50,7 @@
                         </div>
                         <div class="row">
                             <div class="input-group">
-                                <input type="text" placeholder="Ej: Queso mantecoso" name="search" class="form-control input-lg" ng-model="textToSearch"
+                                <input type="text" placeholder="Ej: Queso mantecoso o pilas AA" name="search" class="form-control input-lg" ng-model="textToSearch"
                                     focus-me="true" ng-keypress="($event.which === 13)?searchProduct(textToSearch):0">
                                 <div class="input-group-btn">
                                     <button class="btn btn-lg btn-primary" type="submit" ng-click="searchProduct(textToSearch)">
@@ -60,15 +61,65 @@
                             <br />
                         </div>
                         <div class="row">
-                            <div class="forum-item active">
+                                <div class="ibox">
+                                        <div class="ibox-content">
+                                            <table class="footable table table-stripped toggle-arrow-tiny middle" data-page-size="20">
+                                                <thead>
+                                                    <tr>
+                                                        <th data-sort-ignore="true"></th>
+                                                        <th data-hide="phone">Categoria</th>
+                                                        <th data-hide="phone">Marca o Tienda</th>
+                                                        <th data-hide="">Nombre</th>
+                                                        <th data-type="number" data-hide="">Precio</th>
+                                                        <th data-hide="all">PPU</th>
+                                                        <th data-hide="all">M&aacute;s informaci&oacute;n</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="product in products" footable-refresh>
+                                                        <td>
+                                                            <img ng-src="{{product.thumb}}" alt="{{product.product_type}}" style="max-height: 80px; max-width: 80px;" />
+                                                        </td>
+                                                        <td>
+                                                            {{ product.product_type | capitalize }}
+                                                        </td>
+                                                        <td>
+                                                            {{ product.brand |  capitalize }}
+                                                        </td>
+                                                        <td>
+                                                            {{ product.description | capitalize}}
+                                                        </td>
+                                                        <td>
+                                                             {{ product.price | currency : "" : 0}}
+                                                        </td>
+                                                        <td>
+                                                             {{ product.ppu }}
+                                                        </td>  
+                                                        <td>
+                                                            Encontrado en {{product.source | capitalize}}.cl
+                                                        </td>  
+                                                    </tr>
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <td colspan="7">
+                                                            <ul class="pagination pull-right"></ul>
+                                                        </td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                        
+                                        </div>
+                                    </div>  
+                            <div class="forum-item active" ng-show="false">
                                 <!-- new  version -->
-                                <div class="row" ng-repeat="productGroup in products | chunkBy:4">
+                                <div class="row" ng-repeat="productGroup in products | orderBy:'price' | chunkBy:4">
                                     <!--Product description -->
                                     <div class="col-md-3" ng-repeat="product in productGroup">
-                                        <div class="ibox" height="400px">
+                                        <div class="ibox" style="min-height: 400px;max-height: 400px; height: 400px">
                                             <div class="ibox-content product-box">
-                                                <div class="product-imitation-small">
-                                                    <img ng-src="{{product.thumb}}" alt="{{product.product_type}}" style="max-height: 100px; max-width: 100px;" />
+                                                <div class="product-imitation-small" style="min-height: 150px;">
+                                                    <img ng-src="{{product.thumb}}" alt="{{product.product_type}}" style="max-height: 130px; max-width: 130px;" />
                                                 </div>
                                                 <div class="product-desc">
                                                     <span class="product-price">

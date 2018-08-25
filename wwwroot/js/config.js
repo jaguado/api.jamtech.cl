@@ -15,29 +15,46 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
     });
 
     $stateProvider
-
         .state('index', {
             abstract: true,
             url: "/index",
             templateUrl: "views/common/content.html",
+        })
+        .state('standalone', {
+            abstract: true,
+            url: "/standalone",
+            templateUrl: "views/common/without_menu.html",
         })
         .state('index.combustible', {
             url: "/combustible",
             templateUrl: "views/combustible_search.es.html",
             data: { pageTitle: 'Combustible Search' }
         })
-        .state('combustible', {
-            url: "/standalone/combustible",
+        .state('standalone.combustible', {
+            url: "/combustible",
             templateUrl: "views/combustible_search.es.html",
             data: { pageTitle: 'Combustible Search' }
         })
         .state('index.products', {
             url: "/products",
             templateUrl: "views/products_search.es.html",
-            data: { pageTitle: 'Products Search' }
+            data: { pageTitle: 'Products Search' },
+            resolve: {
+                loadPlugin: function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            files: ['js/plugins/footable/footable.all.min.js', 'css/plugins/footable/footable.core.css']
+                        },
+                        {
+                            name: 'ui.footable',
+                            files: ['js/plugins/footable/angular-footable.js']
+                        }
+                    ]);
+                }
+            }
         })
-        .state('products', {
-            url: "/standalone/products",
+        .state('standalone.products', {
+            url: "/products",
             templateUrl: "views/products_search.es.html",
             data: { pageTitle: 'Products Search' }
         })
