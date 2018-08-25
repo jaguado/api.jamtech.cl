@@ -113,7 +113,14 @@ namespace JAMTech
                     }
                     context.Response.Headers.Add("X-Robots-Tag", "noindex");
                     context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
-
+                    //add cache headers
+                    const int durationInSeconds = 0; // 60 * 60 * 24;
+                    if (durationInSeconds == 0)
+                    {
+                        context.Response.Headers[HeaderNames.CacheControl] = "no-cache, no-store, must-revalidate";
+                    }
+                    //else
+                    //    ctx.Context.Response.Headers[HeaderNames.CacheControl] = "public,max-age=" + durationInSeconds;
                     return Task.FromResult(0);
                 });
                 await nextMiddleware();

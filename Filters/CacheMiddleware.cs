@@ -40,15 +40,6 @@ namespace JAMTech.Filters
                     context.Response.ContentType = result.Item1;
                     context.Response.ContentLength = result.Item2.Length;
                     originalStream.Write(result.Item2, 0, result.Item2.Length);
-
-                    //add cache headers
-                    const int durationInSeconds = 0; // 60 * 60 * 24;
-                    if (durationInSeconds == 0)
-                    {
-                        context.Response.Headers[HeaderNames.CacheControl] = "no-cache, no-store, must-revalidate";
-                    }
-                    //else
-                    //    ctx.Context.Response.Headers[HeaderNames.CacheControl] = "public,max-age=" + durationInSeconds;
                 }
                 else
                     context.Response.StatusCode = 404;
