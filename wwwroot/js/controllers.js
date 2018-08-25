@@ -1,5 +1,5 @@
  var baseApiUrl = '//jamtechapi.herokuapp.com/v1/';
-
+ 
  function MainCtrl($scope) {
      this.userName = 'Visit';
      this.helloText = 'Welcome to JAM Tech.cl';
@@ -13,12 +13,27 @@
  function ProductsCtrl($http, $scope) {
      var searchUrl = baseApiUrl + 'Products?pages=1&product=';
      var compareUrl = baseApiUrl + 'JumboProducts/{productId}/compare';
-
+     $scope.availableProductTemplates = [
+        {
+            "name": "Table",
+            "url": "views/products_table.html",
+            "iconClass": "fas fa-table"
+        },
+        {
+            "name": "Grid",
+            "url": "views/products_grid.html",
+            "iconClass": "fas fa-th"
+        }
+     ];
+     $scope.gridTemplate = $scope.availableProductTemplates[0];
      $scope.view = 'Search';
      $scope.textToSearch = null;
      $scope.position = null;
      $scope.showLocationWarning = false;
      $scope.products = [];
+     $scope.setTemplate = function(val){
+        $scope.gridTemplate = val;
+     }
      $scope.searchProduct = function (product) {
          $scope.textToSearch = product;
          var url = searchUrl + product;
