@@ -93,7 +93,7 @@ namespace JAMTech.Controllers
         }
 
 
-        public static IDictionary<int, string> locals = null;
+        public static IDictionary<int, string> locals = Controllers.JumboProductsController.GetLocalsAsync().Result;
         private static dynamic GetFormattedResultAsync(IEnumerable<Models.Product> result, bool addRanking=false)
         {                   
             var ranking = addRanking ? GetRanking(result): null;
