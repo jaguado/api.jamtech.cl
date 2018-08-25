@@ -62,7 +62,7 @@ namespace JAMTech.Filters
             var minifyHtml = new WebMarkupMin.Core.HtmlMinifier();
             foreach (var file in files)
             {
-                //TODO compress or minify
+                //compress or minify
                 var content = File.ReadAllBytes(file);
                 var ext = Path.GetExtension(file);
                 switch (ext)
