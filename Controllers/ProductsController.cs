@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -45,10 +46,11 @@ namespace JAMTech.Controllers
             {
                 var content = await response.Content.ReadAsStringAsync();
                 var productsResult = JsonConvert.DeserializeObject<Models.KnastaSearchResullt>(content);
+                var categories = productsResult.ktegories.ToDictionary(v => v.value, v => v.label);
                 var commonFormat = productsResult.products.Select(p => new
                 {
                     product_id = p.product_id,
-                    product_type = p.kategory,
+                    product_type = categories[int.Parse(p.kategory)],
                     brand=p.retail,
                     image=p.images,
                     thumb=p.images,

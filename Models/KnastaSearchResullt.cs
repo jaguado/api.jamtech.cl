@@ -51,7 +51,7 @@ namespace JAMTech.Models
 
         public class Ktegory
         {
-            public string value { get; set; }
+            public int value { get; set; }
             public string label { get; set; }
         }
     }
