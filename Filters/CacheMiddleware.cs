@@ -52,7 +52,6 @@ namespace JAMTech.Filters
                         context.Response.ContentType = MimeMapping.MimeUtility.GetMimeMapping(filename);
                         var file = File.ReadAllBytes(filename);
                         await originalStream.WriteAsync(file, 0, file.Length);
-                        Console.WriteLine("Serving: " + Path.GetFileName(filename));
                     }
                     else
                         context.Response.StatusCode = 404;
@@ -66,13 +65,13 @@ namespace JAMTech.Filters
             //put static files minificated in a memory store -> cache        
             var staticFilesStorage = new Dictionary<string, Tuple<string, byte[]>>();
             //read all static files and load into mmemory
-            var files = Directory.GetFiles(basePath, "*", SearchOption.AllDirectories);
+            var files = Directory.GetFiles(basePath, "*", SearchOption.AllDirectories).ToList();
             if (extensions != null)
-                files = files.Where(f => extensions.Contains(Path.GetExtension(f))).ToArray(); 
+                files = files.Where(f => extensions.Contains(Path.GetExtension(f))).ToList(); 
             var minifyJs = new WebMarkupMin.Core.CrockfordJsMinifier();
             var minifyCss = new WebMarkupMin.Core.KristensenCssMinifier();
             var minifyHtml = new WebMarkupMin.Core.HtmlMinifier();
-            foreach (var file in files)
+            files.ForEach(file =>
             {
                 //compress or minify
                 var content = File.ReadAllBytes(file);
@@ -102,7 +101,8 @@ namespace JAMTech.Filters
                         break;
                 }
                 staticFilesStorage.Add(file, new Tuple<string, byte[]>(MimeMapping.MimeUtility.GetMimeMapping(file), content));
-            }
+            });
+
             var usedMemory = Math.Round( staticFilesStorage.Select(s=>s.Value).Sum(s=>s.Item2.Length) / 1024.0 / 1024.0);
             Console.WriteLine($"{staticFilesStorage.Count} static files loaded into memory using {usedMemory} MB");
             return staticFilesStorage;

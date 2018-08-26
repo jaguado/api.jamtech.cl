@@ -26,22 +26,22 @@ using WebMarkupMin.AspNet.Common.UrlMatchers;
 using WebMarkupMin.NUglify;
 
 namespace JAMTech
-{ 
+{
     public class Startup
     {
         public const string ApiTitle = "JAM Tech Public API";
         /// <summary>
         /// useCache=false to disable mem cache
         /// </summary>
-        internal static bool useMemCache = Environment.GetEnvironmentVariable("useCache") != null && Environment.GetEnvironmentVariable("useCache") == "false"?false:true; //default true
+        internal static bool useMemCache = Environment.GetEnvironmentVariable("useCache") != null && Environment.GetEnvironmentVariable("useCache") == "false" ? false : true; //default true
 
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            
+
         }
 
-         public IConfiguration Configuration { get; }
+        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -80,7 +80,7 @@ namespace JAMTech
             })
             .AddHttpCompression(options =>
             {
-               
+
                 options.CompressorFactories = new List<ICompressorFactory>
                 {
                     new BrotliCompressorFactory(new BrotliCompressionSettings
@@ -98,18 +98,15 @@ namespace JAMTech
                 };
             });
 
-            //only compress dynamic content
+            //compress dynamic json content using brotli
             services.AddResponseCompression(options =>
             {
                 options.EnableForHttps = true;
                 options.Providers.Add<BrotliCompressionProvider>();
-                options.MimeTypes = new[]
-                {
-                    "application/json"
-                };
+                options.MimeTypes = new[] { "application/json" };
             });
 
-            services.AddMvc(options=>
+            services.AddMvc(options =>
             {
                 options.Filters.Add(typeof(BaseResultFilter)); // by type
             })
@@ -117,7 +114,7 @@ namespace JAMTech
             {
                 options.SerializerSettings.ContractResolver = new DefaultContractResolver();
                 options.SerializerSettings.Converters.Add(new StringEnumConverter());
-                if(Environment.GetEnvironmentVariable("minifyResponse") == "false")
+                if (Environment.GetEnvironmentVariable("minifyResponse") == "false")
                     options.SerializerSettings.Formatting = Formatting.Indented; //this only makes sense if the content will not be minified at the end
             });
 
@@ -125,12 +122,9 @@ namespace JAMTech
             {
                 c.DescribeAllEnumsAsStrings();
                 c.SwaggerDoc("v1", new Info { Title = ApiTitle, Version = "v1" });
-
-                var xmlFiles = Directory.GetFiles(GetXmlCommentsPath(), "*.xml");
-                foreach (var xml in xmlFiles)
-                {
-                    c.IncludeXmlComments(xml);
-                }
+                Directory.GetFiles(GetXmlCommentsPath(), "*.xml")
+                         .ToList()
+                         .ForEach(f => c.IncludeXmlComments(f));
             });
         }
 
@@ -143,10 +137,7 @@ namespace JAMTech
                 app.UseDeveloperExceptionPage();
                 app.UseBrowserLink();
             }
-           
 
-            //app.UseRequestLocalization(BuildLocalizationOptions());
-            
             // Middleware to add headers       
             app.Use(async (context, nextMiddleware) =>
             {
@@ -170,12 +161,12 @@ namespace JAMTech
                 });
                 await nextMiddleware();
             });
-            
-            if(!useMemCache)
+
+            if (!useMemCache)
                 app.UseStaticFiles();
 
-           app.UseWebMarkupMin();
-            
+            app.UseWebMarkupMin();
+
             app.UseDefaultFiles();
             app.UseMvc();
             app.UseSwagger(c =>
@@ -194,29 +185,11 @@ namespace JAMTech
                 var basePath = Path.GetFullPath("wwwroot");
                 app.UseMiddleware<CacheMiddleware>(basePath);
             }
-        }            
+        }
 
         private string GetXmlCommentsPath()
         {
             return System.AppContext.BaseDirectory;
-        }
-
-        private RequestLocalizationOptions BuildLocalizationOptions()
-        {
-            var supportedCultures = new List<CultureInfo>
-            {
-                new CultureInfo("en-US"),
-                new CultureInfo("es-CL"),
-            };
-
-            var options = new RequestLocalizationOptions
-            {
-                DefaultRequestCulture = new RequestCulture("en-US"),
-                SupportedCultures = supportedCultures,
-                SupportedUICultures = supportedCultures
-            };
-
-            return options;
         }
     }
 }
