@@ -27,15 +27,16 @@ namespace JAMTech.Controllers
         /// <returns>List of torrent files</returns>
         [HttpGet]
         [Produces(typeof(List<TorrentResult>))]
-        public async Task<IActionResult> Get(string search, int pages=1)
+        public async Task<IActionResult> Get(string search, int pages=1, bool skipLinks=false)
         {
             var torrentPagesTasks = Enumerable.Range(1, pages)
-                              .Select(page => FindTorrentsAsync(search, page)).ToArray();
+                              .Select(page => FindTorrentsAsync(search, page, skipLinks)).ToArray();
             await Task.WhenAll(torrentPagesTasks);
             var flattenResult = torrentPagesTasks.Where(t => t.IsCompletedSuccessfully && t.Result != null)
                                .Select(s => s.Result)
                                .SelectMany(s => s, (list, value) => value)
-                               .OrderBy(o => o.Page);
+                               .OrderBy(o => o.Page)
+                               .ToList();
             return new OkObjectResult(flattenResult);
         }
 
@@ -43,7 +44,7 @@ namespace JAMTech.Controllers
         private const string searchResultDivName = "searchResult";
         private const string detailDivName = "detName";
 
-        private static async Task<List<TorrentResult>> FindTorrentsAsync(string movie, int page)
+        private static async Task<List<TorrentResult>> FindTorrentsAsync(string movie, int page, bool skipLinks)
         {
             var url = string.Format(tpbSearchUrl, movie, page);
             var response = await Net.GetResponse(url);
@@ -73,13 +74,16 @@ namespace JAMTech.Controllers
                                 var descriptions = row.Descendants().Where(x => x.Attributes["class"] != null && x.Attributes["class"].Value.Equals("detDesc"));
                                 tempResult.Description.AddRange(descriptions.Select(d => d.InnerText));
 
-                                var links = row.Descendants().Where(x => (x.Name == "a" && x.Attributes["href"] != null && x.Attributes["title"] != null) || (x.Name == "img" && x.Attributes["title"] != null && x.Attributes["src"] != null));
-                                foreach (var link in links)
+                                if (!skipLinks)
                                 {
-                                    if (link.Name == "a")
-                                        tempResult.Links.Add(new Tuple<string, string>(link.Attributes["title"].Value.ToString(), link.Attributes["href"].Value));
-                                    else
-                                        tempResult.Links.Add(new Tuple<string, string>(link.Attributes["title"].Value.ToString(), link.Attributes["src"].Value));
+                                    var links = row.Descendants().Where(x => (x.Name == "a" && x.Attributes["href"] != null && x.Attributes["title"] != null) || (x.Name == "img" && x.Attributes["title"] != null && x.Attributes["src"] != null));
+                                    foreach (var link in links)
+                                    {
+                                        if (link.Name == "a")
+                                            tempResult.Links.Add(new Tuple<string, string>(link.Attributes["title"].Value.ToString(), link.Attributes["href"].Value));
+                                        else
+                                            tempResult.Links.Add(new Tuple<string, string>(link.Attributes["title"].Value.ToString(), link.Attributes["src"].Value));
+                                    }
                                 }
 
                                 //Seeds and leeds
