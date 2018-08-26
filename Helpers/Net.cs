@@ -95,13 +95,15 @@ namespace JAMTech.Helpers
             return await stream.ReadToEndAsync();
         }
 
-        public static async Task<HttpResponseMessage> GetResponse(string tempUrl, Uri customReferrer = null)
+        public static async Task<HttpResponseMessage> GetResponse(string tempUrl, Uri customReferrer = null, int timeoutInSeconds=0)
         {
             var handler = new HttpClientHandler()
             {
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate                
             };
             var client = new HttpClient(handler);
+            if(timeoutInSeconds>0)
+                client.Timeout = TimeSpan.FromSeconds(timeoutInSeconds);
             if (customReferrer != null)
                 client.DefaultRequestHeaders.Referrer = customReferrer;
             return await client.GetAsync(tempUrl);
