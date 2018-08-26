@@ -14,10 +14,6 @@ namespace JAMTech.Models
         /// <summary>
         /// 
         /// </summary>
-        public int Position { set; get; }
-        /// <summary>
-        /// 
-        /// </summary>
         public int Page { set; get; }
         /// <summary>
         /// 
@@ -63,8 +59,6 @@ namespace JAMTech.Models
         {
             Description = new List<string>();
             Links = new List<Tuple<string, string>>();
-        }
-        
-        
+        }       
     }
 }
