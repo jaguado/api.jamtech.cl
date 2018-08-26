@@ -18,6 +18,12 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using WebMarkupMin.Core;
+using WebMarkupMin.AspNetCore2;
+using WebMarkupMin.AspNet.Common.Compressors;
+using System.IO.Compression;
+using WebMarkupMin.AspNet.Common.UrlMatchers;
+using WebMarkupMin.NUglify;
 
 namespace JAMTech
 { 
@@ -40,6 +46,58 @@ namespace JAMTech
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            // Add WebMarkupMin services.
+            services.AddWebMarkupMin(options =>
+            {
+                options.AllowMinificationInDevelopmentEnvironment = true;
+                options.AllowCompressionInDevelopmentEnvironment = true;
+            })
+            .AddHtmlMinification(options =>
+            {
+                var settings = options.MinificationSettings;
+                settings.RemoveRedundantAttributes = true;
+                settings.RemoveHttpProtocolFromAttributes = true;
+                settings.RemoveHttpsProtocolFromAttributes = true;
+
+                options.CssMinifierFactory = new NUglifyCssMinifierFactory();
+                options.JsMinifierFactory = new NUglifyJsMinifierFactory();
+            })
+            .AddXhtmlMinification(options =>
+            {
+                var settings = options.MinificationSettings;
+                settings.RemoveRedundantAttributes = true;
+                settings.RemoveHttpProtocolFromAttributes = true;
+                settings.RemoveHttpsProtocolFromAttributes = true;
+
+                options.CssMinifierFactory = new KristensenCssMinifierFactory();
+                options.JsMinifierFactory = new CrockfordJsMinifierFactory();
+            })
+            .AddXmlMinification(options =>
+            {
+                var settings = options.MinificationSettings;
+                settings.CollapseTagsWithoutContent = true;
+            })
+            .AddHttpCompression(options =>
+            {
+               
+                options.CompressorFactories = new List<ICompressorFactory>
+                {
+                    new BrotliCompressorFactory(new BrotliCompressionSettings
+                    {
+                        Level = CompressionLevel.Fastest
+                    }),
+                    new DeflateCompressorFactory(new DeflateCompressionSettings
+                    {
+                        Level = CompressionLevel.Fastest
+                    }),
+                    new GZipCompressorFactory(new GZipCompressionSettings
+                    {
+                        Level = CompressionLevel.Fastest
+                    })
+                };
+            });
+
             services.AddMvc(options=>
             {
                 options.Filters.Add(typeof(BaseResultFilter)); // by type
@@ -62,45 +120,23 @@ namespace JAMTech
                     c.IncludeXmlComments(xml);
                 }
             });
-
-            services.Configure<GzipCompressionProviderOptions>(options =>
-                options.Level = System.IO.Compression.CompressionLevel.Fastest);
-
-            services.AddResponseCompression(options =>
-            {
-                options.Providers.Add<BrotliCompressionProvider>();
-                options.MimeTypes = new[]
-                {
-                    // Default
-                    "text/plain",
-                    "text/css",
-                    "application/javascript",
-                    "text/html",
-                    "application/xml",
-                    "text/xml",
-                    "application/json",
-                    "text/json",
-                    // Custom
-                    "image/svg+xml"
-                };
-                options.EnableForHttps = true;
-            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.UseResponseCompression();
-
             Program.isDev = env.IsDevelopment();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseBrowserLink();
             }
+            else
+                app.UseExceptionHandler();
 
             //app.UseRequestLocalization(BuildLocalizationOptions());
             
-            // Middleware            
+            // Middleware to add headers       
             app.Use(async (context, nextMiddleware) =>
             {
                 context.Response.OnStarting(() =>
@@ -123,7 +159,11 @@ namespace JAMTech
                 });
                 await nextMiddleware();
             });
+            
+            if(!useMemCache)
+                app.UseStaticFiles();
 
+            app.UseWebMarkupMin();
             app.UseDefaultFiles();
             app.UseMvc();
             app.UseSwagger(c =>

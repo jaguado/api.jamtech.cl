@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
@@ -16,47 +17,60 @@ namespace JAMTech.Filters
         private readonly RequestDelegate _next;
         private readonly Dictionary<string, Tuple<string, byte[]>> _staticFilesStorage;
         private readonly string _basePath;
+        private readonly PhysicalFileProvider _provider;
+
         //Said delegate must be passed in from the previous middleware.
         public CacheMiddleware(RequestDelegate next, string fullBasePath)
         {
             _next = next;
             _basePath = fullBasePath;
-            _staticFilesStorage = LoadCache(_basePath); 
+            var extensions = Environment.GetEnvironmentVariable("cacheExtensions") ?? null;
+            _staticFilesStorage = LoadCache(_basePath, extensions!=null ? extensions.Split(',') : null);
+            _provider = new PhysicalFileProvider(_basePath);
         }
 
         //The Invoke method is called by the previous middleware 
         //to kick off the current one.
-        public Task Invoke(HttpContext context)
+        public async Task InvokeAsync(HttpContext context)
         {
             //custom static files middleware with cache
             if (context.Request.Method == "GET" && Path.GetExtension(context.Request.Path) != string.Empty)
             {
                 //get file from cache and put into response
-                var filename = _basePath + context.Request.Path.Value.Replace("/", Path.DirectorySeparatorChar.ToString());
+                var originalStream = context.Response.Body;
+                context.Response.StatusCode = 200;
+                var filename = _basePath +  context.Request.Path.Value.Replace("/", Path.DirectorySeparatorChar.ToString());
                 if (_staticFilesStorage.TryGetValue(filename, out var result))
                 {
-                    var originalStream = context.Response.Body;
-                    context.Response.StatusCode = 200;
                     context.Response.ContentType = result.Item1;
                     context.Response.ContentLength = result.Item2.Length;
-                    originalStream.Write(result.Item2, 0, result.Item2.Length);
+                    await originalStream.WriteAsync(result.Item2, 0, result.Item2.Length);
                 }
                 else
-                    context.Response.StatusCode = 404;
+                {
+                    //if exists serve from disk
+                    if (File.Exists(filename))
+                    {
+                        context.Response.ContentType = MimeMapping.MimeUtility.GetMimeMapping(filename);
+                        var file = File.ReadAllBytes(filename);
+                        await originalStream.WriteAsync(file, 0, file.Length);
+                        Console.WriteLine("Serving: " + Path.GetFileName(filename));
+                    }
+                    else
+                        context.Response.StatusCode = 404;
+                }
             }
-
-            //Finally, we call Invoke() on the next middleware in the pipeline.
-            //TODO find a way to avoid 404 when   return _next.Invoke(context); -> Workaround
-            return Task.FromResult(0);
         }
 
 
-        private static Dictionary<string, Tuple<string, byte[]>> LoadCache(string basePath)
+        private static Dictionary<string, Tuple<string, byte[]>> LoadCache(string basePath, string[] extensions=null)
         {
             //put static files minificated in a memory store -> cache        
             var staticFilesStorage = new Dictionary<string, Tuple<string, byte[]>>();
             //read all static files and load into mmemory
             var files = Directory.GetFiles(basePath, "*", SearchOption.AllDirectories);
+            if (extensions != null)
+                files = files.Where(f => extensions.Contains(Path.GetExtension(f))).ToArray(); 
             var minifyJs = new WebMarkupMin.Core.CrockfordJsMinifier();
             var minifyCss = new WebMarkupMin.Core.KristensenCssMinifier();
             var minifyHtml = new WebMarkupMin.Core.HtmlMinifier();
