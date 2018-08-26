@@ -142,8 +142,7 @@ namespace JAMTech
                 app.UseDeveloperExceptionPage();
                 app.UseBrowserLink();
             }
-            else
-                app.UseExceptionHandler();
+           
 
             //app.UseRequestLocalization(BuildLocalizationOptions());
             

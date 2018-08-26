@@ -24,7 +24,7 @@ namespace JAMTech.Filters
         {
             _next = next;
             _basePath = fullBasePath;
-            var extensions = Environment.GetEnvironmentVariable("cacheExtensions") ?? null;
+            var extensions = Environment.GetEnvironmentVariable("cacheExtensions") ?? ".js,.css";
             _staticFilesStorage = LoadCache(_basePath, extensions!=null ? extensions.Split(',') : null);
             _provider = new PhysicalFileProvider(_basePath);
         }
