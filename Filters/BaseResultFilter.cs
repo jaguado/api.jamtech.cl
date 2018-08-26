@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace JAMTech.Filters
     {
         const int defaultLimit = 100;
         public static string[] Operators = new[] { "==", "!=", "<", ">", "<>", "<=", ">=" };
-
+        private static readonly bool _minifyResponse = Environment.GetEnvironmentVariable("minifyResponse") =="false" ? false : true;
         public void OnActionExecuting(ActionExecutingContext context)
         {
             // do something before the action executes
@@ -29,6 +30,7 @@ namespace JAMTech.Filters
             FilterOrderLimitResult<dynamic>(context, request, resultResponse);
         }
 
+        private static WebMarkupMin.Core.CrockfordJsMinifier minifyJs = new WebMarkupMin.Core.CrockfordJsMinifier();
         private void FilterOrderLimitResult<T>(ActionExecutedContext context, HttpRequest request, OkObjectResult resultResponse)
         {
             if (resultResponse != null)
@@ -42,7 +44,17 @@ namespace JAMTech.Filters
                         newObject = FilterResult(result, request);
                         newObject = OrderResult(newObject, request);
                         newObject = LimitObjectResult(newObject, request);
-                        context.Result = new OkObjectResult(newObject);
+                        //minify dynamic content
+                        if (_minifyResponse)
+                        {
+                            var minified = minifyJs.Minify(JsonConvert.SerializeObject(newObject), false);
+                            if (!minified.Errors.Any())
+                                context.Result = new OkObjectResult(minified.MinifiedContent);
+                            else
+                                context.Result = new OkObjectResult(newObject);
+                        }
+                        else
+                            context.Result = new OkObjectResult(newObject);
                     }
                 }
             }

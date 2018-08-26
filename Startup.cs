@@ -98,6 +98,17 @@ namespace JAMTech
                 };
             });
 
+            //only compress dynamic content
+            services.AddResponseCompression(options =>
+            {
+                options.EnableForHttps = true;
+                options.Providers.Add<BrotliCompressionProvider>();
+                options.MimeTypes = new[]
+                {
+                    "application/json"
+                };
+            });
+
             services.AddMvc(options=>
             {
                 options.Filters.Add(typeof(BaseResultFilter)); // by type
@@ -163,7 +174,8 @@ namespace JAMTech
             if(!useMemCache)
                 app.UseStaticFiles();
 
-            app.UseWebMarkupMin();
+           app.UseWebMarkupMin();
+            
             app.UseDefaultFiles();
             app.UseMvc();
             app.UseSwagger(c =>
