@@ -11,7 +11,7 @@
                     <a href="index.html">Inicio</a>
                 </li>
                 <li class="active">
-                    <strong>Buscador de Torrents -> MOCK de TPB por ahora!!</strong>
+                    <strong>Buscador de Torrents</strong>
                 </li>
             </ol>
             <br />
@@ -38,18 +38,28 @@
                         </div>
                     </div>
                     <div class="ibox-content forum-container">
+                        <div class="panel panel-warning" ng-show="showMocksWarning">
+                            <div class="panel-heading">
+                                <i class="fa fa-warning"></i> Alerta
+                            </div>
+                            <div class="panel-body">
+                                <p>
+                                    Hemos detectado problemas en la conexi&oacute;n con ThePirateBay.Org. Debido a lo anterior apuntaremos a un mock con informaci&oacute;n estatica.
+                                    <br />Esto quiere decir que la aplicaci&oacute;n siempre mostrara los mismos resultados.
+                                </p>
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="input-group">
-                                <input type="text" placeholder="Ej: BRRip" name="search" class="form-control input-lg" ng-model="textToSearch"
-                                    focus-me="true" ng-keypress="($event.which === 13)?searchTorrents(textToSearch):0">
+                                <input type="text" placeholder="Ej: BRRip" name="search" class="form-control input-lg" ng-model="textToSearch" focus-me="true"
+                                    ng-keypress="($event.which === 13)?searchTorrents(textToSearch):0">
                                 <div class="input-group-btn">
                                     <button class="btn btn-lg btn-primary" type="submit" ng-click="searchTorrents(textToSearch)">
                                         Buscar
                                     </button>
                                 </div>
                             </div>
-                            <br />
-                            Vista:&nbsp;
+                            <br /> Vista:&nbsp;
                             <div class="btn-group dropdown" uib-dropdown="" ng-if="false">
                                 <a ng-repeat="type in availableTorrentsTemplates" ng-class="type!=gridTemplate ? 'btn':'btn btn-white'" ng-click="setTemplate(type)">
                                     <i ng-class="type.iconClass"></i>

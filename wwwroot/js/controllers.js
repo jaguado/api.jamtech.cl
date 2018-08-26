@@ -12,6 +12,7 @@ var baseApiUrl = '//jamtechapi.herokuapp.com/v1/';
  };
 
  function TorrentsCtrl($http, $scope, $window) {
+     $scope.showMocksWarning=true; //mocks mode
      var searchUrl = baseApiUrl + 'Torrent?skipLinks=false&pages=1&search=';
      $scope.availableTorrentsTemplates = [{
              "name": "Table",
@@ -32,7 +33,9 @@ var baseApiUrl = '//jamtechapi.herokuapp.com/v1/';
      $scope.searchTorrents = function (val) {
          var url =searchUrl + val;
          //using mocks for dev
-         url = mocksBaseApiUrl;
+         if($scope.showMocksWarning)
+            url = mocksBaseApiUrl;
+         
          return $http.get(url).then(function (response) {
              $scope.torrents = response.data;
              console.log('getTorrents', response.data)
