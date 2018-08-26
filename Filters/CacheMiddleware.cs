@@ -17,7 +17,6 @@ namespace JAMTech.Filters
         private readonly RequestDelegate _next;
         private readonly Dictionary<string, Tuple<string, byte[]>> _staticFilesStorage;
         private readonly string _basePath;
-        private readonly PhysicalFileProvider _provider;
 
         //Said delegate must be passed in from the previous middleware.
         public CacheMiddleware(RequestDelegate next, string fullBasePath)
@@ -26,7 +25,6 @@ namespace JAMTech.Filters
             _basePath = fullBasePath;
             var extensions = Environment.GetEnvironmentVariable("cacheExtensions") ?? ".js,.css";
             _staticFilesStorage = LoadCache(_basePath, extensions!=null ? extensions.Split(',') : null);
-            _provider = new PhysicalFileProvider(_basePath);
         }
 
         //The Invoke method is called by the previous middleware 

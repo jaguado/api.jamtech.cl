@@ -63,54 +63,54 @@ namespace JAMTech.Controllers
                                x.Attributes["id"].Value.Equals(searchResultDivName))).ToList();
 
                     resultsTable.ForEach(results =>
-                    {
-                        var rows = results.Descendants("tr").ToList();
-                        rows.ForEach(row =>
-                        {
-                            var tempResult = new TorrentResult() { Page = page };
-                            var details = row.Descendants()
-                                             .Where(x =>
-                                                x.Name == "div" &&
-                                                x.Attributes["class"] != null &&
-                                                x.Attributes["class"].Value.Equals(detailDivName))
-                                                .ToList();
+                                        {
+                                            var rows = results.Descendants("tr").ToList();
+                                            rows.ForEach(row =>
+                                            {
+                                                var tempResult = new TorrentResult() { Page = page };
+                                                var details = row.Descendants()
+                                                                 .Where(x =>
+                                                                    x.Name == "div" &&
+                                                                    x.Attributes["class"] != null &&
+                                                                    x.Attributes["class"].Value.Equals(detailDivName))
+                                                                    .ToList();
 
-                            details.ForEach(detail =>
-                            {
-                                var descriptions = row.Descendants().Where(x => x.Attributes["class"] != null && x.Attributes["class"].Value.Equals("detDesc"));
-                                tempResult.Description.AddRange(descriptions.Select(d => d.InnerText));
-                                tempResult.Name = detail.InnerText.Trim();
+                                                details.ForEach(detail =>
+                                                {
+                                                    var descriptions = row.Descendants().Where(x => x.Attributes["class"] != null && x.Attributes["class"].Value.Equals("detDesc"));
+                                                    tempResult.Description.AddRange(descriptions.Select(d => d.InnerText));
+                                                    tempResult.Name = detail.InnerText.Trim();
 
-                                if (!skipLinks)
-                                {
-                                    var links = row.Descendants().Where(x => (x.Name == "a" && x.Attributes["href"] != null && x.Attributes["title"] != null) || (x.Name == "img" && x.Attributes["title"] != null && x.Attributes["src"] != null));
-                                    foreach (var link in links)
-                                    {
-                                        if (link.Name == "a")
-                                            tempResult.Links.Add(new Tuple<string, string>(link.Attributes["title"].Value.ToString(), link.Attributes["href"].Value));
-                                        else
-                                            tempResult.Links.Add(new Tuple<string, string>(link.Attributes["title"].Value.ToString(), link.Attributes["src"].Value));
-                                    }
-                                }
+                                                    if (!skipLinks)
+                                                    {
+                                                        var links = row.Descendants().Where(x => (x.Name == "a" && x.Attributes["href"] != null && x.Attributes["title"] != null) || (x.Name == "img" && x.Attributes["title"] != null && x.Attributes["src"] != null));
+                                                        foreach (var link in links)
+                                                        {
+                                                            if (link.Name == "a")
+                                                                tempResult.Links.Add(new Tuple<string, string>(link.Attributes["title"].Value.ToString(), link.Attributes["href"].Value));
+                                                            else
+                                                                tempResult.Links.Add(new Tuple<string, string>(link.Attributes["title"].Value.ToString(), link.Attributes["src"].Value));
+                                                        }
+                                                    }
 
                                 //Seeds and leeds
                                 var columns = row.Descendants().Where(x => x.Name == "td").ToList();
-                                var colCount = columns.Count();
-                                if (colCount > 3)
-                                {
-                                    var types = columns[0].Descendants().Where(x => x.Name == "a").ToList();
-                                    tempResult.Type = types[0].InnerText;
-                                    tempResult.SubType = types[1].InnerText;
-                                    tempResult.Leeds = int.Parse(columns[colCount - 1].InnerText);
-                                    tempResult.Seeds = int.Parse(columns[colCount - 2].InnerText);
-                                }
-                            });
+                                                    var colCount = columns.Count();
+                                                    if (colCount > 3)
+                                                    {
+                                                        var types = columns[0].Descendants().Where(x => x.Name == "a").ToList();
+                                                        tempResult.Type = types[0].InnerText;
+                                                        tempResult.SubType = types[1].InnerText;
+                                                        tempResult.Leeds = int.Parse(columns[colCount - 1].InnerText);
+                                                        tempResult.Seeds = int.Parse(columns[colCount - 2].InnerText);
+                                                    }
+                                                });
 
-                            tempResult.Vip = row.Descendants().Any(x => x.Name == "img" && x.Attributes["title"] != null && x.Attributes["title"].Value.Equals("VIP"));
-                            if (!string.IsNullOrEmpty(tempResult.Name))
-                                torrentResults.Add(tempResult);
-                        });
-                    });
+                                                tempResult.Vip = row.Descendants().Any(x => x.Name == "img" && x.Attributes["title"] != null && x.Attributes["title"].Value.Equals("VIP"));
+                                                if (!string.IsNullOrEmpty(tempResult.Name))
+                                                    torrentResults.Add(tempResult);
+                                            });
+                                        });
                 }
                 return torrentResults;
             }

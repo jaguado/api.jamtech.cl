@@ -117,7 +117,8 @@ namespace JAMTech
             {
                 options.SerializerSettings.ContractResolver = new DefaultContractResolver();
                 options.SerializerSettings.Converters.Add(new StringEnumConverter());
-                options.SerializerSettings.Formatting = Formatting.Indented;
+                if(Environment.GetEnvironmentVariable("minifyResponse") == "false")
+                    options.SerializerSettings.Formatting = Formatting.Indented; //this only makes sense if the content will not be minified at the end
             });
 
             services.AddSwaggerGen(c =>
