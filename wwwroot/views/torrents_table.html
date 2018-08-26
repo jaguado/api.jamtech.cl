@@ -3,19 +3,27 @@
         <table class="footable table table-stripped toggle-arrow-tiny middle" data-page-size="20">
             <thead>
                 <tr>
-                    <th data-sort-ignore="true">VIP</th>
+                    <th data-sort-ignore="true"></th>
+                    <th data-hide="phone" data-sort-ignore="true">VIP</th>
+                    <th data-type="number">Seeds</th>
+                    <th data-hide="phone" data-type="number">Leeds</th>
                     <th data-hide="phone">Tipo</th>
                     <th data-hide="phone">Sub Tipo</th>
                     <th>Nombre</th>
-                    <th data-hide="number">Seeds</th>
-                    <th data-type="number" data-hide="phone">Leeds</th>
                     <th data-sort-ignore="true"></th>
                 </tr>
             </thead>
             <tbody>
                 <tr ng-repeat="torrent in torrents" footable-refresh>
+                    <td></td>
                     <td>
-                        <img ng-show="torrent.Vip" src="//thepiratebay.org/static/img/vip.gif"  style="max-height: 80px; max-width: 80px;" />
+                        <img ng-show="torrent.Vip" src="//thepiratebay.org/static/img/vip.gif" style="max-height: 80px; max-width: 80px;" />
+                    </td>
+                    <td>
+                        {{ torrent.Seeds }}
+                    </td>
+                    <td>
+                        {{ torrent.Leeds }}
                     </td>
                     <td>
                         {{ torrent.Type | capitalize }}
@@ -24,13 +32,7 @@
                         {{ torrent.SubType | capitalize }}
                     </td>
                     <td>
-                        {{ torrent.Name | capitalize}}
-                    </td>
-                    <td>
-                        {{ torrent.Seeds }}
-                    </td>
-                    <td>
-                        {{ torrent.Leeds }}
+                        {{ torrent.Name | capitalize | truncate: 100: '...'}}
                     </td>
                     <td>
                         <button class="btn btn-white" ng-click="download(torrent)">

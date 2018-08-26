@@ -32,21 +32,25 @@
                             </div>
                             <br />
                             <h2>Busqueda de Torrents</h2>
-                            <span class="pull-right"  style="margin-top:-10px;">
+                            <span class="pull-right" style="margin-top:-10px;">
                                 <brand-url />
                             </span>
                         </div>
                     </div>
                     <div class="ibox-content forum-container">
-                        <div class="panel panel-warning" ng-show="useMocks">
-                            <div class="panel-heading">
-                                <i class="fa fa-warning"></i> Alerta
-                            </div>
-                            <div class="panel-body">
-                                <p>
-                                    Hemos detectado problemas en la conexi&oacute;n con ThePirateBay.Org. Debido a lo anterior apuntaremos a un mock con informaci&oacute;n estatica.
-                                    <br />Esto quiere decir que la aplicaci&oacute;n siempre mostrara los mismos resultados.
-                                </p>
+                        <div class="row">
+                            <div class="panel panel-danger" ng-show="useMocks">
+                                <div class="panel-heading">
+                                    <i class="fa fa-alert"></i> Alerta
+                                </div>
+                                <div class="panel-body">
+                                    Hemos detectado problemas en la conexi&oacute;n con ThePirateBay.Org que es el origen de la informaci&oacute;n que estamos
+                                    utilizando. Debido a lo anterior y para no tener que bajar esta aplicación apuntaremos
+                                    a una maqueta con informaci&oacute;n real, pero obsoleta.
+                                </div>
+                                <div class="panel-footer">
+                                    La informaci&oacute;n que se muestra a continuaci&oacute;n se encuentra desactualizada.
+                                </div>
                             </div>
                         </div>
                         <div class="row">

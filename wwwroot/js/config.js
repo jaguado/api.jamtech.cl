@@ -56,7 +56,20 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         .state('standalone.products', {
             url: "/products",
             templateUrl: "views/products_search.es.html",
-            data: { pageTitle: 'Products Search' }
+            data: { pageTitle: 'Products Search' },
+            resolve: {
+                loadPlugin: function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            files: ['js/plugins/footable/footable.all.min.js', 'css/plugins/footable/footable.core.css']
+                        },
+                        {
+                            name: 'ui.footable',
+                            files: ['js/plugins/footable/angular-footable.js']
+                        }
+                    ]);
+                }
+            }
         })
         .state('index.torrents', {
             url: "/torrents",
@@ -79,7 +92,20 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         .state('standalone.torrents', {
             url: "/torrents",
             templateUrl: "views/torrents_search.es.html",
-            data: { pageTitle: 'Torrents Search' }
+            data: { pageTitle: 'Torrents Search' },
+            resolve: {
+                loadPlugin: function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            files: ['js/plugins/footable/footable.all.min.js', 'css/plugins/footable/footable.core.css']
+                        },
+                        {
+                            name: 'ui.footable',
+                            files: ['js/plugins/footable/angular-footable.js']
+                        }
+                    ]);
+                }
+            }
         })
         .state('index.projects', {
             url: "/projects",

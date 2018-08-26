@@ -38,17 +38,19 @@
                         </div>
                     </div>
                     <div class="ibox-content forum-container">
-                        <div class="panel panel-warning" ng-show="showLocationWarning">
-                            <div class="panel-heading">
-                                <i class="fa fa-warning"></i> Alerta de ubicaci&oacute;n
-                            </div>
-                            <div class="panel-body">
-                                <p>
-                                    No tenemos acceso a tu ubicaci&oacute;n por lo que no podemos identificar donde est&aacute;s para darte informaci&oacute;n
-                                    relevante.
-                                    <br />Compartenos tu ubicaci&oacute;n para recibir informaci&oacute;n m&aacute;s precisa.
-                                    <br />En caso contrario el tiempo de carga aumentar&aacute; considerablemente.
-                                </p>
+                        <div class="row">
+                            <div class="panel panel-warning" ng-show="showLocationWarning">
+                                <div class="panel-heading">
+                                    <i class="fa fa-warning"></i> Alerta de ubicaci&oacute;n
+                                </div>
+                                <div class="panel-body">
+                                    <p>
+                                        No tenemos acceso a tu ubicaci&oacute;n por lo que no podemos identificar donde est&aacute;s para darte informaci&oacute;n
+                                        relevante.
+                                        <br />Compartenos tu ubicaci&oacute;n para recibir informaci&oacute;n m&aacute;s precisa.
+                                        <br />En caso contrario el tiempo de carga aumentar&aacute; considerablemente.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                         <div class="row">
@@ -147,10 +149,10 @@
                                 </div>
                             </div>
                         </div>
-                         <!-- Stations Grid -->
+                        <!-- Stations Grid -->
                         <div ng-include="'views/combustible_grid.html'"></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
