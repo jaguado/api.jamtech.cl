@@ -16,7 +16,7 @@ namespace JAMTech.Controllers
     /// API to TPB
     /// </summary>
     [Route("v1/[controller]")]
-    public class TorrentController: BaseController
+    public class TorrentController : BaseController
     {
         // GET: api/Torrent/movie
         /// <summary>
@@ -27,7 +27,7 @@ namespace JAMTech.Controllers
         /// <returns>List of torrent files</returns>
         [HttpGet]
         [Produces(typeof(List<TorrentResult>))]
-        public async Task<IActionResult> Get(string search, int pages=1, bool skipLinks=false)
+        public async Task<IActionResult> Get(string search, int pages = 1, bool skipLinks = false)
         {
             var torrentPagesTasks = Enumerable.Range(1, pages)
                               .Select(page => FindTorrentsAsync(search, page, skipLinks)).ToArray();
@@ -61,18 +61,25 @@ namespace JAMTech.Controllers
                     var resultsTable = htmlDoc.DocumentNode.Descendants().Where
                             (x => (x.Name == "table" && x.Attributes["id"] != null &&
                                x.Attributes["id"].Value.Equals(searchResultDivName))).ToList();
+
                     resultsTable.ForEach(results =>
                     {
                         var rows = results.Descendants("tr").ToList();
                         rows.ForEach(row =>
                         {
                             var tempResult = new TorrentResult() { Page = page };
-                            var details = row.Descendants().Where(x => x.Name == "div" && x.Attributes["class"] != null && x.Attributes["class"].Value.Equals(detailDivName));
-                            foreach (var detail in details)
+                            var details = row.Descendants()
+                                             .Where(x =>
+                                                x.Name == "div" &&
+                                                x.Attributes["class"] != null &&
+                                                x.Attributes["class"].Value.Equals(detailDivName))
+                                                .ToList();
+
+                            details.ForEach(detail =>
                             {
-                                tempResult.Name = detail.InnerText.Trim();
                                 var descriptions = row.Descendants().Where(x => x.Attributes["class"] != null && x.Attributes["class"].Value.Equals("detDesc"));
                                 tempResult.Description.AddRange(descriptions.Select(d => d.InnerText));
+                                tempResult.Name = detail.InnerText.Trim();
 
                                 if (!skipLinks)
                                 {
@@ -97,7 +104,8 @@ namespace JAMTech.Controllers
                                     tempResult.Leeds = int.Parse(columns[colCount - 1].InnerText);
                                     tempResult.Seeds = int.Parse(columns[colCount - 2].InnerText);
                                 }
-                            }
+                            });
+
                             tempResult.Vip = row.Descendants().Any(x => x.Name == "img" && x.Attributes["title"] != null && x.Attributes["title"].Value.Equals("VIP"));
                             if (!string.IsNullOrEmpty(tempResult.Name))
                                 torrentResults.Add(tempResult);
