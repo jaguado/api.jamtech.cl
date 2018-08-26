@@ -1,0 +1,51 @@
+<div class="ibox">
+    <div class="ibox-content">
+        <table class="footable table table-stripped toggle-arrow-tiny middle" data-page-size="20">
+            <thead>
+                <tr>
+                    <th data-sort-ignore="true"></th>
+                    <th data-hide="phone">Tipo</th>
+                    <th data-hide="phone">Sub Tipo</th>
+                    <th data-hide="phone">Nombre</th>
+                    <th data-hide="number">Seeds</th>
+                    <th data-type="number">Leeds</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="torrent in torrents" footable-refresh>
+                    <td>
+                        <!--<img ng-src="{{torrent.thumb}}"  style="max-height: 80px; max-width: 80px;" />-->
+                    </td>
+                    <td>
+                        {{ torrent.Type | capitalize }}
+                    </td>
+                    <td>
+                        {{ torrent.SubType | capitalize }}
+                    </td>
+                    <td>
+                        {{ torrent.Name | capitalize}}
+                    </td>
+                    <td>
+                        {{ torrent.Seeds }}
+                    </td>
+                    <td>
+                        {{ torrent.Leeds }}
+                    </td>
+                    <td>
+                        <button class="btn btn-white" ng-click="download(torrent)">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="7">
+                        <ul class="pagination pull-right"></ul>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>

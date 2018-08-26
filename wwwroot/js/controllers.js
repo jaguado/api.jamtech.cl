@@ -1,5 +1,6 @@
- var baseApiUrl = '//jamtechapi.herokuapp.com/v1/';
- 
+var mocksBaseApiUrl = '//jamtechapi.herokuapp.com/mocks/torrents.json'
+var baseApiUrl = '//jamtechapi.herokuapp.com/v1/';
+
  function MainCtrl($scope) {
      this.userName = 'Visit';
      this.helloText = 'Welcome to JAM Tech.cl';
@@ -10,20 +11,55 @@
      $scope.minimalize();
  };
 
+ function TorrentsCtrl($http, $scope, $window) {
+     var searchUrl = baseApiUrl + 'Torrent?skipLinks=false&pages=1&search=';
+     $scope.availableTorrentsTemplates = [{
+             "name": "Table",
+             "url": "views/torrents_table.html",
+             "iconClass": "fas fa-table"
+         },
+         {
+             "name": "Grid",
+             "url": "views/torrents_grid.html",
+             "iconClass": "fas fa-th"
+         }
+     ];
+     $scope.gridTemplate = $scope.availableTorrentsTemplates[0];
+     $scope.setTemplate = function (val) {
+        $scope.gridTemplate = val;
+    }
+     $scope.torrents = [];
+     $scope.searchTorrents = function (val) {
+         var url =searchUrl + val;
+         //using mocks for dev
+         url = mocksBaseApiUrl;
+         return $http.get(url).then(function (response) {
+             $scope.torrents = response.data;
+             console.log('getTorrents', response.data)
+             return true;
+         });
+     }
+     $scope.download = function (val) {
+       console.log('downloading', val);
+       var url = val.Links.filter(link => link.Item2.startsWith('magnet:'));
+       if(url.length>0)
+            $window.open(url[0].Item2, '_blank');
+    }
+ }
+
  function ProductsCtrl($http, $scope) {
      var searchUrl = baseApiUrl + 'Products?pages=1&product=';
      var compareUrl = baseApiUrl + 'JumboProducts/{productId}/compare';
-     $scope.availableProductTemplates = [
-        {
-            "name": "Table",
-            "url": "views/products_table.html",
-            "iconClass": "fas fa-table"
-        },
-        {
-            "name": "Grid",
-            "url": "views/products_grid.html",
-            "iconClass": "fas fa-th"
-        }
+     $scope.availableProductTemplates = [{
+             "name": "Table",
+             "url": "views/products_table.html",
+             "iconClass": "fas fa-table"
+         },
+         {
+             "name": "Grid",
+             "url": "views/products_grid.html",
+             "iconClass": "fas fa-th"
+         }
      ];
      $scope.gridTemplate = $scope.availableProductTemplates[0];
      $scope.view = 'Search';
@@ -31,8 +67,8 @@
      $scope.position = null;
      $scope.showLocationWarning = false;
      $scope.products = [];
-     $scope.setTemplate = function(val){
-        $scope.gridTemplate = val;
+     $scope.setTemplate = function (val) {
+         $scope.gridTemplate = val;
      }
      $scope.searchProduct = function (product) {
          $scope.textToSearch = product;
@@ -282,6 +318,7 @@
      .controller('MainCtrl', MainCtrl)
      .controller('StationsCtrl', StationsCtrl)
      .controller('ProductsCtrl', ProductsCtrl)
+     .controller('TorrentsCtrl', TorrentsCtrl)
      .filter('capitalize', Capitalize)
      .filter('toArray', toArray)
      .filter('getBrand', getProductBrandType);

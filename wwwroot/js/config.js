@@ -7,7 +7,7 @@
  *
  */
 function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
-    $urlRouterProvider.otherwise("/index/combustible");
+    $urlRouterProvider.otherwise("/index/torrents");
 
     $ocLazyLoadProvider.config({
         // Set to true if you want to see what and when is dynamically loaded
@@ -57,6 +57,29 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
             url: "/products",
             templateUrl: "views/products_search.es.html",
             data: { pageTitle: 'Products Search' }
+        })
+        .state('index.torrents', {
+            url: "/torrents",
+            templateUrl: "views/torrents_search.es.html",
+            data: { pageTitle: 'Torrents Search' },
+            resolve: {
+                loadPlugin: function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            files: ['js/plugins/footable/footable.all.min.js', 'css/plugins/footable/footable.core.css']
+                        },
+                        {
+                            name: 'ui.footable',
+                            files: ['js/plugins/footable/angular-footable.js']
+                        }
+                    ]);
+                }
+            }
+        })
+        .state('standalone.torrents', {
+            url: "/torrents",
+            templateUrl: "views/torrents_search.es.html",
+            data: { pageTitle: 'Torrents Search' }
         })
         .state('index.projects', {
             url: "/projects",
