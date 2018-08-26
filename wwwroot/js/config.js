@@ -7,7 +7,7 @@
  *
  */
 function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
-    $urlRouterProvider.otherwise("/index/torrents");
+    $urlRouterProvider.otherwise("/index/combustible");
 
     $ocLazyLoadProvider.config({
         // Set to true if you want to see what and when is dynamically loaded
