@@ -7,7 +7,8 @@
         'ui.router',                    // Routing
         'oc.lazyLoad',                  // ocLazyLoad
         'ui.bootstrap',                 // Ui Bootstrap,
-        'angular.filter'                //angular filter
+        'angular.filter',               //angular filter
+        'angular-google-analytics'      //Google Analytics
     ])
 })();
 

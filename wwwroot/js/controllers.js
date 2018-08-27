@@ -15,7 +15,7 @@ function MainCtrl($scope) {
     $scope.minimalize();
 };
 
-function TorrentsCtrl($http, $scope, $window) {
+function TorrentsCtrl($http, $scope, $window, Analytics) {
     $scope.useMocks = false; //mocks mode
     var searchUrl = baseApiUrl + 'Torrent?skipLinks=false&pages=1&search=';
     $scope.availableTorrentsTemplates = [{
@@ -25,10 +25,12 @@ function TorrentsCtrl($http, $scope, $window) {
     }];
     $scope.gridTemplate = $scope.availableTorrentsTemplates[0];
     $scope.setTemplate = function (val) {
+        Analytics.trackEvent('torrent', 'template', val);
         $scope.gridTemplate = val;
     }
     $scope.torrents = [];
     $scope.searchTorrents = function (val) {
+        Analytics.trackEvent('torrent', 'search', val);
         var url = searchUrl + val;
         //using mocks for dev
         if ($scope.useMocks)
@@ -42,6 +44,7 @@ function TorrentsCtrl($http, $scope, $window) {
     }
     $scope.download = function (val) {
         console.log('downloading', val);
+        Analytics.trackEvent('torrent', 'download', val.Name);
         var url = val.Links.filter(link => link.Item2.startsWith('magnet:'));
         if (url.length > 0)
             $window.open(url[0].Item2, '_blank');
@@ -69,9 +72,11 @@ function ProductsCtrl($http, $scope) {
     $scope.showLocationWarning = false;
     $scope.products = [];
     $scope.setTemplate = function (val) {
+        Analytics.trackEvent('product', 'template', val);
         $scope.gridTemplate = val;
     }
     $scope.searchProduct = function (product) {
+        Analytics.trackEvent('product', 'search', product);
         $scope.textToSearch = product;
         var url = searchUrl + product;
 
@@ -85,6 +90,7 @@ function ProductsCtrl($http, $scope) {
     //$scope.searchProduct('vino');
 
     $scope.viewProduct = function (product) {
+        Analytics.trackEvent('product', 'view', product);
         var url = compareUrl.replace('{productId}', product.product_id);
         //get stations from api.jamtech.cl
         return $http.get(url).then(function (response) {
@@ -100,9 +106,11 @@ function ProductsCtrl($http, $scope) {
                 $scope.$apply(function () {
                     $scope.position = position;
                     $scope.showLocationWarning = false;
+                    Analytics.trackEvent('product', 'geolocation', 'true');
                 });
             },
             function (error) {
+                Analytics.trackEvent('product', 'geolocation', 'false');
                 $scope.showLocationWarning = true;
             });
     };
@@ -161,6 +169,7 @@ function StationsCtrl($http, $scope) {
     ];
     $scope.gridTemplate = $scope.availableTemplates[0];
     $scope.setTemplate = function (val) {
+        Analytics.trackEvent('combustible', 'template', val);
         $scope.gridTemplate = val;
     }
 
@@ -226,6 +235,7 @@ function StationsCtrl($http, $scope) {
     $scope.loadRegions();
 
     $scope.searchStations = function () {
+        Analytics.trackEvent('combustible', 'search', $scope.combustible);
         //refresh order by
         if ($scope.fuel != null)
             $scope.orderBy = 'precios.ranking_' + $scope.fuel.replaceAll(' ', '_');
@@ -263,6 +273,7 @@ function StationsCtrl($http, $scope) {
                 $scope.$apply(function () {
                     $scope.position = position;
                     $scope.showLocationWarning = false;
+                    Analytics.trackEvent('product', 'geolocation', 'true');
                     $scope.searchStations();
                 });
             },
@@ -270,6 +281,7 @@ function StationsCtrl($http, $scope) {
                 //load stations without location
                 $scope.searchStations();
                 $scope.showLocationWarning = true;
+                Analytics.trackEvent('product', 'geolocation', 'false');
             });
     };
 }

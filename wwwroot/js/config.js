@@ -142,6 +142,10 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 angular
     .module('inspinia')
     .config(config)
+    .config(['AnalyticsProvider', function (AnalyticsProvider) {
+        AnalyticsProvider.setAccount('UA-124610725-1');
+     }])
+     .run(['Analytics', function(Analytics) { }])
     .run(function($rootScope, $state) {
         $rootScope.$state = $state;
     });
