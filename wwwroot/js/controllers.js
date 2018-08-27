@@ -6,7 +6,12 @@ var baseApiUrl = '//jamtechapi.herokuapp.com/v1/';
      this.helloText = 'Welcome to JAM Tech.cl';
      this.descriptionText = '';
      $scope.minimalize = function () {
-         $("body").toggleClass("mini-navbar");
+        if(!$("body").hasClass("mini-navbar")){
+            $("body").toggleClass("mini-navbar");
+        }
+        else{
+            $("body").removeClass("mini-navbar");
+        }
      }
      $scope.minimalize();
  };
@@ -18,11 +23,6 @@ var baseApiUrl = '//jamtechapi.herokuapp.com/v1/';
              "name": "Table",
              "url": "views/torrents_table.html",
              "iconClass": "fas fa-table"
-         },
-         {
-             "name": "Grid",
-             "url": "views/torrents_grid.html",
-             "iconClass": "fas fa-th"
          }
      ];
      $scope.gridTemplate = $scope.availableTorrentsTemplates[0];
