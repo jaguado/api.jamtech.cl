@@ -18,6 +18,8 @@ namespace JAMTech.Controllers
     [Route("v1/[controller]")]
     public class TorrentController : BaseController
     {
+        const int defaultTimeout = 10;
+
         // GET: api/Torrent/movie
         /// <summary>
         /// Allow to search for a torrent on TPB
@@ -30,7 +32,8 @@ namespace JAMTech.Controllers
         public async Task<IActionResult> Get(string search, int pages = 1, bool skipLinks = false)
         {
             var torrentPagesTasks = Enumerable.Range(1, pages)
-                              .Select(page => FindTorrentsAsync(search, page, skipLinks)).ToArray();
+                              .Select(page => FindOtherTorrentsAsync(search, page, skipLinks)).ToArray();
+
             await Task.WhenAll(torrentPagesTasks);
             var flattenResult = torrentPagesTasks.Where(t => t.IsCompletedSuccessfully && t.Result != null)
                                .Select(s => s.Result)
@@ -44,16 +47,18 @@ namespace JAMTech.Controllers
         private const string searchResultDivName = "searchResult";
         private const string detailDivName = "detName";
 
-        private static async Task<List<TorrentResult>> FindTorrentsAsync(string movie, int page, bool skipLinks)
+        private static async Task<List<TorrentResult>> FindTPBTorrentsAsync(string movie, int page, bool skipLinks)
         {
-            var url = string.Format(tpbSearchUrl, movie, page);
             try
             {
-                var response = await Net.GetResponse(url, null, 10);
-                if (response.IsSuccessStatusCode)
+                var url = string.Format(tpbSearchUrl, movie, page);
+                using (var response = await Net.GetResponse(url, null, defaultTimeout))
                 {
-                    var source = await response.Content.ReadAsStringAsync();
-                    return GetTorrents(source, page, skipLinks);                        
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var source = await response.Content.ReadAsStringAsync();
+                        return GetTPBTorrents(source, page, skipLinks);
+                    }
                 }
             }
             catch (Exception ex)
@@ -62,8 +67,7 @@ namespace JAMTech.Controllers
             }
             return null;
         }
-
-        private static List<TorrentResult> GetTorrents(string source, int page, bool skipLinks)
+        private static List<TorrentResult> GetTPBTorrents(string source, int page, bool skipLinks)
         {
             if (string.IsNullOrEmpty(source)) return null;
 
@@ -126,6 +130,99 @@ namespace JAMTech.Controllers
                 });
             });
             return torrentResults;
+        }
+
+        private const string otherBaseUrl = "https://1337x.to";
+        private const string otherSearchUrl = otherBaseUrl + @"/sort-search/{0}/seeders/desc/{1}/";
+        private const string otherResultDivClassName = "table-list table table-responsive table-striped";
+        private static async Task<List<TorrentResult>> FindOtherTorrentsAsync(string movie, int page, bool skipLinks)
+        {
+            try
+            {
+                var url = string.Format(otherSearchUrl, movie, page);
+                using (var response = await Net.GetResponse(url, null, defaultTimeout))
+                {
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var source = await response.Content.ReadAsStringAsync();
+                        var results = GetOtherTorrents(source, page);
+                        if (!skipLinks)
+                        {
+                            var tasks = results.Select(async t => new { torrent = t, downloadLink = await GetOtherDownloadLink(t.Link) }).ToArray();
+                            await Task.WhenAll(tasks);
+                            var links = tasks.ToDictionary(r => r.Result.torrent.Name, r => r.Result.downloadLink);
+                            results.ForEach(result => result.Links.Add(new Tuple<string, string>("magnet", links[result.Name])));
+                        }
+                        return results;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new TimeoutException(ex.Message, ex.InnerException);
+            }
+            return null;
+        }
+        private static List<TorrentResult> GetOtherTorrents(string source, int page)
+        {
+            if (string.IsNullOrEmpty(source)) return null;
+
+            var torrentResults = new List<TorrentResult>();
+            var htmlDoc = new HtmlDocument();
+            htmlDoc.LoadHtml(source);
+
+            //Parse results
+            var resultsTable = htmlDoc.DocumentNode.Descendants().Where
+                    (x => (x.Name == "table" && x.Attributes["class"] != null &&
+                       x.Attributes["class"].Value.Equals(otherResultDivClassName))).ToList();
+            resultsTable.ForEach(results =>
+            {
+                var rows = results.Descendants("tr").Skip(1).ToList(); //skip header
+                rows.ForEach(row =>
+                {
+                    var columnClasses = row.Descendants("td").Where(s => s.Attributes["class"] != null).Select(s => s.Attributes["class"].Value).ToList();
+                    var columnValues = row.Descendants("td").Select(s => s.InnerText).ToList();
+                    var links = row.Descendants("a").Where(s => s.Attributes["href"] != null).Select(s => s.Attributes["href"].Value).ToList();
+                    var iconsClasses = row.Descendants("i").Where(s => s.Attributes["class"] != null).Select(s => s.Attributes["class"].Value).ToList();
+                    torrentResults.Add(new TorrentResult()
+                    {
+                        Page = page,
+                        Type = iconsClasses.First().Split('-')[1],
+                        Name = columnValues[0],
+                        Seeds = int.Parse(columnValues[1]),
+                        Leeds = int.Parse(columnValues[2]),
+                        Description = new List<string>() { "Date: " + columnValues[3], "Size: " + columnValues[4], "Uploader:" + columnValues[5] },
+                        Link = links.Skip(1).First()
+                    });
+                });
+            });
+            return torrentResults;
+        }
+        private static async Task<string> GetOtherDownloadLink(string url)
+        {
+            var source = string.Empty;
+            using (var response = await Net.GetResponse(otherBaseUrl + url, null, defaultTimeout))
+            {
+                response.EnsureSuccessStatusCode();
+                source = await response.Content.ReadAsStringAsync();
+            }
+
+            if (string.IsNullOrEmpty(source)) return null;
+
+            var htmlDoc = new HtmlDocument();
+            htmlDoc.LoadHtml(source);
+
+            //Parse results
+            var link = htmlDoc.DocumentNode.Descendants("a")
+                                           .Where(e => e.Attributes["href"] != null)
+                                           .Select(e => e.Attributes["href"].Value)
+                                           .Where(href => href.StartsWith("magnet:"));
+            if (link.Any())
+            {
+                var magnet = WebUtility.HtmlDecode(link.First());
+                return magnet.Substring(0, magnet.IndexOf('&'));
+            }
+            return null;
         }
     }
 }
