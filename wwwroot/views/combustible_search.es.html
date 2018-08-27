@@ -150,7 +150,17 @@
                             </div>
                         </div>
                         <!-- Stations Grid -->
-                        <div ng-include="'views/combustible_grid.html'"></div>
+                        <br /> Vista:&nbsp;
+                        <div class="btn-group dropdown" uib-dropdown="">
+                            <a ng-repeat="type in availableTemplates" ng-class="type!=gridTemplate ? 'btn':'btn btn-white'" ng-click="setTemplate(type)">
+                                <i ng-class="type.iconClass"></i>
+                            </a>
+                        </div>
+                        <div ng-include="gridTemplate.url"></div>
+                        <small class="pull-right" ng-show="stations!=null">
+                                <b>{{stations.length}}</b> {{stations.length>1 ? 'estaciones' : 'estaci&oacute;n'}} encontrada{{stations.length>1 ? 's': ''}} en un radio de
+                                <b>{{maxDistance}}</b> metros
+                            </small>
                     </div>
                 </div>
             </div>

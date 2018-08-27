@@ -28,12 +28,38 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         .state('index.combustible', {
             url: "/combustible",
             templateUrl: "views/combustible_search.es.html",
-            data: { pageTitle: 'Combustible Search' }
+            data: { pageTitle: 'Combustible Search' },
+            resolve: {
+                loadPlugin: function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            files: ['js/plugins/footable/footable.all.min.js', 'css/plugins/footable/footable.core.css']
+                        },
+                        {
+                            name: 'ui.footable',
+                            files: ['js/plugins/footable/angular-footable.js']
+                        }
+                    ]);
+                }
+            }
         })
         .state('standalone.combustible', {
             url: "/combustible",
             templateUrl: "views/combustible_search.es.html",
-            data: { pageTitle: 'Combustible Search' }
+            data: { pageTitle: 'Combustible Search' },
+            resolve: {
+                loadPlugin: function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            files: ['js/plugins/footable/footable.all.min.js', 'css/plugins/footable/footable.core.css']
+                        },
+                        {
+                            name: 'ui.footable',
+                            files: ['js/plugins/footable/angular-footable.js']
+                        }
+                    ]);
+                }
+            }
         })
         .state('index.products', {
             url: "/products",
