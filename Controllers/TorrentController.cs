@@ -192,7 +192,8 @@ namespace JAMTech.Controllers
                         Seeds = int.Parse(columnValues[1]),
                         Leeds = int.Parse(columnValues[2]),
                         Description = new List<string>() { "Date: " + columnValues[3], "Size: " + columnValues[4], "Uploader:" + columnValues[5] },
-                        Link = links.Skip(1).First()
+                        Link = links.Skip(1).First(),
+                        Vip = columnClasses.Any(c => c.Contains("vip"))
                     });
                 });
             });
