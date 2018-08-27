@@ -8,7 +8,7 @@
             <h2>JAM Tech.cl</h2>
             <ol class="breadcrumb">
                 <li>
-                    <a href="index.html">Inicio</a>
+                    <a href="#/index/torrents">Inicio</a>
                 </li>
                 <li class="active">
                     <strong>Buscador de Torrents</strong>
@@ -64,7 +64,7 @@
                                 </div>
                             </div>
                             <br /> Vista:&nbsp;
-                            <div class="btn-group dropdown" uib-dropdown="" ng-if="false">
+                            <div class="btn-group dropdown" uib-dropdown="">
                                 <a ng-repeat="type in availableTorrentsTemplates" ng-class="type!=gridTemplate ? 'btn':'btn btn-white'" ng-click="setTemplate(type)">
                                     <i ng-class="type.iconClass"></i>
                                 </a>
