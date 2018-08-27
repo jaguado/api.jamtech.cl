@@ -119,8 +119,7 @@ function StationsCtrl($http, $scope) {
     $scope.distributor = null;
     $scope.region = null; //all is the default //TODO read from cookie or calculate by location
     $scope.fuel = 'gasolina_95';
-    $scope.fuelTypes_old = ["gasolina_93", "gasolina_95", "gasolina_97", "diesel", "kerosene", "glp_vehicular"];
-    $scope.fuelTypes = ["gasolina 93", "gasolina 95", "gasolina 97", "diesel", "kerosene", "glp vehicular"];
+    $scope.fuelTypes = ["gasolina 93", "gasolina 95", "gasolina 97", "petroleo diesel", "kerosene", "glp vehicular"];
     $scope.distances = [1000, 5000, 10000, 15000, 20000, 50000, 100000];
     $scope.combustible = 'Vehicular';
     $scope.orderBy = 'precios.ranking_gasolina_95';
@@ -229,7 +228,7 @@ function StationsCtrl($http, $scope) {
     $scope.searchStations = function () {
         //refresh order by
         if ($scope.fuel != null)
-            $scope.orderBy = 'precios.ranking_' + $scope.fuel.replace(' ', '_');
+            $scope.orderBy = 'precios.ranking_' + $scope.fuel.replaceAll(' ', '_');
 
         //add filters
         var tempStationsUrl = stationsUrl;
@@ -341,6 +340,15 @@ function GetPrice() {
     return function (input) {
         return 'no price yet';
     }
+};
+
+String.prototype.replaceAll = function(searchStr, replaceStr) {
+    var str = this;
+    
+    // escape regexp special characters in search string
+    searchStr = searchStr.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    
+    return str.replace(new RegExp(searchStr, 'gi'), replaceStr);
 };
 
 //angular js - load controllers, filters and other stuff
