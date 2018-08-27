@@ -10,7 +10,6 @@
                     <th data-hide="all">Formas de pago</th>
                     <th data-hide="all">Horario</th>
                     <th data-hide="all">Distancia</th>
-                    <th data-hide="all"></th>
                     <th data-hide="phone">Gasolina 93</th>
                     <th data-hide="phone">Gasolina 95</th>
                     <th data-hide="phone">Gasolina 97</th>
@@ -46,8 +45,6 @@
                     </td>
                     <td>
                         {{station.ubicacion.distancia | number:0}} metros aprox.
-                    </td>
-                    <td>
                         <div ng-show="!showLocationWarning">
                             <a target="_blank" ng-href="http://www.google.com/maps/place/{{station.ubicacion.latitud}},{{station.ubicacion.longitud}}">
                                 <i class="fas fa-map-marked-alt"></i>
@@ -65,7 +62,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="7">
+                    <td colspan="13">
                         <ul class="pagination pull-right"></ul>
                     </td>
                 </tr>
