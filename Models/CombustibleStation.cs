@@ -72,7 +72,7 @@ namespace JAMTech.Models
         [JsonProperty("ranking kerosene")]
         public int ranking_kerosene { get; set; } = 99;
         [JsonProperty("ranking petroleo diesel")]
-        public int ranking_diesel { get; set; } = 99;
+        public int ranking_petroleo_diesel { get; set; } = 99;
         [JsonProperty("ranking glp vehicular")]
         public int ranking_glp_vehicular { get; set; } = 99;
     }

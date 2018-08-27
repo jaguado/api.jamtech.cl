@@ -123,7 +123,7 @@ namespace JAMTech.Controllers
                 if (station.precios.kerosene > 0)
                     station.precios.ranking_kerosene = Array.IndexOf(rankingKerosene, station.precios.kerosene) + 1;
                 if (station.precios.petroleo_diesel > 0)
-                    station.precios.ranking_diesel = Array.IndexOf(rankingDiesel, station.precios.petroleo_diesel) + 1;
+                    station.precios.ranking_petroleo_diesel = Array.IndexOf(rankingDiesel, station.precios.petroleo_diesel) + 1;
                 if (station.precios.glp_vehicular != null && station.precios.glp_vehicular != "")
                     station.precios.ranking_glp_vehicular = Array.IndexOf(rankingGlp, double.Parse(station.precios.glp_vehicular)) + 1;
             }
