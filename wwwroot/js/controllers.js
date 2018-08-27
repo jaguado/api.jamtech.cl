@@ -1,5 +1,5 @@
-var mocksBaseApiUrl = '//jamtechapi.herokuapp.com/mocks/torrents.json'
-var baseApiUrl = '//jamtechapi.herokuapp.com/v1/';
+var mocksBaseApiUrl = '//aio.jamtech.cl/mocks/torrents.json'
+var baseApiUrl = '//aio.jamtech.cl/v1/';
 
 function MainCtrl($scope) {
     this.userName = 'Visit';
@@ -47,7 +47,7 @@ function TorrentsCtrl($http, $scope, $window, Analytics) {
         Analytics.trackEvent('torrent', 'download', val.Name);
         var url = val.Links.filter(link => link.Item2.startsWith('magnet:'));
         if (url.length > 0)
-            $window.open(url[0].Item2, '_blank');
+            $window.open(url[0].Item2, '_self');
     }
 }
 
