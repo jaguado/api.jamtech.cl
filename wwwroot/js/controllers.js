@@ -60,6 +60,13 @@ function TorrentsCtrl($http, $scope, $window, Analytics) {
 }
 
 function ProductsCtrl($http, $scope, Analytics) {
+    $scope.minimalize = function () {
+        if (!$("body").hasClass("mini-navbar")) {
+            $("body").toggleClass("mini-navbar");
+        } else {
+            $("body").removeClass("mini-navbar");
+        }
+    }
     var searchUrl = baseApiUrl + 'Products?pages=1&product=';
     var compareUrl = baseApiUrl + 'JumboProducts/{productId}/compare';
     $scope.availableProductTemplates = [{
@@ -125,7 +132,14 @@ function ProductsCtrl($http, $scope, Analytics) {
 }
 
 function StationsCtrl($http, $scope, Analytics) {
-
+    $scope.minimalize = function () {
+        if (!$("body").hasClass("mini-navbar")) {
+            $("body").toggleClass("mini-navbar");
+        } else {
+            $("body").removeClass("mini-navbar");
+        }
+    }
+    
     var stationsUrl = baseApiUrl + 'CombustibleStations?';
     var regionsUrl = baseApiUrl + 'CombustibleStations/Regiones';
 
