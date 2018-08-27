@@ -16,6 +16,14 @@ function MainCtrl($scope) {
 };
 
 function TorrentsCtrl($http, $scope, $window, Analytics) {
+    $scope.minimalize = function () {
+        if (!$("body").hasClass("mini-navbar")) {
+            $("body").toggleClass("mini-navbar");
+        } else {
+            $("body").removeClass("mini-navbar");
+        }
+    }
+    
     $scope.useMocks = false; //mocks mode
     var searchUrl = baseApiUrl + 'Torrent?skipLinks=false&pages=1&search=';
     $scope.availableTorrentsTemplates = [{

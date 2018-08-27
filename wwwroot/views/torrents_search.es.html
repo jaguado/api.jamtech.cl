@@ -1,82 +1,72 @@
-<div class="gray-bg" ng-controller="TorrentsCtrl as main">
-    <div class="row wrapper border-bottom white-bg page-heading">
-        <div class="col-lg-12">
-            <div>
-                <br />
-                <img class="pull-right" src="img/favicon/apple-icon-60x60.png" alt="logo" />
-            </div>
-            <h2>JAM Tech.cl</h2>
-            <ol class="breadcrumb">
-                <li>
-                    <a href="#/index/torrents">Inicio</a>
-                </li>
-                <li class="active">
-                    <strong>Buscador de Torrents</strong>
-                </li>
-            </ol>
+<div ng-controller="TorrentsCtrl as main">
+    <div class="row wrapper page-heading">
+        <div>
             <br />
-            <a href="#/standalone/torrents">
-                <small>Pantalla Completa</small>&nbsp;
-                <i class="fas fa-arrows-alt"></i>
-            </a>
+            <img class="pull-right" src="img/favicon/apple-icon-60x60.png" alt="logo" />
+        </div>
+        <h2>JAM Tech.cl</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="#/index/torrents">Inicio</a>
+            </li>
+            <li class="active">
+                <strong>Buscador de Torrents</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="row wrapper">
+        <div class="p-xs">
+            <div class="pull-left m-r-md">
+                <i class="fas fa-cloud-download-alt text-navy mid-icon"></i>
+            </div>
+            <h2>Busqueda de Torrents</h2>
+            <span class="pull-right">
+                <brand-url />
+            </span>
         </div>
     </div>
     <div class="row animated fadeInRight">
-        <div class="col-lg-12">
-            <div class="wrapper wrapper-content animated fadeInRight">
-                <div class="ibox-content m-b-sm border-bottom">
-                    <div class="p-xs">
-                        <div class="pull-left m-r-md">
-                            <i class="fas fa-cloud-download-alt text-navy mid-icon"></i>
+        <div class="wrapper wrapper-content animated fadeInRight">
+            <div class="forum-container">
+                <div class="row">
+                    <div class="panel panel-danger" ng-show="useMocks">
+                        <div class="panel-heading">
+                            <i class="fa fa-alert"></i> Alerta
                         </div>
-                        <br />
-                        <h2>Busqueda de Torrents</h2>
-                        <span class="pull-right" style="margin-top:-10px;">
-                            <brand-url />
-                        </span>
+                        <div class="panel-body">
+                            Hemos detectado problemas en la conexi&oacute;n con ThePirateBay.Org que es el origen de la informaci&oacute;n que estamos
+                            utilizando. Debido a lo anterior y para no tener que bajar esta aplicación apuntaremos a una
+                            maqueta con informaci&oacute;n real, pero obsoleta.
+                        </div>
+                        <div class="panel-footer">
+                            La informaci&oacute;n que se muestra a continuaci&oacute;n se encuentra desactualizada.
+                        </div>
                     </div>
                 </div>
-                <div class="ibox-content forum-container">
-                    <div class="row">
-                        <div class="panel panel-danger" ng-show="useMocks">
-                            <div class="panel-heading">
-                                <i class="fa fa-alert"></i> Alerta
-                            </div>
-                            <div class="panel-body">
-                                Hemos detectado problemas en la conexi&oacute;n con ThePirateBay.Org que es el origen de la informaci&oacute;n que estamos
-                                utilizando. Debido a lo anterior y para no tener que bajar esta aplicación apuntaremos a
-                                una maqueta con informaci&oacute;n real, pero obsoleta.
-                            </div>
-                            <div class="panel-footer">
-                                La informaci&oacute;n que se muestra a continuaci&oacute;n se encuentra desactualizada.
-                            </div>
+                <div class="row">
+                    <div class="input-group">
+                        <input type="text" placeholder="Ej: BRRip" name="search" class="form-control input-lg" ng-model="textToSearch" focus-me="true"
+                            ng-keypress="($event.which === 13)?searchTorrents(textToSearch):0">
+                        <div class="input-group-btn">
+                            <button class="btn btn-lg btn-primary" type="submit" ng-click="searchTorrents(textToSearch)">
+                                Buscar
+                            </button>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="input-group">
-                            <input type="text" placeholder="Ej: BRRip" name="search" class="form-control input-lg" ng-model="textToSearch" focus-me="true"
-                                ng-keypress="($event.which === 13)?searchTorrents(textToSearch):0">
-                            <div class="input-group-btn">
-                                <button class="btn btn-lg btn-primary" type="submit" ng-click="searchTorrents(textToSearch)">
-                                    Buscar
-                                </button>
-                            </div>
-                        </div>
-                        <br /> Vista:&nbsp;
-                        <div class="btn-group dropdown" uib-dropdown="">
-                            <a ng-repeat="type in availableTorrentsTemplates" ng-class="type!=gridTemplate ? 'btn':'btn btn-white'" ng-click="setTemplate(type)">
-                                <i ng-class="type.iconClass"></i>
-                            </a>
-                        </div>
+                    <br /> Vista:&nbsp;
+                    <div class="btn-group dropdown" uib-dropdown="">
+                        <a ng-repeat="type in availableTorrentsTemplates" ng-class="type!=gridTemplate ? 'btn':'btn btn-white'" ng-click="setTemplate(type)">
+                            <i ng-class="type.iconClass"></i>
+                        </a>
                     </div>
-                    <br />
-                    <div class="row">
-                        <!-- Torrents Grid -->
-                        <div ng-include="gridTemplate.url"></div>
-                        <small class="pull-right" ng-show="torrents!=null">
-                            <b>{{torrents.length}}</b> torrent{{torrents.length>1 ? 's' : ''}} encontrado{{torrents.length>1
-                            ? 's' : ''}}</small>
-                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <!-- Torrents Grid -->
+                    <div ng-include="gridTemplate.url"></div>
+                    <small class="pull-right" ng-show="torrents!=null">
+                        <b>{{torrents.length}}</b> torrent{{torrents.length>1 ? 's' : ''}} encontrado{{torrents.length>1 ? 's'
+                        : ''}}</small>
                 </div>
             </div>
         </div>
