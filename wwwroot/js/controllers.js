@@ -51,7 +51,7 @@ function TorrentsCtrl($http, $scope, $window, Analytics) {
     }
 }
 
-function ProductsCtrl($http, $scope) {
+function ProductsCtrl($http, $scope, Analytics) {
     var searchUrl = baseApiUrl + 'Products?pages=1&product=';
     var compareUrl = baseApiUrl + 'JumboProducts/{productId}/compare';
     $scope.availableProductTemplates = [{
@@ -116,7 +116,7 @@ function ProductsCtrl($http, $scope) {
     };
 }
 
-function StationsCtrl($http, $scope) {
+function StationsCtrl($http, $scope, Analytics) {
 
     var stationsUrl = baseApiUrl + 'CombustibleStations?';
     var regionsUrl = baseApiUrl + 'CombustibleStations/Regiones';
