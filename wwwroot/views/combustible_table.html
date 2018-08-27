@@ -9,7 +9,7 @@
                     <th data-hide="all">Servicios</th>
                     <th data-hide="all">Formas de pago</th>
                     <th data-hide="all">Horario</th>
-                    <th data-hide="all">Distancia</th>
+                    <th data-hide="phone">Distancia</th>
                     <th data-hide="phone">Gasolina 93</th>
                     <th data-hide="phone">Gasolina 95</th>
                     <th data-hide="phone">Gasolina 97</th>
@@ -28,7 +28,7 @@
                         />
                     </td>
                     <td>
-                        {{station.razon_social | capitalize}}
+                        {{station.razon_social | capitalize | truncate: 50: '...'}}
                     </td>
                     <td>
                         <span ng-repeat="(key, value) in station.servicios" ng-if="value">
@@ -44,13 +44,10 @@
                         {{station.horario_atencion}}
                     </td>
                     <td>
-                        {{station.ubicacion.distancia | number:0}} metros aprox.
-                        <div ng-show="!showLocationWarning">
-                            <a target="_blank" ng-href="http://www.google.com/maps/place/{{station.ubicacion.latitud}},{{station.ubicacion.longitud}}">
-                                <i class="fas fa-map-marked-alt"></i>
-                                ¿C&oacute;mo llegar?
-                            </a>
-                        </div>
+                        {{station.ubicacion.distancia | number:0}} metros aprox.&nbsp;
+                        <a ng-show="!showLocationWarning" target="_blank" ng-href="http://www.google.com/maps/place/{{station.ubicacion.latitud}},{{station.ubicacion.longitud}}">
+                            <i class="fas fa-map-marked-alt"></i>
+                        </a>
                     </td>
                     <td ng-repeat="fuelType in fuelTypes">
                         <span ng-show="station.precios['ranking ' + fuelType] < 4" class="badge" ng-class="{'badge-primary': station.precios['ranking ' + fuelType] == 1 , 'badge-success': station.precios['ranking ' + fuelType] == 2}">
