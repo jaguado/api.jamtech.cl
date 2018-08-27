@@ -17,7 +17,7 @@
                 <tr ng-repeat="torrent in torrents" footable-refresh>
                     <td></td>
                     <td>
-                        <img ng-show="torrent.Vip" src="//thepiratebay.org/static/img/vip.gif" style="max-height: 80px; max-width: 80px;" />
+                        <i ng-show="torrent.Vip" class="fas fa-trophy" style="color:#f0e22b;"></i>
                     </td>
                     <td>
                         {{ torrent.Seeds }}
