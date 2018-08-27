@@ -18,7 +18,7 @@ namespace JAMTech.Controllers
     [Route("v1/[controller]")]
     public class TorrentController : BaseController
     {
-        const int defaultTimeout = 10;
+        const int defaultTimeout = 30;
 
         // GET: api/Torrent/movie
         /// <summary>
@@ -203,8 +203,10 @@ namespace JAMTech.Controllers
             var source = string.Empty;
             using (var response = await Net.GetResponse(otherBaseUrl + url, null, defaultTimeout))
             {
-                response.EnsureSuccessStatusCode();
-                source = await response.Content.ReadAsStringAsync();
+                if(response.IsSuccessStatusCode)
+                    source = await response.Content.ReadAsStringAsync();
+                else
+                    Console.WriteLine("Error getting download link from " + url);
             }
 
             if (string.IsNullOrEmpty(source)) return null;
