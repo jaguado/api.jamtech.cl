@@ -9,8 +9,8 @@
                     <th data-hide="phone" data-type="number">Leeds</th>
                     <th data-hide="phone">Tipo</th>
                     <th data-hide="all">Sub Tipo</th>
-                    <th>Nombre</th>
-                    <th data-sort-ignore="true"></th>
+                    <th data-hide="">Nombre</th>
+                    <th data-hide="" data-sort-ignore="true"></th>
                 </tr>
             </thead>
             <tbody>
@@ -32,7 +32,7 @@
                         {{ torrent.SubType | capitalize }}
                     </td>
                     <td>
-                        {{ torrent.Name | capitalize | truncate: 100: '...'}}
+                        {{ torrent.Name | capitalize }}
                     </td>
                     <td>
                         <button class="btn btn-white" ng-click="download(torrent)">
