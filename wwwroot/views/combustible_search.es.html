@@ -1,174 +1,164 @@
-<div class="gray-bg">
-    <div class="row wrapper border-bottom white-bg page-heading">
-        <div class="col-lg-12">
-            <div>
-                <br />
-                <img class="pull-right" src="img/favicon/apple-icon-60x60.png" alt="logo" />
-            </div>
-            <h2>JAM Tech.cl</h2>
-            <ol class="breadcrumb">
-                <li>
-                    <a href="#/index/combustible">Inicio</a>
-                </li>
-                <li class="active">
-                    <strong>Buscador de estaciones de combustible</strong>
-                </li>
-            </ol>
+<div ng-controller="StationsCtrl as main">
+    <div class="row wrapper page-heading">
+        <div>
             <br />
-            <a href="#/standalone/combustible">
-                <small>Pantalla Completa</small>&nbsp;
-                <i class="fas fa-arrows-alt"></i>
-            </a>
+            <img class="pull-right" src="img/favicon/apple-icon-60x60.png" alt="logo" />
+        </div>
+        <h2>JAM Tech.cl</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="#/index/combustible">Inicio</a>
+            </li>
+            <li class="active">
+                <strong>Buscador de estaciones de combustible</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="row wrapper">
+        <div class="p-xs">
+            <div class="pull-left m-r-md">
+                <i class="fas fa-gas-pump text-navy mid-icon"></i>
+            </div>
+            <h2>Estaciones de combustible</h2>
+            <span class="pull-right">
+                <brand-url />
+            </span>
         </div>
     </div>
-    <div class="row animated fadeInRight" ng-controller="StationsCtrl as main">
-        <div class="col-lg-12">
-            <div class="wrapper wrapper-content animated fadeInRight">
-                <div class="ibox-content m-b-sm border-bottom">
-                    <div class="p-xs">
-                        <div class="pull-left m-r-md">
-                            <i class="fas fa-gas-pump text-navy mid-icon"></i>
+    <div class="row animated fadeInRight">
+        <div class="wrapper wrapper-content animated fadeInRight">
+            <div class="forum-container">
+                <div class="row">
+                    <div class="panel panel-warning" ng-show="showLocationWarning">
+                        <div class="panel-heading">
+                            <i class="fa fa-warning"></i> Alerta de ubicaci&oacute;n
                         </div>
-                        <br />
-                        <h2>Estaciones de combustible</h2>
-                        <span class="pull-right" style="margin-top:-10px;">
-                            <brand-url />
-                        </span>
+                        <div class="panel-body">
+                            <p>
+                                No tenemos acceso a tu ubicaci&oacute;n por lo que no podemos identificar donde est&aacute;s para darte informaci&oacute;n
+                                relevante.
+                                <br />Compartenos tu ubicaci&oacute;n para recibir informaci&oacute;n m&aacute;s precisa.
+                                <br />En caso contrario el tiempo de carga aumentar&aacute; considerablemente.
+                            </p>
+                        </div>
                     </div>
                 </div>
-                <div class="ibox-content forum-container">
-                    <div class="row">
-                        <div class="panel panel-warning" ng-show="showLocationWarning">
-                            <div class="panel-heading">
-                                <i class="fa fa-warning"></i> Alerta de ubicaci&oacute;n
-                            </div>
-                            <div class="panel-body">
-                                <p>
-                                    No tenemos acceso a tu ubicaci&oacute;n por lo que no podemos identificar donde est&aacute;s para darte informaci&oacute;n
-                                    relevante.
-                                    <br />Compartenos tu ubicaci&oacute;n para recibir informaci&oacute;n m&aacute;s precisa.
-                                    <br />En caso contrario el tiempo de carga aumentar&aacute; considerablemente.
-                                </p>
+                <div class="row">
+                    <div class="col-sm-6" style="vertical-align: middle">
+                        Filtros:
+                        <div class="btn-group dropdown" uib-dropdown="">
+                            <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle="" aria-haspopup="true" aria-expanded="false">
+                                {{combustible}}
+                                <span class="caret"></span>
+                            </button>
+                            <ul role="menu" uib-dropdown-menu="" class="dropdown-menu">
+                                <li>
+                                    <a href="#" ng-click="setCombustible('Vehicular')">
+                                        Vehicular
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" ng-click="setCombustible('Calefaccion')">
+                                        Calefaccion
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="btn-group dropdown" uib-dropdown="">
+                            <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle="" aria-haspopup="true" aria-expanded="false">
+                                {{getRegionName() | capitalize}}
+                                <span class="caret"></span>
+                            </button>
+                            <ul role="menu" uib-dropdown-menu="" class="dropdown-menu">
+                                <li>
+                                    <a href="#" ng-click="setRegion(null)">Todas</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li ng-repeat="region in regions" ng-model="region">
+                                    <a href="#" ng-click="setRegion(region)">
+                                        {{region.nombre}}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="btn-group dropdown" uib-dropdown="">
+                            <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle="" aria-haspopup="true" aria-expanded="false">
+                                {{getDistributorName() | capitalize}}
+                                <span class="caret"></span>
+                            </button>
+                            <ul role="menu" uib-dropdown-menu="" class="dropdown-menu">
+                                <li ng-repeat="brand in getDistributors()">
+                                    <a href="#" ng-click="setDistributor(brand)">
+                                        {{brand}}
+                                    </a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="#" ng-click="setDistributor(null)">Todas</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="btn-group dropdown" uib-dropdown="">
+                            <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle="" aria-haspopup="true" aria-expanded="false">
+                                {{maxDistance}} mts
+                                <span class="caret"></span>
+                            </button>
+                            <ul role="menu" uib-dropdown-menu="" class="dropdown-menu">
+                                <li ng-repeat="distance in distances" ng-model="maxDistance">
+                                    <a href="#" ng-click="setDistance(distance)">
+                                        {{distance}} mts
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <br />
+                        <div style="padding-top: 5px;"></div>
+                        <span>Orden:</span>
+                        <div class="btn-group dropdown" style="vertical-align: middle" uib-dropdown="">
+                            <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle="" aria-haspopup="true" aria-expanded="false">
+                                {{getFuelType() | capitalize}}
+                                <span class="caret"></span>
+                            </button>
+                            <ul role="menu" uib-dropdown-menu="" class="dropdown-menu">
+                                <li ng-repeat="fuel in fuelTypes" ng-model="fuel">
+                                    <a href="#" ng-click="setFuel(fuel)">
+                                        {{fuel | capitalize}}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="pull-right" ng-show="false">
+                            <b>Ranking precios</b>
+                            <div class="row text-center">
+                                <span class="badge badge-primary">1</span>
+                                <span class="badge badge-success">2</span>
+                                <span class="badge">3</span>
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-sm-6" style="vertical-align: middle">
-                            Filtros:
-                            <div class="btn-group dropdown" uib-dropdown="">
-                                <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle="" aria-haspopup="true" aria-expanded="false">
-                                    {{combustible}}
-                                    <span class="caret"></span>
-                                </button>
-                                <ul role="menu" uib-dropdown-menu="" class="dropdown-menu">
-                                    <li>
-                                        <a href="#" ng-click="setCombustible('Vehicular')">
-                                            Vehicular
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" ng-click="setCombustible('Calefaccion')">
-                                            Calefaccion
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="btn-group dropdown" uib-dropdown="">
-                                <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle="" aria-haspopup="true" aria-expanded="false">
-                                    {{getRegionName() | capitalize}}
-                                    <span class="caret"></span>
-                                </button>
-                                <ul role="menu" uib-dropdown-menu="" class="dropdown-menu">
-                                    <li>
-                                        <a href="#" ng-click="setRegion(null)">Todas</a>
-                                    </li>
-                                    <li class="divider"></li>
-                                    <li ng-repeat="region in regions" ng-model="region">
-                                        <a href="#" ng-click="setRegion(region)">
-                                            {{region.nombre}}
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="btn-group dropdown" uib-dropdown="">
-                                <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle="" aria-haspopup="true" aria-expanded="false">
-                                    {{getDistributorName() | capitalize}}
-                                    <span class="caret"></span>
-                                </button>
-                                <ul role="menu" uib-dropdown-menu="" class="dropdown-menu">
-                                    <li ng-repeat="brand in getDistributors()">
-                                        <a href="#" ng-click="setDistributor(brand)">
-                                            {{brand}}
-                                        </a>
-                                    </li>
-                                    <li class="divider"></li>
-                                    <li>
-                                        <a href="#" ng-click="setDistributor(null)">Todas</a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="btn-group dropdown" uib-dropdown="">
-                                <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle="" aria-haspopup="true" aria-expanded="false">
-                                    {{maxDistance}} mts
-                                    <span class="caret"></span>
-                                </button>
-                                <ul role="menu" uib-dropdown-menu="" class="dropdown-menu">
-                                    <li ng-repeat="distance in distances" ng-model="maxDistance">
-                                        <a href="#" ng-click="setDistance(distance)">
-                                            {{distance}} mts
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <br />
-                            <div style="padding-top: 5px;"></div>
-                            <span>Orden:</span>
-                            <div class="btn-group dropdown" style="vertical-align: middle" uib-dropdown="">
-                                <button type="button" class="btn btn-default dropdown-toggle" uib-dropdown-toggle="" aria-haspopup="true" aria-expanded="false">
-                                    {{getFuelType() | capitalize}}
-                                    <span class="caret"></span>
-                                </button>
-                                <ul role="menu" uib-dropdown-menu="" class="dropdown-menu">
-                                    <li ng-repeat="fuel in fuelTypes" ng-model="fuel">
-                                        <a href="#" ng-click="setFuel(fuel)">
-                                            {{fuel | capitalize}}
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="pull-right" ng-show="false">
-                                <b>Ranking precios</b>
-                                <div class="row text-center">
-                                    <span class="badge badge-primary">1</span>
-                                    <span class="badge badge-success">2</span>
-                                    <span class="badge">3</span>
-                                </div>
-                            </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12" style="vertical-align: middle">
+                        <br /> Vista:&nbsp;
+                        <div class="btn-group dropdown" uib-dropdown="">
+                            <a ng-repeat="type in availableTemplates" ng-class="type!=gridTemplate ? 'btn':'btn btn-white'" ng-click="setTemplate(type)">
+                                <i ng-class="type.iconClass"></i>
+                            </a>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-sm-12" style="vertical-align: middle">
-                            <br /> Vista:&nbsp;
-                            <div class="btn-group dropdown" uib-dropdown="">
-                                <a ng-repeat="type in availableTemplates" ng-class="type!=gridTemplate ? 'btn':'btn btn-white'" ng-click="setTemplate(type)">
-                                    <i ng-class="type.iconClass"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <br />
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <!-- Stations Grid -->
-                            <div ng-include="gridTemplate.url"></div>
-                            <small class="pull-right" ng-show="stations!=null">
-                                <b>{{stations.length}}</b> {{stations.length>1 ? 'estaciones' : 'estaci&oacute;n'}} encontrada{{stations.length>1
-                                ? 's': ''}} en un radio de
-                                <b>{{maxDistance}}</b> metros
-                            </small>
-                        </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-sm-12">
+                        <!-- Stations Grid -->
+                        <div ng-include="gridTemplate.url"></div>
+                        <small class="pull-right" ng-show="stations!=null">
+                            <b>{{stations.length}}</b> {{stations.length>1 ? 'estaciones' : 'estaci&oacute;n'}} encontrada{{stations.length>1
+                            ? 's': ''}} en un radio de
+                            <b>{{maxDistance}}</b> metros
+                        </small>
                     </div>
                 </div>
             </div>
