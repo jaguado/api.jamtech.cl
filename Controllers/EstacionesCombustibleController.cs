@@ -26,7 +26,7 @@ namespace JAMTech.Controllers
 
         const int cacheDurationInHours = 20; //in hours
         const int skipDataBeforeInMonths = 1; //in months
-        
+
         //mem store to cache external apis data
         private static Dictionary<string, Tuple<DateTime, List<Models.CombustibleStation>>> memStore = new Dictionary<string, Tuple<DateTime, List<Models.CombustibleStation>>>();
         private static Dictionary<string, dynamic> memStoreFilters = new Dictionary<string, dynamic>();
@@ -41,7 +41,7 @@ namespace JAMTech.Controllers
         /// <returns></returns>
         [HttpGet]
         [Produces(typeof(List<Models.CombustibleStation>))]
-        public async Task<IActionResult> GetStations(CombustibleType type, int region=0, int comuna = 0, string distributor="")
+        public async Task<IActionResult> GetStations(CombustibleType type, int region = 0, int comuna = 0, string distributor = "")
         {
             try
             {
@@ -90,7 +90,7 @@ namespace JAMTech.Controllers
 
             foreach (var station in filteredResult)
             {
-                if(station.precios.gasolina_93>0)
+                if (station.precios.gasolina_93 > 0)
                     ranking["gasolina 93"].Add(station.precios.gasolina_93);
                 if (station.precios.gasolina_95 > 0)
                     ranking["gasolina 95"].Add(station.precios.gasolina_95);
@@ -109,7 +109,7 @@ namespace JAMTech.Controllers
             var ranking97 = ranking["gasolina 97"].Distinct().OrderBy(o => o).ToArray();
             var rankingKerosene = ranking["kerosene"].Distinct().OrderBy(o => o).ToArray();
             var rankingDiesel = ranking["petroleo diesel"].Distinct().OrderBy(o => o).ToArray();
-            var rankingGlp= ranking["glp vehicular"].Distinct().OrderBy(o => o).ToArray();
+            var rankingGlp = ranking["glp vehicular"].Distinct().OrderBy(o => o).ToArray();
 
 
             foreach (var station in filteredResult)
@@ -149,19 +149,21 @@ namespace JAMTech.Controllers
             if (data.Value == null || data.Value.Item1 < DateTime.Now) //check expiration
             {
                 var tempUrl = string.Format(url, Enum.GetName(typeof(CombustibleType), type).ToLower(), name);
-                var result = await Helpers.Net.GetResponse(tempUrl);
-                if (result.IsSuccessStatusCode)
+                using (var result = await Helpers.Net.GetResponse(tempUrl))
                 {
-                    var newData = JsonConvert.DeserializeObject<JObject>(await result.Content.ReadAsStringAsync());
-                    var stations = JsonConvert.DeserializeObject<List<Models.CombustibleStation>>(newData["data"].ToString());
+                    if (result.IsSuccessStatusCode)
+                    {
+                        var newData = JsonConvert.DeserializeObject<JObject>(await result.Content.ReadAsStringAsync());
+                        var stations = JsonConvert.DeserializeObject<List<Models.CombustibleStation>>(newData["data"].ToString());
 
-                    var newValue = new Tuple<DateTime, List<Models.CombustibleStation>>(DateTime.Now.AddHours(cacheDurationInHours), stations.Where(s => s.fecha_hora_actualizacion != null && DateTime.Parse(s.fecha_hora_actualizacion) > DateTime.Now.AddMonths(skipDataBeforeInMonths * -1)).ToList());
+                        var newValue = new Tuple<DateTime, List<Models.CombustibleStation>>(DateTime.Now.AddHours(cacheDurationInHours), stations.Where(s => s.fecha_hora_actualizacion != null && DateTime.Parse(s.fecha_hora_actualizacion) > DateTime.Now.AddMonths(skipDataBeforeInMonths * -1)).ToList());
 
-                    if (data.Value == null)
-                        memStore.Add(typeName, newValue);
-                    else
-                        memStore[typeName] = newValue;
-                    return newValue.Item2;
+                        if (data.Value == null)
+                            memStore.Add(typeName, newValue);
+                        else
+                            memStore[typeName] = newValue;
+                        return newValue.Item2;
+                    }
                 }
             }
             else
@@ -172,7 +174,7 @@ namespace JAMTech.Controllers
             return null;
         }
 
-       
+
 
         /// <summary>
         /// GET different kind of vehicle filters
@@ -185,18 +187,21 @@ namespace JAMTech.Controllers
             {
                 var name = Enum.GetName(typeof(CombustibleType), CombustibleType.Vehicular).ToLower();
                 var cache = memStoreFilters.ContainsKey(name);
-                if (!cache) { 
+                if (!cache)
+                {
                     var tempUrl = string.Format(url, name, "filtros");
-                    var response = await Helpers.Net.GetResponse(tempUrl);
-                    if (response.IsSuccessStatusCode)
+                    using (var response = await Helpers.Net.GetResponse(tempUrl))
                     {
-                        var result = await response.Content.ReadAsAsync<dynamic>();
-                        if (result != null && result.data!=null)
+                        if (response.IsSuccessStatusCode)
                         {
-                            lock (memStoreFilters)
+                            var result = await response.Content.ReadAsAsync<dynamic>();
+                            if (result != null && result.data != null)
                             {
-                                if(!memStoreFilters.ContainsKey(name))
-                                    memStoreFilters.Add(name, result.data);
+                                lock (memStoreFilters)
+                                {
+                                    if (!memStoreFilters.ContainsKey(name))
+                                        memStoreFilters.Add(name, result.data);
+                                }
                             }
                         }
                     }
@@ -241,16 +246,18 @@ namespace JAMTech.Controllers
             var cache = memStoreFilters.ContainsKey(name);
             if (!cache)
             {
-                var response = await Helpers.Net.GetResponse(urlRegions + name);
-                if (response.IsSuccessStatusCode)
+                using (var response = await Helpers.Net.GetResponse(urlRegions + name))
                 {
-                    var result = await response.Content.ReadAsAsync<dynamic>();
-                    if (result != null)
+                    if (response.IsSuccessStatusCode)
                     {
-                        lock (memStoreFilters)
+                        var result = await response.Content.ReadAsAsync<dynamic>();
+                        if (result != null)
                         {
-                            if (!memStoreFilters.ContainsKey(name))
-                                memStoreFilters.Add(name, result);
+                            lock (memStoreFilters)
+                            {
+                                if (!memStoreFilters.ContainsKey(name))
+                                    memStoreFilters.Add(name, result);
+                            }
                         }
                     }
                 }

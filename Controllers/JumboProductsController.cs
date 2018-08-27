@@ -157,23 +157,27 @@ namespace JAMTech.Controllers
         }
         private static async Task<List<Models.Product>> GetResultAsync(string url)
         {
-            var result = await Helpers.Net.GetResponse(url);
-            if (result.IsSuccessStatusCode)
+            using (var result = await Helpers.Net.GetResponse(url))
             {
-                var content = await result.Content.ReadAsStringAsync();
-                var productsResult = JsonConvert.DeserializeObject<JObject>(content)["products"].ToString();
-                return JsonConvert.DeserializeObject<List<Models.Product>>(productsResult);
+                if (result.IsSuccessStatusCode)
+                {
+                    var content = await result.Content.ReadAsStringAsync();
+                    var productsResult = JsonConvert.DeserializeObject<JObject>(content)["products"].ToString();
+                    return JsonConvert.DeserializeObject<List<Models.Product>>(productsResult);
+                }
             }
             return null;
         }
         internal static async Task<Dictionary<int, string>> GetLocalsAsync()
         {
-            var result = await Helpers.Net.GetResponse(urlLocals);
-            if (result.IsSuccessStatusCode && locals==null)
+            using (var result = await Helpers.Net.GetResponse(urlLocals))
             {
-                var content = await result.Content.ReadAsStringAsync();
-                var localsResult = JsonConvert.DeserializeObject <Models.JumboLocals>(content);
-                return localsResult.locals.ToDictionary(l => l.local_id, l => l.local_name);
+                if (result.IsSuccessStatusCode && locals == null)
+                {
+                    var content = await result.Content.ReadAsStringAsync();
+                    var localsResult = JsonConvert.DeserializeObject<Models.JumboLocals>(content);
+                    return localsResult.locals.ToDictionary(l => l.local_id, l => l.local_name);
+                }
             }
             return null;
         }

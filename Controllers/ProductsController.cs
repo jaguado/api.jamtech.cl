@@ -41,25 +41,27 @@ namespace JAMTech.Controllers
         private static Uri referrer = new Uri("https://knasta.cl");
         const string url = "https://knasta.cl/api/products?p=all&page={1}&q={0}&app_version=2.8.12";
         private static async Task<IActionResult> FindProductsKnastaAsync(string product, int page = 1)
-        {    
-            var response = await Net.GetResponse(string.Format(url,product, page), referrer);
-            if (response.IsSuccessStatusCode)
+        {
+            using (var response = await Net.GetResponse(string.Format(url, product, page), referrer))
             {
-                var content = await response.Content.ReadAsStringAsync();
-                var productsResult = JsonConvert.DeserializeObject<Models.KnastaSearchResullt>(content);
-                var categories = productsResult.ktegories.ToDictionary(v => v.value, v => v.label);
-                var commonFormat = productsResult.products.Select(p => new
+                if (response.IsSuccessStatusCode)
                 {
-                    product_id = p.product_id,
-                    product_type = categories[int.Parse(p.kategory)],
-                    brand=p.retail,
-                    image=p.images,
-                    thumb=p.images,
-                    description=p.title,
-                    price=p.price_value,
-                    source="knasta"
-                });
-                return new OkObjectResult(commonFormat);
+                    var content = await response.Content.ReadAsStringAsync();
+                    var productsResult = JsonConvert.DeserializeObject<Models.KnastaSearchResullt>(content);
+                    var categories = productsResult.ktegories.ToDictionary(v => v.value, v => v.label);
+                    var commonFormat = productsResult.products.Select(p => new
+                    {
+                        product_id = p.product_id,
+                        product_type = categories[int.Parse(p.kategory)],
+                        brand = p.retail,
+                        image = p.images,
+                        thumb = p.images,
+                        description = p.title,
+                        price = p.price_value,
+                        source = "knasta"
+                    });
+                    return new OkObjectResult(commonFormat);
+                }
             }
             return new NotFoundResult();
         }
