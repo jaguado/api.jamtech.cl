@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using JAMTech.Extensions;
@@ -164,6 +165,8 @@ namespace JAMTech.Controllers
                         //replace broken links with default image and remove schema to avoid mixed content warnings
                         await RemoveBrokenLinks(filteredStations, "//api.cne.cl/brands/sin%20bandera-horizontal.svg", "http:");
 
+                        SaveResultsInMongoDB(filteredStations);
+
                         var newValue = new Tuple<DateTime, List<Models.CombustibleStation>>(DateTime.Now.AddHours(cacheDurationInHours), filteredStations);
                         if (data.Value == null)
                             memStore.Add(typeName, newValue);
@@ -179,6 +182,17 @@ namespace JAMTech.Controllers
                 return data.Value.Item2;
             }
             return null;
+        }
+
+        private static void SaveResultsInMongoDB(List<Models.CombustibleStation> filteredStations)
+        {
+            //save to mongodb async without waiting for result
+            ThreadPool.QueueUserWorkItem(async state =>
+            {
+                var timer = Stopwatch.StartNew();
+                await filteredStations.ToMongoDB<Models.CombustibleStation>(true);
+                Console.WriteLine($"{filteredStations.Count} stations saved in {timer.ElapsedMilliseconds} ms.");
+            });
         }
 
         private static async Task RemoveBrokenLinks(List<Models.CombustibleStation> filteredStations, string replaceWith = "", string removeText = "")

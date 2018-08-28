@@ -12,7 +12,8 @@ namespace JAMTech.Extensions
     {
         const string baseUrl = "https://api.mlab.com/api/1/";
         const string apiKey = "Y_-KGvDKUDqEMDgUp0so9kNQ8kMNkwoA";
-        const string defaultDatabase = "heroku_rq3dg792";
+        private static readonly string mongodbUri = Environment.GetEnvironmentVariable("MONGODB_URI") ?? throw new ApplicationException("'MONGODB_URI' variable is missing");
+        private static readonly string defaultDatabase = mongodbUri.Substring(mongodbUri.LastIndexOf("/") + 1);
 
         public static async Task<IActionResult> GetCollections(string database)
         {
