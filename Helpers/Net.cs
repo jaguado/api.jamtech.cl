@@ -108,6 +108,32 @@ namespace JAMTech.Helpers
                 client.DefaultRequestHeaders.Referrer = customReferrer;
             return await client.GetAsync(tempUrl);
         }
+        public static async Task<HttpResponseMessage> PostResponse(string tempUrl, HttpContent content, Uri customReferrer = null, int timeoutInSeconds = 0)
+        {
+            var handler = new HttpClientHandler()
+            {
+                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+            };
+            var client = new HttpClient(handler);
+            if (timeoutInSeconds > 0)
+                client.Timeout = TimeSpan.FromSeconds(timeoutInSeconds);
+            if (customReferrer != null)
+                client.DefaultRequestHeaders.Referrer = customReferrer;
+            return await client.PostAsync(tempUrl, content);
+        }
+        public static async Task<HttpResponseMessage> PutResponse(string tempUrl, HttpContent content, Uri customReferrer = null, int timeoutInSeconds = 0)
+        {
+            var handler = new HttpClientHandler()
+            {
+                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+            };
+            var client = new HttpClient(handler);
+            if (timeoutInSeconds > 0)
+                client.Timeout = TimeSpan.FromSeconds(timeoutInSeconds);
+            if (customReferrer != null)
+                client.DefaultRequestHeaders.Referrer = customReferrer;
+            return await client.PutAsync(tempUrl, content);
+        }
 
         ///
         /// Checks the file exists or not.
@@ -122,6 +148,32 @@ namespace JAMTech.Helpers
                 var request = WebRequest.Create(url) as HttpWebRequest;
                 //Setting the Request method HEAD, you can also use GET too.
                 request.Method = "HEAD";
+                //Getting the Web Response.
+                using (var response = await request.GetResponseAsync() as HttpWebResponse)
+                {
+                    return (response.StatusCode == HttpStatusCode.OK);
+                }
+            }
+            catch
+            {
+                //Any exception will returns false.
+                return false;
+            }
+        }
+
+        ///
+        /// Checks the file exists or not.
+        ///
+        /// The URL of the remote file.
+        /// True : If the file exits, False if file not exists
+        public static async Task<bool> RemoteUrlExists(string url)
+        {
+            try
+            {
+                //Creating the HttpWebRequest
+                var request = WebRequest.Create(url) as HttpWebRequest;
+                //Setting the Request method HEAD, you can also use GET too.
+                request.Method = "GET";
                 //Getting the Web Response.
                 using (var response = await request.GetResponseAsync() as HttpWebResponse)
                 {
