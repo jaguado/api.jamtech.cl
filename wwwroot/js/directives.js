@@ -27,7 +27,7 @@ function pageTitle($rootScope, $timeout) {
 
 function brandUrl(){
     return {
-        template : "<b><small>Mantenido por&nbsp;<br /><a target=\"_blank\" href=\"http://www.jamtech.cl/\">http://www.jamtech.cl</a></small></b>"
+        template : "<b>Powered by <a target=\"_blank\" href=\"http://www.jamtech.cl/\">http://www.jamtech.cl</a></b>"
     };
 }
 
