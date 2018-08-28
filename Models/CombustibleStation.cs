@@ -83,7 +83,6 @@ namespace JAMTech.Models
         public bool cheque { get; set; }
         [JsonProperty("tarjetas bancarias")]
         public bool tarjetas_bancarias { get; set; }
-        [JsonProperty("tarjetas grandes tiendas")]
         public bool tarjetas_grandes_tiendas { get; set; }
     }
 

@@ -47,7 +47,8 @@ namespace JAMTech.Filters
                         //minify dynamic content
                         if (_minifyResponse)
                         {
-                            var minified = minifyJs.Minify(JsonConvert.SerializeObject(newObject), false);
+                            var json = JsonConvert.SerializeObject(newObject, Startup.jsonSettings);
+                            var minified = minifyJs.Minify(json, false);
                             if (!minified.Errors.Any())
                                 context.Result = new OkObjectResult(minified.MinifiedContent);
                             else

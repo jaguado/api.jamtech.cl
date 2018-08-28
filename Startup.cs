@@ -41,6 +41,7 @@ namespace JAMTech
 
         }
 
+        public static JsonSerializerSettings jsonSettings = null;
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -98,13 +99,19 @@ namespace JAMTech
                 };
             });
 
-            //compress dynamic json content using brotli
+           //compress dynamic json content using brotli
             services.AddResponseCompression(options =>
             {
                 options.EnableForHttps = true;
                 options.Providers.Add<BrotliCompressionProvider>();
                 options.MimeTypes = new[] { "application/json" };
             });
+
+            jsonSettings = new JsonSerializerSettings()
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                DefaultValueHandling = DefaultValueHandling.Ignore
+            };
 
             services.AddMvc(options =>
             {
@@ -116,6 +123,8 @@ namespace JAMTech
                 options.SerializerSettings.Converters.Add(new StringEnumConverter());
                 if (Environment.GetEnvironmentVariable("minifyResponse") == "false")
                     options.SerializerSettings.Formatting = Formatting.Indented; //this only makes sense if the content will not be minified at the end
+                options.SerializerSettings.DefaultValueHandling = jsonSettings.DefaultValueHandling;
+                options.SerializerSettings.NullValueHandling = jsonSettings.NullValueHandling;
             });
 
             services.AddSwaggerGen(c =>
