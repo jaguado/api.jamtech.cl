@@ -146,6 +146,8 @@ angular
         AnalyticsProvider.setAccount('UA-124610725-1');
      }])
      .run(['Analytics', function(Analytics) { }])
-    .run(function($rootScope, $state) {
+    .run(function($rootScope, $state, $locale) {
         $rootScope.$state = $state;
+        $locale.NUMBER_FORMATS.GROUP_SEP = "";
+        $locale.NUMBER_FORMATS.DECIMAL_SEP = ",";
     });

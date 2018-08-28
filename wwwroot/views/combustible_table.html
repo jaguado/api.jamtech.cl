@@ -10,7 +10,7 @@
                     <th data-hide="all">Formas de pago</th>
                     <th data-hide="all">Horario</th>
                     <th data-hide="all">Ubicaci&oacute;n</th>
-                    <th data-hide="phone">Distancia</th>
+                    <th data-hide="phone">Distancia aprox.</th>
                     <th data-hide="phone">Gasolina 93</th>
                     <th data-hide="phone">Gasolina 95</th>
                     <th data-hide="phone">Gasolina 97</th>
@@ -33,12 +33,12 @@
                     </td>
                     <td>
                         <span ng-repeat="(key, value) in station.servicios" ng-if="value">
-                            {{key | capitalize}}
+                            {{key | capitalize}}<span ng-if="!$last">&nbsp;-&nbsp;</span>
                         </span>
                     </td>
                     <td>
                         <span ng-repeat="(key, value) in station.metodos_de_pago" ng-if="value">
-                            {{key | capitalize}}
+                            {{key | capitalize}}<span ng-if="!$last">&nbsp;-&nbsp;</span>
                         </span>
                     </td>
                     <td>
@@ -46,9 +46,12 @@
                     </td>
                     <td>
                         {{station.direccion_calle}} {{station.direccion_numero}} / {{station.nombre_comuna}}
+                        <a ng-show="!showLocationWarning" target="_blank" ng-href="http://www.google.com/maps/place/{{station.ubicacion.latitud}},{{station.ubicacion.longitud}}">
+                            ¿C&oacute;mo llegar?&nbsp;<i class="fas fa-map-marked-alt"></i>
+                        </a>
                     </td>
                     <td>
-                        {{station.ubicacion.distancia | number:0}} metros aprox.&nbsp;
+                        {{station.ubicacion.distancia | number:0 }}&nbsp;metros
                         <a ng-show="!showLocationWarning" target="_blank" ng-href="http://www.google.com/maps/place/{{station.ubicacion.latitud}},{{station.ubicacion.longitud}}">
                             <i class="fas fa-map-marked-alt"></i>
                         </a>
