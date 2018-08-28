@@ -109,5 +109,31 @@ namespace JAMTech.Helpers
             return await client.GetAsync(tempUrl);
         }
 
+        ///
+        /// Checks the file exists or not.
+        ///
+        /// The URL of the remote file.
+        /// True : If the file exits, False if file not exists
+        public static async Task<bool> RemoteFileExists(string url)
+        {
+            try
+            {
+                //Creating the HttpWebRequest
+                var request = WebRequest.Create(url) as HttpWebRequest;
+                //Setting the Request method HEAD, you can also use GET too.
+                request.Method = "HEAD";
+                //Getting the Web Response.
+                using (var response = await request.GetResponseAsync() as HttpWebResponse)
+                {
+                    return (response.StatusCode == HttpStatusCode.OK);
+                }
+            }
+            catch
+            {
+                //Any exception will returns false.
+                return false;
+            }
+        }
+
     }
 }

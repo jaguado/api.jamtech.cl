@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net;
@@ -156,8 +157,12 @@ namespace JAMTech.Controllers
                         var newData = JsonConvert.DeserializeObject<JObject>(await result.Content.ReadAsStringAsync());
                         var stations = JsonConvert.DeserializeObject<List<Models.CombustibleStation>>(newData["data"].ToString());
 
-                        var newValue = new Tuple<DateTime, List<Models.CombustibleStation>>(DateTime.Now.AddHours(cacheDurationInHours), stations.Where(s => s.fecha_hora_actualizacion != null && DateTime.Parse(s.fecha_hora_actualizacion) > DateTime.Now.AddMonths(skipDataBeforeInMonths * -1)).ToList());
+                        // filter stations
+                        var filteredStations = stations.Where(s => s.fecha_hora_actualizacion != null && DateTime.Parse(s.fecha_hora_actualizacion) > DateTime.Now.AddMonths(skipDataBeforeInMonths * -1))
+                                                       .ToList();
+                        await RemoveBrokenLinks(filteredStations);
 
+                        var newValue = new Tuple<DateTime, List<Models.CombustibleStation>>(DateTime.Now.AddHours(cacheDurationInHours), filteredStations);
                         if (data.Value == null)
                             memStore.Add(typeName, newValue);
                         else
@@ -174,6 +179,22 @@ namespace JAMTech.Controllers
             return null;
         }
 
+        private static async Task RemoveBrokenLinks(List<Models.CombustibleStation> filteredStations)
+        {
+            //remove broken image links -> logo_horizontal_svg
+            Console.WriteLine("starting links check");
+            var timer = Stopwatch.StartNew();
+            var checkedLinks = filteredStations.Select(s => s.distribuidor.logo_horizontal_svg).Distinct().Select(async l => new { link = l, valid = await Helpers.Net.RemoteFileExists(l) }).ToArray();
+            await Task.WhenAll(checkedLinks);
+            timer.Stop();
+            Console.WriteLine($"{checkedLinks.Length} links checked in {timer.ElapsedMilliseconds} ms.");
+            var links = checkedLinks.ToDictionary(r => r.Result.link, r => r.Result.valid);
+            filteredStations.ForEach(station =>
+            {
+                if (!links[station.distribuidor.logo_horizontal_svg])
+                    station.distribuidor.logo_horizontal_svg = string.Empty;
+            });
+        }
 
 
         /// <summary>
