@@ -160,7 +160,9 @@ namespace JAMTech.Controllers
                         // filter stations
                         var filteredStations = stations.Where(s => s.fecha_hora_actualizacion != null && DateTime.Parse(s.fecha_hora_actualizacion) > DateTime.Now.AddMonths(skipDataBeforeInMonths * -1))
                                                        .ToList();
-                        await RemoveBrokenLinks(filteredStations);
+
+                        //replace broken links with default image and remove schema to avoid mixed content warnings
+                        await RemoveBrokenLinks(filteredStations, "//api.cne.cl/brands/sin%20bandera-horizontal.svg", "http:");
 
                         var newValue = new Tuple<DateTime, List<Models.CombustibleStation>>(DateTime.Now.AddHours(cacheDurationInHours), filteredStations);
                         if (data.Value == null)
@@ -179,7 +181,7 @@ namespace JAMTech.Controllers
             return null;
         }
 
-        private static async Task RemoveBrokenLinks(List<Models.CombustibleStation> filteredStations)
+        private static async Task RemoveBrokenLinks(List<Models.CombustibleStation> filteredStations, string replaceWith = "", string removeText = "")
         {
             //remove broken image links -> logo_horizontal_svg
             Console.WriteLine("starting links check");
@@ -192,7 +194,8 @@ namespace JAMTech.Controllers
             filteredStations.ForEach(station =>
             {
                 if (!links[station.distribuidor.logo_horizontal_svg])
-                    station.distribuidor.logo_horizontal_svg = string.Empty;
+                    station.distribuidor.logo_horizontal_svg = replaceWith;
+                station.distribuidor.logo_horizontal_svg = station.distribuidor.logo_horizontal_svg.Replace(removeText, "");
             });
         }
 
