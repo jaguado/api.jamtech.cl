@@ -14,11 +14,6 @@ namespace JAMTech.Extensions
         const string apiKey = "Y_-KGvDKUDqEMDgUp0so9kNQ8kMNkwoA";
         const string defaultDatabase = "heroku_rq3dg792";
 
-        public static async Task<IActionResult> GetDatabases()
-        {
-            var url = $"{baseUrl}databases?apiKey={apiKey}";
-            return await GetStringResultAsync(url);
-        }
         public static async Task<IActionResult> GetCollections(string database)
         {
             var url = $"{baseUrl}databases/{database}/collections?apiKey={apiKey}";
@@ -26,7 +21,7 @@ namespace JAMTech.Extensions
         }
 
         private static WebMarkupMin.Core.CrockfordJsMinifier minifyJs = new WebMarkupMin.Core.CrockfordJsMinifier();
-        public static async Task<IActionResult> ToMongoDB<T>(this IEnumerable<T> collection, bool storeMinified=false)
+        public static async Task<IActionResult> ToMongoDB<T>(this IEnumerable<T> collection, bool update=false, bool storeMinified=false)
         {
             var collectionName = typeof(T).Name.ToLower();
             var collectionUrl = $"{baseUrl}databases/{defaultDatabase}/collections/{collectionName}?apiKey={apiKey}";
@@ -38,7 +33,8 @@ namespace JAMTech.Extensions
                     stringPayload = minified.MinifiedContent;
             }
             var httpContent = new StringContent(stringPayload, Encoding.UTF8, "application/json");
-            var response = await Helpers.Net.PostResponse(collectionUrl, httpContent);
+            
+            var response = update ? await Helpers.Net.PutResponse(collectionUrl, httpContent) : await Helpers.Net.PostResponse(collectionUrl, httpContent);
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
             return new OkObjectResult(content);
