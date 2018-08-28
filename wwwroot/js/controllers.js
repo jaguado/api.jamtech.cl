@@ -25,7 +25,7 @@ function TorrentsCtrl($http, $scope, $window, Analytics) {
     }
     
     $scope.useMocks = false; //mocks mode
-    var searchUrl = baseApiUrl + 'Torrent?skipLinks=false&pages=1&search=';
+    var searchUrl = baseApiUrl + 'Torrent?skipLinks=false&pages=4&search=';
     $scope.availableTorrentsTemplates = [{
         "name": "Table",
         "url": "views/torrents_table.html",
@@ -67,7 +67,7 @@ function ProductsCtrl($http, $scope, Analytics) {
             $("body").removeClass("mini-navbar");
         }
     }
-    var searchUrl = baseApiUrl + 'Products?pages=1&product=';
+    var searchUrl = baseApiUrl + 'Products?pages=4&product=';
     var compareUrl = baseApiUrl + 'JumboProducts/{productId}/compare';
     $scope.availableProductTemplates = [{
             "name": "Table",
