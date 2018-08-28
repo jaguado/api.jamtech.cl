@@ -6,7 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using JAMTech.Repository;
+using JAMTech.Extensions;
 
 
 namespace JAMTech.Controllers
