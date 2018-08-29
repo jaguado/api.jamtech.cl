@@ -1,8 +1,10 @@
 var mocksBaseApiUrl = '//aio.jamtech.cl/mocks/torrents.json'
 var baseApiUrl = '//aio.jamtech.cl/v1/';
 
-function MainCtrl($scope) {
-    this.userName = 'Visit';
+function MainCtrl($scope, $rootScope, Analytics, socialLoginService) {
+    $scope.user = localStorage.getItem('user') != null ? JSON.parse(localStorage.getItem('user')) : null;
+    if ($scope.user != null)
+        console.log('user logged in', $scope.user.name, $scope.user);
     this.helloText = 'Welcome to JAM Tech.cl';
     this.descriptionText = '';
     $scope.minimalize = function () {
@@ -13,6 +15,37 @@ function MainCtrl($scope) {
         }
     }
     $scope.minimalize();
+
+
+    $scope.logoff = function(){
+        socialLoginService.logout();
+    };
+
+    $rootScope.$on('event:social-sign-in-success', function (event, userDetails) {
+        /*  Login ok
+            userDetails = {
+                            name: <user_name>, 
+                            email: <user_email>, 
+                            imageUrl: <image_url>, 
+                            uid: <UID by social vendor>, 
+                            provider: <Google/Facebook/LinkedIN>, 
+                            token: < accessToken for Facebook & google, no token for linkedIN>}, 
+                            idToken: < google idToken >
+            };
+        */
+        $scope.$apply(function () {
+            $scope.user = userDetails;
+            localStorage.setItem('user', JSON.stringify($scope.user));
+        });
+        Analytics.trackEvent('aio', 'auth', $scope.user.provider);
+        console.log('social-sign-in-success', $scope.user);
+    });
+    $rootScope.$on('event:social-sign-out-success', function (event, logoutStatus) {
+        //logout ok
+        $scope.user = null;
+        localStorage.setItem('user', $scope.user);
+        console.log('social-sign-out-success', logoutStatus);
+    });
 };
 
 function TorrentsCtrl($http, $scope, $window, Analytics) {
@@ -23,7 +56,7 @@ function TorrentsCtrl($http, $scope, $window, Analytics) {
             $("body").removeClass("mini-navbar");
         }
     }
-    
+
     $scope.useMocks = false; //mocks mode
     var searchUrl = baseApiUrl + 'Torrent?skipLinks=false&pages=4&search=';
     $scope.availableTorrentsTemplates = [{
@@ -139,7 +172,7 @@ function StationsCtrl($http, $scope, Analytics) {
             $("body").removeClass("mini-navbar");
         }
     }
-    
+
     var stationsUrl = baseApiUrl + 'CombustibleStations?';
     var regionsUrl = baseApiUrl + 'CombustibleStations/Regiones';
 
@@ -364,9 +397,9 @@ function onlyUnique(value, index, self) {
     return self.indexOf(value) === index;
 }
 
-function GetPrice(){
+function GetPrice() {
     return function (input) {
-       
+
     }
 }
 
@@ -376,12 +409,12 @@ function GetPrice() {
     }
 };
 
-String.prototype.replaceAll = function(searchStr, replaceStr) {
+String.prototype.replaceAll = function (searchStr, replaceStr) {
     var str = this;
-    
+
     // escape regexp special characters in search string
     searchStr = searchStr.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-    
+
     return str.replace(new RegExp(searchStr, 'gi'), replaceStr);
 };
 

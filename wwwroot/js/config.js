@@ -28,11 +28,12 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         .state('index.combustible', {
             url: "/combustible",
             templateUrl: "views/combustible_search.es.html",
-            data: { pageTitle: 'Combustible Search' },
+            data: {
+                pageTitle: 'Combustible Search'
+            },
             resolve: {
                 loadPlugin: function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
+                    return $ocLazyLoad.load([{
                             files: ['js/plugins/footable/footable.all.min.js', 'css/plugins/footable/footable.core.css']
                         },
                         {
@@ -46,11 +47,12 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         .state('standalone.combustible', {
             url: "/combustible",
             templateUrl: "views/combustible_search.es.html",
-            data: { pageTitle: 'Combustible Search' },
+            data: {
+                pageTitle: 'Combustible Search'
+            },
             resolve: {
                 loadPlugin: function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
+                    return $ocLazyLoad.load([{
                             files: ['js/plugins/footable/footable.all.min.js', 'css/plugins/footable/footable.core.css']
                         },
                         {
@@ -64,11 +66,12 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         .state('index.products', {
             url: "/products",
             templateUrl: "views/products_search.es.html",
-            data: { pageTitle: 'Products Search' },
+            data: {
+                pageTitle: 'Products Search'
+            },
             resolve: {
                 loadPlugin: function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
+                    return $ocLazyLoad.load([{
                             files: ['js/plugins/footable/footable.all.min.js', 'css/plugins/footable/footable.core.css']
                         },
                         {
@@ -82,11 +85,12 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         .state('standalone.products', {
             url: "/products",
             templateUrl: "views/products_search.es.html",
-            data: { pageTitle: 'Products Search' },
+            data: {
+                pageTitle: 'Products Search'
+            },
             resolve: {
                 loadPlugin: function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
+                    return $ocLazyLoad.load([{
                             files: ['js/plugins/footable/footable.all.min.js', 'css/plugins/footable/footable.core.css']
                         },
                         {
@@ -100,11 +104,12 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         .state('index.torrents', {
             url: "/torrents",
             templateUrl: "views/torrents_search.es.html",
-            data: { pageTitle: 'Torrents Search' },
+            data: {
+                pageTitle: 'Torrents Search'
+            },
             resolve: {
                 loadPlugin: function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
+                    return $ocLazyLoad.load([{
                             files: ['js/plugins/footable/footable.all.min.js', 'css/plugins/footable/footable.core.css']
                         },
                         {
@@ -118,11 +123,12 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         .state('standalone.torrents', {
             url: "/torrents",
             templateUrl: "views/torrents_search.es.html",
-            data: { pageTitle: 'Torrents Search' },
+            data: {
+                pageTitle: 'Torrents Search'
+            },
             resolve: {
                 loadPlugin: function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
+                    return $ocLazyLoad.load([{
                             files: ['js/plugins/footable/footable.all.min.js', 'css/plugins/footable/footable.core.css']
                         },
                         {
@@ -136,7 +142,9 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         .state('index.projects', {
             url: "/projects",
             templateUrl: "views/projects.html",
-            data: { pageTitle: 'Projects view' }
+            data: {
+                pageTitle: 'Projects view'
+            }
         })
 }
 angular
@@ -144,9 +152,13 @@ angular
     .config(config)
     .config(['AnalyticsProvider', function (AnalyticsProvider) {
         AnalyticsProvider.setAccount('UA-124610725-1');
-     }])
-     .run(['Analytics', function(Analytics) { }])
-    .run(function($rootScope, $state, $locale) {
+    }])
+    .config(function (socialProvider) {
+        socialProvider.setGoogleKey("95717972095-f3h0t9hmvd0dhjfqctoe39qlsupbrmou.apps.googleusercontent.com");
+        //socialProvider.setLinkedInKey("YOUR LINKEDIN CLIENT ID");
+    })
+    .run(['Analytics', function (Analytics) {}])
+    .run(function ($rootScope, $state, $locale) {
         $rootScope.$state = $state;
         $locale.NUMBER_FORMATS.GROUP_SEP = "";
         $locale.NUMBER_FORMATS.DECIMAL_SEP = ",";

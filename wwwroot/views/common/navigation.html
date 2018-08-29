@@ -1,13 +1,13 @@
 <nav class="navbar-default navbar-static-side" role="navigation">
     <div class="sidebar-collapse">
         <ul side-navigation class="nav metismenu" id="side-menu">
-            <li class="nav-header">
-                <div class="profile-element logo-element-custom" ng-click="minimalize()">
-                    &nbsp;
-                </div>
-                <div class="logo-element" ng-click="minimalize()">
-                    <small>AIO</small>
-                </div>
+            <li>
+                <a ng-if="user == null">
+                    <i class="fas fa-sign-in-alt" g-login></i>
+                </a>
+                <a ng-if="user != null" ng-click="logoff()">
+                    <i class="fas fa-sign-out-alt"></i>
+                </a>
             </li>
             <li ui-sref-active="active">
                 <a ui-sref="index.combustible">
