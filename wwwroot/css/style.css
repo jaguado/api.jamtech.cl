@@ -3731,6 +3731,7 @@ body.body-small .footer.fixed {
 .page-heading {
   border-top: 0;
   padding: 0 10px 20px 10px;
+  vertical-align: middle;
 }
 .panel-heading h1,
 .panel-heading h2 {
@@ -7565,6 +7566,7 @@ body.rtls.mini-navbar .footer.fixed,
 body.body-small.mini-navbar .footer.fixed {
   margin: 0 70px 0 0;
 }
+
 body.rtls.mini-navbar.fixed-sidebar .footer.fixed,
 body.body-small.mini-navbar .footer.fixed {
   margin: 0 0 0 0;
@@ -7792,6 +7794,12 @@ body.rtls.top-navigation .footer.fixed {
 }
 .skin-1 .nav > li.active > a {
   color: #fff;
+}
+.navbar-minimalize {
+  display:block;
+}
+.mini-navbar .navbar-minimalize {
+  display:none;
 }
 .skin-1 .navbar-minimalize {
   background: #0e9aef;
@@ -8482,6 +8490,7 @@ body.md-skin {
   .navbar-header {
     display: inline;
     float: left;
+    margin-left: -15px;
   }
   .sidebar-panel {
     z-index: 2;

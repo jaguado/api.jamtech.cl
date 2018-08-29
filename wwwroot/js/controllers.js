@@ -14,7 +14,7 @@ function MainCtrl($scope, $rootScope, Analytics, socialLoginService) {
             $("body").removeClass("mini-navbar");
         }
     }
-    $scope.minimalize();
+    //$scope.minimalize();
 
 
     $scope.logoff = function(){

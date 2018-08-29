@@ -25,6 +25,12 @@ function pageTitle($rootScope, $timeout) {
 }
 
 
+function brand(){
+    return {
+        template : "<h2>JAM Tech.cl</h2>"
+    };
+}
+
 function brandUrl(){
     return {
         template : "<b>Powered by <a target=\"_blank\" href=\"http://www.jamtech.cl/\">http://www.jamtech.cl</a></b>"
@@ -145,7 +151,7 @@ function iboxToolsFullScreen($timeout) {
 function minimalizaSidebar($timeout) {
     return {
         restrict: 'A',
-        template: '<a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="" ng-click="minimalize()"><i class="fa fa-bars"></i></a>',
+        template: '<a class="navbar-minimalize minimalize-styl-2 btn btn-primary" href="" ng-click="minimalize()"><i class="fa fa-bars"></i></a>',
         controller: function ($scope, $element) {
             $scope.minimalize = function () {
                 $("body").toggleClass("mini-navbar");
@@ -181,6 +187,7 @@ angular
     .module('inspinia')
     .directive('pageTitle', pageTitle)
     .directive('brandUrl', brandUrl)
+    .directive('brand', brand)
     .directive('sideNavigation', sideNavigation)
     .directive('iboxTools', iboxTools)
     .directive('minimalizaSidebar', minimalizaSidebar)
