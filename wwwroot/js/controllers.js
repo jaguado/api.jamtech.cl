@@ -37,6 +37,8 @@ function MainCtrl($scope, $rootScope, Analytics, socialLoginService) {
             $scope.user = userDetails;
             localStorage.setItem('user', JSON.stringify($scope.user));
         });
+        // Set the User Id
+        Analytics.set('&uid', $scope.user.uid);
         Analytics.trackEvent('aio', 'auth', $scope.user.provider);
         console.log('social-sign-in-success', $scope.user);
     });
