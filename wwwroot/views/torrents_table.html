@@ -1,53 +1,49 @@
-<div class="ibox">
-    <div class="ibox-content">
-        <table class="footable table table-stripped toggle-arrow-tiny middle" data-page-size="20">
-            <thead>
-                <tr>
-                    <th data-sort-ignore="true"></th>
-                    <th data-hide="phone" data-sort-ignore="true">VIP</th>
-                    <th data-type="number">Seeds</th>
-                    <th data-hide="phone" data-type="number">Leeds</th>
-                    <th data-hide="phone">Tipo</th>
-                    <th data-hide="all">Sub Tipo</th>
-                    <th data-hide="">Nombre</th>
-                    <th data-hide="" data-sort-ignore="true"></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr ng-repeat="torrent in torrents" footable-refresh>
-                    <td></td>
-                    <td>
-                        <i ng-show="torrent.Vip" class="fas fa-trophy" style="color:#f0e22b;"></i>
-                    </td>
-                    <td>
-                        {{ torrent.Seeds }}
-                    </td>
-                    <td>
-                        {{ torrent.Leeds }}
-                    </td>
-                    <td>
-                        {{ torrent.Type | capitalize }}
-                    </td>
-                    <td>
-                        {{ torrent.SubType | capitalize }}
-                    </td>
-                    <td>
-                        {{ torrent.Name | capitalize }}
-                    </td>
-                    <td>
-                        <button class="btn btn-white" ng-click="download(torrent)">
-                            <i class="fas fa-download"></i>
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="8">
-                        <ul class="pagination pull-right"></ul>
-                    </td>
-                </tr>
-            </tfoot>
-        </table>
-    </div>
-</div>
+<table class="footable table table-stripped toggle-arrow-tiny middle" data-page-size="20">
+    <thead>
+        <tr>
+            <th data-sort-ignore="true"></th>
+            <th data-hide="phone" data-sort-ignore="true">VIP</th>
+            <th data-type="number">Seeds</th>
+            <th data-hide="phone" data-type="number">Leeds</th>
+            <th data-hide="phone">Tipo</th>
+            <th data-hide="all">Sub Tipo</th>
+            <th data-hide="">Nombre</th>
+            <th data-hide="" data-sort-ignore="true"></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="torrent in torrents" footable-refresh>
+            <td></td>
+            <td>
+                <i ng-show="torrent.Vip" class="fas fa-trophy" style="color:#f0e22b;"></i>
+            </td>
+            <td>
+                {{ torrent.Seeds }}
+            </td>
+            <td>
+                {{ torrent.Leeds }}
+            </td>
+            <td>
+                {{ torrent.Type | capitalize }}
+            </td>
+            <td>
+                {{ torrent.SubType | capitalize }}
+            </td>
+            <td>
+                {{ torrent.Name | capitalize }}
+            </td>
+            <td>
+                <button class="btn btn-white" ng-click="download(torrent)">
+                    <i class="fas fa-download"></i>
+                </button>
+            </td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="8">
+                <ul class="pagination pull-right"></ul>
+            </td>
+        </tr>
+    </tfoot>
+</table>
