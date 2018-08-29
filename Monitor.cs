@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
+using static JAMTech.Models.MonitorConfig;
 
 namespace JAMTech
 {
@@ -17,14 +18,17 @@ namespace JAMTech
         private Thread _monitoringThread;
         public List<Tuple<DateTime, bool, string>> Results = new List<Tuple<DateTime, bool, string>>();
 
-        public Monitor(string url, AvailableMethods method, int interval=30000, int expectedStatusCode = 0, string expectResponseBodyContains="")
+        public Monitor(Models.MonitorConfig config)
         {
-            _url = url;
-            _method = method;
-            _interval = interval;
-            _expectedStatusCode = expectedStatusCode;
-            _expectResponseBodyContains = expectResponseBodyContains;
+            _url = config.Url;
+            _method = config.Method;
+            _interval = config.Interval;
+            _expectedStatusCode = config.ExpectedStatusCode;
+            _expectResponseBodyContains = config.ExpectedResponseBodyContains;
+        }
 
+        public void Start()
+        {
             _monitoringThread = new Thread(Run);
             _monitoringThread.Start();
         }
@@ -46,32 +50,41 @@ namespace JAMTech
 
                 //check status
                 HttpResponseMessage response = null;
-                switch (_method)
+                try
                 {
-                    case AvailableMethods.GET:
-                        response = new HttpClient().GetAsync(_url).Result;
-                        break;
-                    case AvailableMethods.POST:
-                        response = new HttpClient().PostAsync(_url, null).Result;
-                        break;
+                    switch (_method)
+                    {
+                        case AvailableMethods.GET:
+                            response = new HttpClient().GetAsync(_url).Result;
+                            break;
+                        case AvailableMethods.POST:
+                            response = new HttpClient().PostAsync(_url, null).Result;
+                            break;
+                    }
+                }
+                catch
+                {
+                    //TODO log ex and trigger notifications, alerts, etc..
                 }
                 if (response != null)
                 {
                     var errMsg = "";
                     if (_expectedStatusCode != 0 && (int)response.StatusCode != _expectedStatusCode)
                         errMsg += "Invalid status code" + Environment.NewLine;
-                    if (_expectResponseBodyContains != "" && !response.Content.ReadAsStringAsync().Result.Contains(_expectResponseBodyContains))
+                    if (_expectResponseBodyContains != null && _expectResponseBodyContains != "" && !response.Content.ReadAsStringAsync().Result.Contains(_expectResponseBodyContains))
                         errMsg += "Invalid response body." + Environment.NewLine;
 
-                    Results.Add(new Tuple<DateTime, bool, string>(DateTime.Now, errMsg == string.Empty, errMsg));
-                    Console.WriteLine((errMsg == string.Empty ? "OK": "ERR") + $" - Monitoring '{_url}' at {DateTime.Now}");
+                    //Results.Add(new Tuple<DateTime, bool, string>(DateTime.Now, errMsg == string.Empty, errMsg));
+                    Console.WriteLine((errMsg == string.Empty ? "OK" : "ERR") + $" - Monitoring '{_url}' at {DateTime.Now}");
+                }
+                else
+                {
+                    var colorBkp = Console.ForegroundColor;
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"ERR - Monitoring '{_url}' at {DateTime.Now}");
+                    Console.ForegroundColor = colorBkp;
                 }
             }
-        }
-
-        public enum AvailableMethods
-        {
-            GET, POST
         }
     }
 }

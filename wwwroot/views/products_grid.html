@@ -1,0 +1,39 @@
+<div class="ibox">
+    <div class="ibox-content">
+        <div class="row" ng-repeat="productGroup in products | orderBy:'price' | chunkBy:4">
+            <!--Product description -->
+            <div class="col-md-3" ng-repeat="product in productGroup">
+                <div class="ibox" style="min-height: 400px;max-height: 400px; height: 400px">
+                    <div class="ibox-content product-box">
+                        <div class="product-imitation-small" style="min-height: 150px;">
+                            <img ng-src="{{product.thumb}}" alt="{{product.product_type}}" style="max-height: 130px; max-width: 130px;" />
+                        </div>
+                        <div class="product-desc">
+                            <span class="product-price">
+                                {{product.price | currency : "$" : 0}}
+                            </span>
+                            <small class="text-muted"> {{ product | getBrand | capitalize | truncate: 25: '...'}}</small>
+                            <a class="product-name">{{product.description | capitalize | truncate: 35: '...'}}</a>
+                            <div class="small m-t-xs">
+                                {{product.ppu}}
+                            </div>
+                            <div class="m-t text-righ" ng-show="view != 'Compare' && product.ppu!=null">
+                                <button href="#" class="btn btn-xs btn-outline btn-primary" ng-click="viewProduct(product)">Ver por local
+                                    <i class="fa fa-long-arrow-right"></i>
+                                </button>
+                            </div>
+                            <div class="pull-right" ng-show="view == 'Compare'">
+                                <!-- <br />
+                                <span ng-show="product.ranking > 0 && product.ranking < 4" class="badge" ng-class="{'badge-primary': product.ranking == 1 , 'badge-success': product.ranking == 2}">
+                                    <b>{{product.ranking}}</b>
+                                </span>
+                                -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--End Product description -->
+        </div>
+    </div>
+</div>

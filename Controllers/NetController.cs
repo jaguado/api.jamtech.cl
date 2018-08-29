@@ -10,7 +10,6 @@ namespace JAMTech.Controllers
     [Route("v1/[controller]")]
     public class NetController : BaseController
     {
-        //TODO convert to ASYNC
         // Post /ping
         /// <summary>
         /// Mesure the number of milliseconds taken to send an Internet Control Message Protocol

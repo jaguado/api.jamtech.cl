@@ -1,22 +1,6 @@
-<!--
-* INSPINIA - Responsive Admin Theme
-* Version 2.7.1
-*
--->
-<script>
-    if(document.location.hostname!=="localhost" && document.location.protocol!=="https:"){
-        document.location = "https://jamtechapi.herokuapp.com" + document.location.pathname;
-    }
-    else
-        console.log('redirect skipped for hostname: ' + document.location.hostname);
-</script>
-
-
 <!DOCTYPE html>
 <html ng-app="inspinia">
-
 <head>
-
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -57,12 +41,12 @@
     <link id="loadBefore" href="css/style.css" rel="stylesheet">
 
     <link id="loadBefore" href="css/custom.css" rel="stylesheet">
-
 </head>
 
+<script src="js/init.js"></script>
 <!-- ControllerAs syntax -->
 <!-- Main controller with serveral data used in Inspinia theme on diferent view -->
-<body ng-controller="MainCtrl as main">
+<body ng-controller="MainCtrl as main" class="mini-navbar" >
 
 <!-- Main view  -->
 <div ui-view></div>
@@ -89,6 +73,9 @@
 <script src="js/plugins/oclazyload/dist/ocLazyLoad.min.js"></script>
 <script src="js/ui-router/angular-ui-router.min.js"></script>
 <script src="js/bootstrap/ui-bootstrap-tpls-1.1.2.min.js"></script>
+<script src="js/plugins/filter/angular-filter.min.js"></script>
+<script src="js/plugins/analytics/angular-google-analytics.js"></script>
+<script src="js/plugins/social-login/angularjs-social-login.js"></script>
 
 
 <!-- Anglar App Script -->

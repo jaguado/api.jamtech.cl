@@ -23,6 +23,11 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "PORT" : "8080",
+        "cne_token": "OMooZxxRzq",
+        "monitoring_url" : "",
+        "monitoring_interval" : "30000",
+        "useCache": "false",
+        "MONGODB_URI":"mongodb://heroku_rq3dg792:6l30qn9fvvon30dsj26ovm02pi@ds133622.mlab.com:33622/heroku_rq3dg792"
       },
       "applicationUrl": "http://localhost:60209/"
     }

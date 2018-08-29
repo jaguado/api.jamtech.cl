@@ -72,7 +72,7 @@ namespace JAMTech.Models
         [JsonProperty("ranking kerosene")]
         public int ranking_kerosene { get; set; } = 99;
         [JsonProperty("ranking petroleo diesel")]
-        public int ranking_diesel { get; set; } = 99;
+        public int ranking_petroleo_diesel { get; set; } = 99;
         [JsonProperty("ranking glp vehicular")]
         public int ranking_glp_vehicular { get; set; } = 99;
     }
@@ -83,7 +83,6 @@ namespace JAMTech.Models
         public bool cheque { get; set; }
         [JsonProperty("tarjetas bancarias")]
         public bool tarjetas_bancarias { get; set; }
-        [JsonProperty("tarjetas grandes tiendas")]
         public bool tarjetas_grandes_tiendas { get; set; }
     }
 

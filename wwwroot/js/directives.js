@@ -24,6 +24,19 @@ function pageTitle($rootScope, $timeout) {
     }
 }
 
+
+function brand(){
+    return {
+        template : "<h2>JAM Tech.cl</h2>"
+    };
+}
+
+function brandUrl(){
+    return {
+        template : "<b>Powered by <a target=\"_blank\" href=\"http://www.jamtech.cl/\">http://www.jamtech.cl</a></b>"
+    };
+}
+
 /**
  * sideNavigation - Directive for run metsiMenu on sidebar navigation
  */
@@ -138,7 +151,7 @@ function iboxToolsFullScreen($timeout) {
 function minimalizaSidebar($timeout) {
     return {
         restrict: 'A',
-        template: '<a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="" ng-click="minimalize()"><i class="fa fa-bars"></i></a>',
+        template: '<a class="navbar-minimalize minimalize-styl-2 btn btn-primary" href="" ng-click="minimalize()"><i class="fa fa-bars"></i></a>',
         controller: function ($scope, $element) {
             $scope.minimalize = function () {
                 $("body").toggleClass("mini-navbar");
@@ -173,7 +186,37 @@ function minimalizaSidebar($timeout) {
 angular
     .module('inspinia')
     .directive('pageTitle', pageTitle)
+    .directive('brandUrl', brandUrl)
+    .directive('brand', brand)
     .directive('sideNavigation', sideNavigation)
     .directive('iboxTools', iboxTools)
     .directive('minimalizaSidebar', minimalizaSidebar)
-    .directive('iboxToolsFullScreen', iboxToolsFullScreen);
+    .directive('iboxToolsFullScreen', iboxToolsFullScreen)
+    .directive('focusMe', function($timeout) {
+    return {
+        scope: { trigger: '@focusMe' },
+        link: function(scope, element) {
+        scope.$watch('trigger', function(value) {
+            if(value === "true") { 
+            $timeout(function() {
+                element[0].focus(); 
+            });
+            }
+        });
+        }
+    };
+    })
+    .directive('footableRefresh', function(){
+        return function(scope, element)
+        {
+          if(scope.$last && !$('.footable').hasClass('footable-loaded')) {
+                  $('.footable').footable();
+          }
+          var footableObject = $('.footable').data('footable');
+          if (footableObject  !== undefined) {
+                  footableObject.appendRow($(element));
+          }
+        };
+    });
+
+    

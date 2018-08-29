@@ -1,30 +1,29 @@
 <nav class="navbar-default navbar-static-side" role="navigation">
     <div class="sidebar-collapse">
         <ul side-navigation class="nav metismenu" id="side-menu">
-            <li class="nav-header">
-
-                <div class="profile-element" uib-dropdown>
-                    <a uib-dropdown-toggle href>
-                            <span class="clear">
-                                <span class="block m-t-xs">
-                                    <strong class="font-bold">{{main.userName}}</strong>
-                             </span>
-                                <span class="text-muted text-xs block">Example menu<b class="caret"></b></span>
-                            </span>
-                    </a>
-                    <ul uib-dropdown-menu="" class="animated fadeInRight m-t-xs">
-                        <li><a href="">Logout</a></li>
-                    </ul>
-                </div>
-                <div class="logo-element">
-                    IN+
-                </div>
-
+            <li>
+                <a ng-if="user == null">
+                    <i class="fas fa-sign-in-alt" g-login></i>
+                </a>
+                <a ng-if="user != null" ng-click="logoff()">
+                    <i class="fas fa-sign-out-alt"></i>
+                </a>
             </li>
             <li ui-sref-active="active">
-                <a ui-sref="combustible"><i class="fas fa-gas-pump"></i> <span class="nav-label">Combustible Search</span></a>
+                <a ui-sref="index.combustible">
+                    <i class="fas fa-gas-pump"></i>
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="index.products">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
+            </li>
+            <li ui-sref-active="active">
+                <a ui-sref="index.torrents">
+                    <i class="fas fa-cloud-download-alt"></i>
+                </a>
             </li>
         </ul>
-
     </div>
 </nav>

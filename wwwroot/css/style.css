@@ -314,6 +314,13 @@ body.mini-navbar .navbar-default .nav > li > .nav-second-level li a {
   display: none;
   padding: 18px 0;
 }
+.logo-element-custom {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  padding: 18px 0;
+}
 .pace-done .navbar-static-side,
 .pace-done .nav-header,
 .pace-done li.active,
@@ -2612,7 +2619,7 @@ label.error {
 }
 .forum-container,
 .forum-post-container {
-  padding: 30px !important;
+  padding: 10px 30px !important;
 }
 .forum-item small {
   color: #999;
@@ -3633,10 +3640,10 @@ video {
   overflow-x: hidden;
 }
 .wrapper {
-  padding: 0 20px;
+  padding: 0 10px;
 }
 .wrapper-content {
-  padding: 20px 10px 40px;
+  padding: 5px 5px 0px;
 }
 #page-wrapper {
   padding: 0 15px;
@@ -3724,6 +3731,7 @@ body.body-small .footer.fixed {
 .page-heading {
   border-top: 0;
   padding: 0 10px 20px 10px;
+  vertical-align: middle;
 }
 .panel-heading h1,
 .panel-heading h2 {
@@ -5512,7 +5520,7 @@ del {
   padding: 120px 0;
 }
 .product-desc {
-  padding: 20px;
+  padding: 5px;
   position: relative;
 }
 .ecommerce .tag-list {
@@ -5547,6 +5555,7 @@ table.shoping-cart-table tr td:last-child {
   color: #676a6c;
   display: block;
   margin: 2px 0 5px 0;
+  min-height: 70px;
 }
 .product-name:hover,
 .product-name:focus {
@@ -7557,6 +7566,7 @@ body.rtls.mini-navbar .footer.fixed,
 body.body-small.mini-navbar .footer.fixed {
   margin: 0 70px 0 0;
 }
+
 body.rtls.mini-navbar.fixed-sidebar .footer.fixed,
 body.body-small.mini-navbar .footer.fixed {
   margin: 0 0 0 0;
@@ -7784,6 +7794,12 @@ body.rtls.top-navigation .footer.fixed {
 }
 .skin-1 .nav > li.active > a {
   color: #fff;
+}
+.navbar-minimalize {
+  display:block;
+}
+.mini-navbar .navbar-minimalize {
+  display:none;
 }
 .skin-1 .navbar-minimalize {
   background: #0e9aef;
@@ -8474,6 +8490,7 @@ body.md-skin {
   .navbar-header {
     display: inline;
     float: left;
+    margin-left: -15px;
   }
   .sidebar-panel {
     z-index: 2;

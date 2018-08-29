@@ -1,8 +1,14 @@
-<div class="footer">
-    <div class="pull-right">
-        10GB of <strong>250GB</strong> Free.
+<div class="footer fixed_full">
+    <span class="pull-right">
+        <brand-url />
+    </span>
+    <div ng-if="user == null">
+        <strong>Copyright</strong> JAM Tech.cl &copy; 2018
     </div>
-    <div>
-        <strong>Copyright</strong> Example Company &copy; 2015-2017
+    <div ng-if="user != null">
+        Sesi&oacute;n iniciada por 
+        <strong>{{user.name}}</strong>
+        &nbsp;
+        <img class="img-circle" src="{{user.imageUrl}}" width="28px" height="28px" alt="{{user.name}}" />
     </div>
 </div>
