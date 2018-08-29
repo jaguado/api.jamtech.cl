@@ -74,4 +74,11 @@
             </div>
         </div>
     </div>
+    <div class="row">
+        <small ng-show="stations!=null">
+            <b>{{stations.length}}</b> {{stations.length>1 ? 'estaciones' : 'estaci&oacute;n'}} encontrada{{stations.length>1
+            ? 's': ''}} en un radio de
+            <b>{{maxDistance}}</b> metros
+        </small>
+    </div>
 </div>

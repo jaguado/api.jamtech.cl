@@ -3689,7 +3689,7 @@ ol.unstyled {
   bottom: 0;
   left: 0;
   padding: 10px 20px;
-  position: absolute;
+  /*position: absolute;*/
   right: 0;
 }
 .footer.fixed_full {
@@ -3698,7 +3698,7 @@ ol.unstyled {
   left: 0;
   right: 0;
   z-index: 1000;
-  padding: 10px 20px;
+  padding: 5px 20px;
   background: white;
   border-top: 1px solid #e7eaec;
 }
