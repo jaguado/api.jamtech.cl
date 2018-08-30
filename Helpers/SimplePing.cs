@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace JAMTech.Helpers
 {
+    /// <summary>
+    /// Workaround when cannot access OS ping tool, but will not work if the ICMP protocol is blocked!!
+    /// </summary>
     public static class SimplePing
     {
         public static long Ping(string hostname, int timeout = 5000)

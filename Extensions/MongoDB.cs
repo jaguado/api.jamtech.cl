@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -22,6 +23,24 @@ namespace JAMTech.Extensions
         }
 
         private static WebMarkupMin.Core.CrockfordJsMinifier minifyJs = new WebMarkupMin.Core.CrockfordJsMinifier();
+        public static async Task<IActionResult> ToMongoDB<T>(this object collection, bool update = false, bool storeMinified = false)
+        {
+            var collectionName = typeof(T).Name.ToLower();
+            var collectionUrl = $"{baseUrl}databases/{defaultDatabase}/collections/{collectionName}?apiKey={apiKey}&m=true&u=true";
+            var stringPayload = JsonConvert.SerializeObject(collection, Startup.jsonSettings);
+            if (storeMinified)
+            {
+                var minified = minifyJs.Minify(stringPayload, false);
+                if (minified.Errors.Count == 0)
+                    stringPayload = minified.MinifiedContent;
+            }
+            var httpContent = new StringContent(stringPayload, Encoding.UTF8, "application/json");
+
+            var response = update ? await Helpers.Net.PutResponse(collectionUrl, httpContent) : await Helpers.Net.PostResponse(collectionUrl, httpContent);
+            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsStringAsync();
+            return new OkObjectResult(content);
+        }
         public static async Task<IActionResult> ToMongoDB<T>(this IEnumerable<T> collection, bool update=false, bool storeMinified=false)
         {
             var collectionName = typeof(T).Name.ToLower();
@@ -48,6 +67,24 @@ namespace JAMTech.Extensions
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<IEnumerable<T>>(content, Startup.jsonSettings);
+        }
+
+        /// <summary>
+        /// Only returns data of specified user
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="uid"></param>
+        /// <returns></returns>
+        public static async Task<IEnumerable<Y>> FromMongoDB<T, Y>(string uid)
+        {
+            var collectionName = typeof(T).Name.ToLower();
+            var collectionUrl = $"{baseUrl}databases/{defaultDatabase}/collections/{collectionName}?apiKey={apiKey}";
+            collectionUrl += "&q={\"uid\": \"" + uid + "\"}";
+            var response = await Helpers.Net.GetResponse(collectionUrl);
+            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsAsync<JArray>();
+            if (content.Count==0) return null;
+            return JsonConvert.DeserializeObject<IEnumerable<Y>>(content[0]["Data"].ToString(), Startup.jsonSettings);
         }
 
         private static async Task<IActionResult> GetStringResultAsync(string url)
