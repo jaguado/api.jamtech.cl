@@ -31,8 +31,9 @@ namespace JAMTech.Controllers
         [Produces(typeof(List<TorrentResult>))]
         public async Task<IActionResult> Get(string search, int pages = 1, bool skipLinks = false)
         {
-            var torrentPagesTasks = Enumerable.Range(1, pages)
-                              .Select(page => FindOtherTorrentsAsync(search, page, skipLinks)).ToArray();
+            var torrentPagesTasks = new List<Task<List<TorrentResult>>>();
+            torrentPagesTasks.AddRange(Enumerable.Range(1, pages).Select(page => FindTPBTorrentsAsync(search, page, skipLinks)));
+            torrentPagesTasks.AddRange(Enumerable.Range(1, pages).Select(page => FindOtherTorrentsAsync(search, page, skipLinks)));
 
             await Task.WhenAll(torrentPagesTasks);
             var flattenResult = torrentPagesTasks.Where(t => t.IsCompletedSuccessfully && t.Result != null)
