@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -43,7 +44,7 @@ namespace JAMTech.Helpers
         /// <param name="port"></param>
         /// <param name="timeout"></param>
         /// <returns></returns>
-        public static async Task<bool> Telnet(string hostname, int port, int timeout = 3000)
+        public static async Task<long> Telnet(string hostname, int port, int timeout = 3000)
         {
             return await Task.Run(() =>
             {
@@ -53,13 +54,15 @@ namespace JAMTech.Helpers
                     {
                         try
                         {
+                            var timer = Stopwatch.StartNew();
                             var connectTask = tcp.ConnectAsync(hostname, port);
                             Task.WaitAll(new[] { connectTask }, ct.Token);
-                            return connectTask.IsCompletedSuccessfully && tcp.Connected;
+                            timer.Stop();
+                            return connectTask.IsCompletedSuccessfully && tcp.Connected ? timer.ElapsedMilliseconds : -1;
                         }
                         catch (Exception)
                         {
-                            return false;
+                            return -1;
                         }
                     }
                 }

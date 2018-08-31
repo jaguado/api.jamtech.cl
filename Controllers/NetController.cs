@@ -72,7 +72,7 @@ namespace JAMTech.Controllers
         /// <param name="timeout"></param>
         /// <returns></returns>
         [HttpPost("telnet")]
-        public async Task<IActionResult> TelnetAsync(string hostname, int port, int timeout = 3000)
+        public async Task<IActionResult> TelnetAsync(string hostname, int port, int timeout = 2000)
         {
             try
             {
@@ -87,6 +87,36 @@ namespace JAMTech.Controllers
                 return HandleException(ex);
             }
         }
+
+        // Post /telnet
+        /// <summary>
+        /// Check if can connect to the specified TCP port on the specified host as an asynchronous operation.
+        /// </summary>
+        /// <param name="hostname"></param>
+        /// <param name="port"></param>
+        /// <param name="timeout"></param>
+        /// <returns></returns>
+        [HttpPost("telnet/{loops}")]
+        public async Task<IActionResult> TelnetAsync(string hostname, int port,int loops=1, int timeout = 2000)
+        {
+            try
+            {
+                var results = new List<long>();
+                for(var i = 0; i < loops; i++)
+                    results.Add(await Net.Telnet(hostname, port, timeout));
+
+                return new OkObjectResult(results);
+            }
+            catch (WebException wex)
+            {
+                return HandleWebException(wex);
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
+
 
 
         /// <summary>
