@@ -32,6 +32,30 @@ namespace JAMTech.Controllers
         public async Task<IActionResult> Get(string search, int pages = 1, bool skipLinks = false)
         {
             var torrentPagesTasks = new List<Task<List<TorrentResult>>>();
+            //torrentPagesTasks.AddRange(Enumerable.Range(1, pages).Select(page => FindTPBTorrentsAsync(search, page, skipLinks)));
+            torrentPagesTasks.AddRange(Enumerable.Range(1, pages).Select(page => FindOtherTorrentsAsync(search, page, skipLinks)));
+
+            await Task.WhenAll(torrentPagesTasks);
+            var flattenResult = torrentPagesTasks.Where(t => t.IsCompletedSuccessfully && t.Result != null)
+                               .Select(s => s.Result)
+                               .SelectMany(s => s, (list, value) => value)
+                               .OrderBy(o => o.Page)
+                               .ToList();
+            return new OkObjectResult(flattenResult);
+        }
+
+        // GET: api/Torrent/movie
+        /// <summary>
+        /// Allow to search for a torrent on TPB
+        /// </summary>
+        /// <param name="search">word to search</param>
+        /// <param name="pages">max pages count</param>
+        /// <returns>List of torrent files</returns>
+        [HttpGet("/v2/[controller]/")]
+        [Produces(typeof(List<TorrentResult>))]
+        public async Task<IActionResult> GetDual(string search, int pages = 1, bool skipLinks = false)
+        {
+            var torrentPagesTasks = new List<Task<List<TorrentResult>>>();
             torrentPagesTasks.AddRange(Enumerable.Range(1, pages).Select(page => FindTPBTorrentsAsync(search, page, skipLinks)));
             torrentPagesTasks.AddRange(Enumerable.Range(1, pages).Select(page => FindOtherTorrentsAsync(search, page, skipLinks)));
 
