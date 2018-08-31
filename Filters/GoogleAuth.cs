@@ -62,6 +62,10 @@ namespace JAMTech.Filters
                             {
                                 //add uid as parameter
                                 context.ActionArguments.Add(uidFieldName, result.id.ToString());
+
+                                //add info of user
+                                context.ActionArguments["userInfo"] = googleResult;
+
                             }
                         }
                     }
