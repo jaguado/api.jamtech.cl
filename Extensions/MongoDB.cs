@@ -20,7 +20,7 @@ namespace JAMTech.Extensions
         public static async Task<IActionResult> GetCollections(string database)
         {
             var url = $"{baseUrl}databases/{database}/collections?apiKey={apiKey}";
-            return await GetStringResultAsync(url);
+            return new OkObjectResult(await Helpers.Http.GetStringAsync<string>(url));
         }
 
         private static WebMarkupMin.Core.CrockfordJsMinifier minifyJs = new WebMarkupMin.Core.CrockfordJsMinifier();
@@ -85,24 +85,7 @@ namespace JAMTech.Extensions
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsAsync<JArray>();
             if (content.Count == 0) return null;
-            var results = new List<Y>();
-            foreach (var obj in content)
-                results.AddRange(JsonConvert.DeserializeObject<IEnumerable<Y>>(obj["Data"].ToString(), Startup.jsonSettings));
-
-            return results;
-        }
-
-
-
-
-        private static async Task<IActionResult> GetStringResultAsync(string url)
-        {
-            using (var response = await Helpers.Net.GetResponse(url))
-            {
-                if (response.IsSuccessStatusCode)
-                    return new OkObjectResult(await response.Content.ReadAsStringAsync());
-            }
-            return new NotFoundResult();
+            return content.Select(obj => JsonConvert.DeserializeObject<IEnumerable<Y>>(obj["Data"].ToString(), Startup.jsonSettings)).SelectMany(c=>c);  
         }
     }
 }

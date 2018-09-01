@@ -49,11 +49,28 @@ namespace JAMTech.Controllers
         [Produces(typeof(IEnumerable<Models.MonitorConfig>))]
         public async Task<IActionResult> GetMonitoringTasks(string forUser=null)
         {
-            //TODO get user of JWT and validate
             var result = await Extensions.MongoDB.FromMongoDB<Models.UserMonitorConfig, Models.MonitorConfig> (forUser);
             //update monitors
             ThreadPool.QueueUserWorkItem(async state => await Program.RefreshMonitoringForUserAsync(forUser));
             return new OkObjectResult(result as IEnumerable<Models.MonitorConfig>);
+        }
+
+        /// <summary>
+        /// Get monitors results with configuration of an authenticated user
+        /// </summary>
+        /// <param name="forUser">This paramemeter is optional and will be completed or validated against access_token</param>
+        /// <returns></returns>
+        [GoogleAuth]
+        [HttpGet("results")]
+        public IActionResult GetResults(string forUser = null, bool onlyErrors=false)
+        {
+            var monitors = Program.Monitors.Where(m => m.Uid == forUser);
+            var results = monitors.Select(m => new
+            {
+                Config = m.Config,
+                Results = m.Results.Where(r=>r!=null && ((onlyErrors && !r.Success) || !onlyErrors))
+            });
+            return new OkObjectResult(results);
         }
     }
 }
