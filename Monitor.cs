@@ -9,6 +9,7 @@ namespace JAMTech
 {
     public class Monitor:IDisposable
     {
+        public string Uid { get; }
         readonly string _url;
         readonly AvailableMethods _method;
         readonly int _interval;
@@ -18,8 +19,9 @@ namespace JAMTech
         private Thread _monitoringThread;
         public List<Tuple<DateTime, bool, string>> Results = new List<Tuple<DateTime, bool, string>>();
 
-        public Monitor(Models.MonitorConfig config)
+        public Monitor(Models.MonitorConfig config, string uid)
         {
+            Uid = uid;
             _url = config.Url;
             _method = config.Method;
             _interval = config.Interval;
@@ -29,15 +31,16 @@ namespace JAMTech
 
         public void Start()
         {
-            _monitoringThread = new Thread(Run);
-            _monitoringThread.Start();
+            if (_monitoringThread == null)
+            {
+                _monitoringThread = new Thread(Run);
+                _monitoringThread.Start();
+            }
         }
 
         public void Dispose()
         {
             _exit = true;
-            if (_monitoringThread != null)
-                _monitoringThread.Abort();
             _monitoringThread = null;              
         }
 

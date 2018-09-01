@@ -29,16 +29,36 @@ namespace JAMTech
             var monitoringInterval = Environment.GetEnvironmentVariable("monitoring_interval") ?? "30000";
             if (monitoringUrl != null)
             {
-                var monitor = new Monitor(new Models.MonitorConfig() { Url=monitoringUrl, Interval=int.Parse(monitoringInterval), Method=Models.MonitorConfig.AvailableMethods.GET });
+                var monitor = new Monitor(new Models.MonitorConfig() { Url=monitoringUrl, Interval=int.Parse(monitoringInterval), Method=Models.MonitorConfig.AvailableMethods.GET },"");
                 monitor.Start();
             }
 
-            monitors = null;
-            //search for other monitoring tasks
-            var configs = await Extensions.MongoDB.FromMongoDB<Models.MonitorConfig>();
-            if (configs != null)
+            monitors = new List<Monitor>() ;
+            //search for all users monitoring tasks
+            var usersConfigs = await Extensions.MongoDB.FromMongoDB<Models.UserMonitorConfig>();
+            if (usersConfigs != null)
             {
-                monitors = configs.Select(config => new Monitor(config)).ToList();
+                usersConfigs.ToList().ForEach(user =>
+                {
+                    Console.WriteLine($"Loading '{user.Data.Count()}' monitors of user '{user.uid}'");
+                    monitors.AddRange(user.Data.Select(config => new Monitor(config, user.uid)).ToList());
+                    monitors.ForEach(m => m.Start());
+                });     
+            }
+        }
+        public static async Task RefreshMonitoringForUserAsync(string user)
+        {
+            //remove all active monitors of the user
+            if (monitors == null) return;
+            monitors.Where(m => m.Uid == user).ToList().ForEach(m => m.Dispose());
+            monitors.RemoveAll(m => m.Uid == user);
+
+            //load all monitors for the user
+            var userConfigs = await Extensions.MongoDB.FromMongoDB<Models.UserMonitorConfig, Models.MonitorConfig>(user);
+            if (userConfigs != null)
+            {
+                Console.WriteLine($"Refreshing '{userConfigs.Count()}' monitors of user '{user}'");
+                monitors.AddRange(userConfigs.Select(config => new Monitor(config, user)).ToList());
                 monitors.ForEach(m => m.Start());
             }
         }

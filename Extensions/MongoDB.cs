@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,7 +42,7 @@ namespace JAMTech.Extensions
             var content = await response.Content.ReadAsStringAsync();
             return new OkObjectResult(content);
         }
-        public static async Task<IActionResult> ToMongoDB<T>(this IEnumerable<T> collection, bool update=false, bool storeMinified=false)
+        public static async Task<IActionResult> ToMongoDB<T>(this IEnumerable<T> collection, bool update = false, bool storeMinified = false)
         {
             var collectionName = typeof(T).Name.ToLower();
             var collectionUrl = $"{baseUrl}databases/{defaultDatabase}/collections/{collectionName}?apiKey={apiKey}&m=true&u=true";
@@ -53,7 +54,7 @@ namespace JAMTech.Extensions
                     stringPayload = minified.MinifiedContent;
             }
             var httpContent = new StringContent(stringPayload, Encoding.UTF8, "application/json");
-            
+
             var response = update ? await Helpers.Net.PutResponse(collectionUrl, httpContent) : await Helpers.Net.PostResponse(collectionUrl, httpContent);
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
@@ -83,9 +84,16 @@ namespace JAMTech.Extensions
             var response = await Helpers.Net.GetResponse(collectionUrl);
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsAsync<JArray>();
-            if (content.Count==0) return null;
-            return JsonConvert.DeserializeObject<IEnumerable<Y>>(content[0]["Data"].ToString(), Startup.jsonSettings);
+            if (content.Count == 0) return null;
+            var results = new List<Y>();
+            foreach (var obj in content)
+                results.AddRange(JsonConvert.DeserializeObject<IEnumerable<Y>>(obj["Data"].ToString(), Startup.jsonSettings));
+
+            return results;
         }
+
+
+
 
         private static async Task<IActionResult> GetStringResultAsync(string url)
         {

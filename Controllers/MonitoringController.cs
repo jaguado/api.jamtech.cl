@@ -34,9 +34,8 @@ namespace JAMTech.Controllers
 
              var result = await obj.ToMongoDB<Models.UserMonitorConfig>();
             //update monitors
-            //ThreadPool.QueueUserWorkItem(async state => await Program.StartMonitoringAsync());
+            ThreadPool.QueueUserWorkItem(async state => await Program.RefreshMonitoringForUserAsync(forUser));
             return new OkObjectResult(result);
-
         }
 
 
@@ -53,7 +52,7 @@ namespace JAMTech.Controllers
             //TODO get user of JWT and validate
             var result = await Extensions.MongoDB.FromMongoDB<Models.UserMonitorConfig, Models.MonitorConfig> (forUser);
             //update monitors
-            //ThreadPool.QueueUserWorkItem(async state => await Program.StartMonitoringAsync());
+            ThreadPool.QueueUserWorkItem(async state => await Program.RefreshMonitoringForUserAsync(forUser));
             return new OkObjectResult(result as IEnumerable<Models.MonitorConfig>);
         }
     }
