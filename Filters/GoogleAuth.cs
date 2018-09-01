@@ -50,9 +50,11 @@ namespace JAMTech.Filters
                             throw new SecurityTokenException("Invalid access token");
                         else
                         {
-                            // validate parameter uid against google uid
+                            
                             var googleResult = response.Content.ReadAsStringAsync().Result;
                             var result = JsonConvert.DeserializeObject<dynamic>(googleResult);
+
+                            // validate parameter uid against google uid
                             if (!string.IsNullOrEmpty(uid))
                             {
                                 if (uid != result.id.ToString())
@@ -60,10 +62,8 @@ namespace JAMTech.Filters
                             }
                             else
                             {
-                                //add uid as parameter
-                                context.ActionArguments.Add(uidFieldName, result.id.ToString());
-
-                                //add info of user
+                                //add user info to request
+                                context.ActionArguments[uidFieldName] = result.id.ToString();
                                 context.ActionArguments["userInfo"] = googleResult;
 
                             }

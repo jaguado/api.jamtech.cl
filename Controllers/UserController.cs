@@ -11,6 +11,7 @@ using System.Threading;
 using JAMTech.Filters;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Authorization;
 
 namespace JAMTech.Controllers
 {
