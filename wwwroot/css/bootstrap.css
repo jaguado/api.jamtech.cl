@@ -3868,7 +3868,7 @@ select[multiple].input-group-lg > .input-group-btn > .btn {
 select.input-group-sm > .form-control,
 select.input-group-sm > .input-group-addon,
 select.input-group-sm > .input-group-btn > .btn {
-  height: 30px;
+  height:30px;
   line-height: 30px;
 }
 textarea.input-group-sm > .form-control,

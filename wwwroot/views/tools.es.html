@@ -1,0 +1,114 @@
+<div ng-controller="ToolsCtrl as main">
+    <div class="row wrapper page-heading">
+        <div>
+            <br />
+            <img class="pull-right" src="img/favicon/apple-icon-60x60.png" alt="logo" />
+        </div>
+        <div class="navbar-header">
+            <span minimaliza-sidebar></span>
+        </div>
+        <brand></brand>
+        <ol class="breadcrumb">
+            <li>
+                <a ng-click="minimalize()">Inicio</a>
+            </li>
+            <li class="active">
+                <strong>Redes</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="row wrapper">
+        <div class="p-xs">
+            <div class="pull-left m-r-md">
+                <i class="fas fa-toolbox text-navy mid-icon"></i>
+            </div>
+            <h2>Herramientas</h2>
+        </div>
+    </div>
+    <div class="row animated fadeInRight">
+        <div class="wrapper wrapper-content animated fadeInRight">
+            <div class="forum-container">
+                <!-- Ping -->
+                <div class="row" ng-if="false">
+                    <div class="input-group">
+                        <input type="text" placeholder="hostname o ip" name="ping" class="form-control input-lg" ng-model="pingHostname" focus-me="true"
+                            ng-keypress="($event.which === 13)?ping(pingHostname):0">
+                        <div class="input-group-btn">
+                            <button class="btn-monitor btn btn-lg btn-primary" type="submit" ng-click="ping(pingHostname)">
+                                Ping
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <!-- Ping result -->
+                    <span ng-repeat="result in pingResult">{{$index}} Pong in {{result}} ms</span>
+                </div>
+                <!-- End Ping -->
+                <!-- Curl -->
+                <div class="row">
+                    <div class="input-group">
+                        <input focus-me="true" style="max-width: 85%;" type="text" placeholder="URI-scheme://subdomain.domain.tld" name="curl" class="form-control input-lg"
+                            ng-model="curlUrl" ng-keypress="($event.which === 13)?curl(curlUrl,curlMethod):0">
+                        <input style="max-width: 10%;" type="text" readonly placeholder="GET" name="curl" class="form-control input-lg" ng-model="curlMethod">
+                        <div class="dropdown open" uib-dropdown="">
+                            <button class="btn btn-white dropdown-toggle input-lg" uib-dropdown-toggle="" type="button" aria-haspopup="true" aria-expanded="true">
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="pull-right dropdown-menu" uib-dropdown-menu="">
+                                <li>
+                                    <a ng-click="curlMethod = 'GET'">GET</a>
+                                </li>
+                                <li>
+                                    <a ng-click="curlMethod = 'POST'">POST</a>
+                                </li>
+                                <li>
+                                    <a ng-click="curlMethod = 'PUT'">PUT</a>
+                                </li>
+                                <li>
+                                    <a ng-click="curlMethod = 'DELETE'">DELETE</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="input-group-btn">
+                            <button ladda="loadingCurl" class="ladda-button btn-monitor btn btn-lg btn-primary" data-style="zoom-in" type="submit" ng-click="curl(curlUrl,curlMethod)">
+                                Curl
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="row" ng-if="curlResult!=null">
+                    <!-- Curl result -->
+                    <ui-codemirror ui-codemirror-opts="editorOptions" ng-model="curlResult">
+                    </ui-codemirror>
+                    <br />
+                </div>
+                <!-- End Curl -->
+                <!-- Telnet -->
+                <div class="row">
+                    <div class="input-group">
+                        <input style="max-width: 90%;" type="text" placeholder="hostname o ip" name="telnet" class="form-control input-lg" ng-model="telnetHostname">
+                        <input style="max-width: 10%;" type="text" placeholder="port" name="telnetport" class="form-control input-lg" ng-model="telnetPort"
+                            ng-keypress="($event.which === 13)?telnet(telnetHostname,telnetPort):0">
+                        <div class="input-group-btn">
+                            <button ladda="loadingTelnet" class="ladda-button btn-monitor btn btn-lg btn-primary" data-style="zoom-in" type="submit" ng-click="telnet(telnetHostname,telnetPort)">
+                                Telnet
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <!-- Telnet result -->
+                    <span ng-repeat="result in telnetResult track by $index">{{$index+1}}# connection established in {{result}} ms.
+                        <br />
+                    </span>
+                    <br />
+                </div>
+                <!-- End Telnet -->
+            </div>
+        </div>
+    </div>
+</div>

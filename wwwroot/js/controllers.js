@@ -1,11 +1,43 @@
 var mocksBaseApiUrl = '//aio.jamtech.cl/mocks/torrents.json'
 var baseApiUrl = '//aio.jamtech.cl/v1/';
 var defaultPages = 2;
+var sessionCheckInterval = 30000;
+var loops = 5;
 
-function MainCtrl($scope, $rootScope, Analytics, socialLoginService) {
+function minimalize() {
+    if (!$("body").hasClass("mini-navbar")) {
+        $("body").toggleClass("mini-navbar");
+    } else {
+        $("body").removeClass("mini-navbar");
+    }
+}
+
+function MainCtrl($scope, $rootScope, $http, $interval, Analytics, socialLoginService) {
+    $scope.sessiontimer = null;
     $scope.user = localStorage.getItem('user') != null ? JSON.parse(localStorage.getItem('user')) : null;
-    if ($scope.user != null)
+
+    $scope.checkSession = function () {
+        if ($scope.user != null) {
+            console.log('checking session');
+            var url = baseApiUrl + "User?access_token=" + $scope.user.token;
+            //get stations from api.jamtech.cl
+            return $http.get(url).then(function (response) {
+                //console.log('status code', response.status);
+                return response.status == 201;
+            }, function (response) {
+                $scope.user = null;
+                $scope.sessiontimer = null;
+                localStorage.setItem('user', $scope.user);
+                console.log('session invalidated');
+                return false;
+            });
+        }
+    };
+
+    $scope.checkSession();
+    if ($scope.user != null) {
         console.log('user logged in', $scope.user.name, $scope.user);
+    }
     this.helloText = 'Welcome to JAM Tech.cl';
     this.descriptionText = '';
     $scope.minimalize = function () {
@@ -18,7 +50,9 @@ function MainCtrl($scope, $rootScope, Analytics, socialLoginService) {
     //$scope.minimalize();
 
 
-    $scope.logoff = function(){
+    $scope.sessiontimer = $interval($scope.checkSession, sessionCheckInterval);
+
+    $scope.logoff = function () {
         socialLoginService.logout();
     };
 
@@ -37,6 +71,7 @@ function MainCtrl($scope, $rootScope, Analytics, socialLoginService) {
         $scope.$apply(function () {
             $scope.user = userDetails;
             localStorage.setItem('user', JSON.stringify($scope.user));
+            $scope.sessiontimer = $interval($scope.checkSession(), sessionCheckInterval);
         });
         // Set the User Id
         Analytics.set('&uid', $scope.user.uid);
@@ -45,6 +80,7 @@ function MainCtrl($scope, $rootScope, Analytics, socialLoginService) {
     });
     $rootScope.$on('event:social-sign-out-success', function (event, logoutStatus) {
         //logout ok
+        $scope.sessiontimer = null;
         $scope.user = null;
         localStorage.setItem('user', $scope.user);
         console.log('social-sign-out-success', logoutStatus);
@@ -52,13 +88,7 @@ function MainCtrl($scope, $rootScope, Analytics, socialLoginService) {
 };
 
 function TorrentsCtrl($http, $scope, $window, Analytics) {
-    $scope.minimalize = function () {
-        if (!$("body").hasClass("mini-navbar")) {
-            $("body").toggleClass("mini-navbar");
-        } else {
-            $("body").removeClass("mini-navbar");
-        }
-    }
+    $scope.minimalize = minimalize;
 
     $scope.useMocks = false; //mocks mode
     var searchUrl = baseApiUrl + 'Torrent?skipLinks=false&pages=' + defaultPages + '&search=';
@@ -96,13 +126,8 @@ function TorrentsCtrl($http, $scope, $window, Analytics) {
 }
 
 function ProductsCtrl($http, $scope, Analytics) {
-    $scope.minimalize = function () {
-        if (!$("body").hasClass("mini-navbar")) {
-            $("body").toggleClass("mini-navbar");
-        } else {
-            $("body").removeClass("mini-navbar");
-        }
-    }
+    $scope.minimalize = minimalize;
+
     var searchUrl = baseApiUrl + 'Products?pages=' + defaultPages + '&product=';
     var compareUrl = baseApiUrl + 'JumboProducts/{productId}/compare';
     $scope.availableProductTemplates = [{
@@ -168,13 +193,7 @@ function ProductsCtrl($http, $scope, Analytics) {
 }
 
 function StationsCtrl($http, $scope, Analytics) {
-    $scope.minimalize = function () {
-        if (!$("body").hasClass("mini-navbar")) {
-            $("body").toggleClass("mini-navbar");
-        } else {
-            $("body").removeClass("mini-navbar");
-        }
-    }
+    $scope.minimalize = minimalize;
 
     var stationsUrl = baseApiUrl + 'CombustibleStations?';
     var regionsUrl = baseApiUrl + 'CombustibleStations/Regiones';
@@ -344,11 +363,88 @@ function StationsCtrl($http, $scope, Analytics) {
     };
 }
 
+function ToolsCtrl($scope, $rootScope, $http, Analytics) {
+    $scope.minimalize = minimalize;
+    $scope.curlMethod = "GET";
 
+    $scope.pingResult = [];
+    $scope.ping = function (hostname) {
+        var url = baseApiUrl + "Net/ping?hostname=" + hostname + "&loops=1";
+        $http.post(url, null, null)
+            .then(
+                function (response) {
+                    // success callback
+                    $scope.pingResult = response.data;
+                    console.log('ping ok', response.data);
+                },
+                function (response) {
+                    // failure callback
+                    console.log('fail', response.data);
+                }
+            );
+    };
 
+    $scope.telnetResult = [];
+    $scope.telnet = function (hostname, port) {;
+        $scope.loadingTelnet=true;
+        var url = baseApiUrl + "Net/telnet/" + loops + "?hostname=" + hostname + "&port=" + port + "&timeout=2000";
+        $http.post(url, null, null)
+            .then(
+                function (response) {
+                    // success callback
+                    $scope.telnetResult = response.data;
+                    console.log('telnet ok', response.data);
+                },
+                function (response) {
+                    // failure callback
+                    console.log('fail', response.data);
+                }
+            ).then(function(){
+                $scope.loadingTelnet=false;
+            });
+    };
 
+    $scope.curlResult = null;
+    $scope.curl = function (url, method) {
+        $scope.loadingCurl = true;
+        if(url.endsWith(".js"))
+            $scope.editorOptions.mode = "javascript";
+        else if(url.endsWith(".xml"))
+            $scope.editorOptions.mode = "xml";
+        else
+            $scope.editorOptions.mode = "htmlmixed";
+        
+        var url = baseApiUrl + "Net/curl?url=" + url + "&method=" + method + "&timeout=30000&useProxy=false";
+        $http.post(url, null, null)
+            .then(
+                function (response) {
+                    // success callback
+                    $scope.curlResult = response.data;
+                    //console.log('curl ok', response.data);
+                },
+                function (response) {
+                    // failure callback
+                    $scope.curlResult = response.data;
+                    console.log('fail', response.data);
+                }
+            ).then(function () {
+                $scope.loadingCurl = false;
+            });
+    };
+
+    $scope.editorOptions = {
+        lineNumbers: true,
+        matchBrackets: true,
+        styleActiveLine: true,
+        mode: "htmlmixed"
+        //,theme:"ambiance"
+    };
+}
 
 // End of controllers
+
+
+
 //math operations used to calculate distnace between two points
 function deg2rad(deg) {
     return deg * (Math.PI / 180)
@@ -421,6 +517,7 @@ String.prototype.replaceAll = function (searchStr, replaceStr) {
     return str.replace(new RegExp(searchStr, 'gi'), replaceStr);
 };
 
+
 //angular js - load controllers, filters and other stuff
 angular
     .module('inspinia')
@@ -428,7 +525,13 @@ angular
     .controller('StationsCtrl', StationsCtrl)
     .controller('ProductsCtrl', ProductsCtrl)
     .controller('TorrentsCtrl', TorrentsCtrl)
+    .controller('ToolsCtrl', ToolsCtrl)
     .filter('capitalize', Capitalize)
     .filter('toArray', toArray)
     .filter('getBrand', getProductBrandType)
-    .filter('getPrice', GetPrice);
+    .filter('getPrice', GetPrice)
+    .filter('to_trusted', ['$sce', function ($sce) {
+        return function (text) {
+            return $sce.trustAsHtml(text);
+        }
+    }]);

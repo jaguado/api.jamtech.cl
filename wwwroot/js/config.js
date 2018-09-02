@@ -6,6 +6,35 @@
  * Initial there are written state for all view in theme.
  *
  */
+
+
+ /* Intercept all http calls*/
+var httpInterceptor = function ($q, $location) {
+        return {
+            request: function (config) {//req
+                //add access token
+                //config.url += config.url.contains("?") ? "&" : "?";
+                //config.url += "access_token=blablbla";
+                //console.log('req', config);
+                return config;
+            },
+
+            response: function (result) {//res
+                //console.log('res',result.status);
+                return result;
+            },
+
+            responseError: function (rejection) {//error
+                console.log('Failed with', rejection.status, 'status');
+                if (rejection.status == 403) {
+                    //$location.url('/dashboard');
+                }
+
+                return $q.reject(rejection);
+            }
+        }
+    };
+
 function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
     $urlRouterProvider.otherwise("/index/combustible");
 
@@ -139,6 +168,32 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
                 }
             }
         })
+        .state('index.tools', {
+            url: "/tools",
+            templateUrl: "views/tools.es.html",
+            data: {
+                pageTitle: 'Tools'
+            },
+            resolve: {
+                loadPlugin: function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            serie: true,
+                            files: ['css/plugins/codemirror/codemirror.css','css/plugins/codemirror/ambiance.css','js/plugins/codemirror/codemirror.js','js/plugins/codemirror/mode/javascript/javascript.js', 'js/plugins/codemirror/mode/css/css.js', 'js/plugins/codemirror/mode/xml/xml.js', 'js/plugins/codemirror/mode/htmlmixed/htmlmixed.js']
+                        },
+                        {
+                            name: 'ui.codemirror',
+                            files: ['js/plugins/ui-codemirror/ui-codemirror.min.js']
+                        },
+                        {
+                            serie: true,
+                            name: 'angular-ladda',
+                            files: ['js/plugins/ladda/spin.min.js', 'js/plugins/ladda/ladda.min.js', 'css/plugins/ladda/ladda-themeless.min.css','js/plugins/ladda/angular-ladda.min.js']
+                        }
+                    ]);
+                }
+            }
+        })
         .state('index.projects', {
             url: "/projects",
             templateUrl: "views/projects.html",
@@ -156,6 +211,9 @@ angular
     .config(function (socialProvider) {
         socialProvider.setGoogleKey("95717972095-f3h0t9hmvd0dhjfqctoe39qlsupbrmou.apps.googleusercontent.com");
         //socialProvider.setLinkedInKey("YOUR LINKEDIN CLIENT ID");
+    })
+    .config(function ($httpProvider) {
+        $httpProvider.interceptors.push(httpInterceptor);
     })
     .run(['Analytics', function (Analytics) {}])
     .run(function ($rootScope, $state, $locale) {

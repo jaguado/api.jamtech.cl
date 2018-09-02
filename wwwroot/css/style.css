@@ -1892,7 +1892,7 @@ div.dt-button-info {
 }
 .form-control,
 .single-line {
-  background-color: #FFFFFF;
+  background-color: transparent;
   background-image: none;
   border: 1px solid #e5e6e7;
   border-radius: 1px;
