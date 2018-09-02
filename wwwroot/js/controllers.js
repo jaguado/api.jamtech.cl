@@ -369,6 +369,7 @@ function ToolsCtrl($scope, $rootScope, $http, Analytics) {
 
     $scope.pingResult = [];
     $scope.ping = function (hostname) {
+        Analytics.trackEvent('tools', 'ping', hostname);
         var url = baseApiUrl + "Net/ping?hostname=" + hostname + "&loops=1";
         $http.post(url, null, null)
             .then(
@@ -386,6 +387,7 @@ function ToolsCtrl($scope, $rootScope, $http, Analytics) {
 
     $scope.telnetResult = [];
     $scope.telnet = function (hostname, port) {;
+        Analytics.trackEvent('tools', 'telnet', hostname);
         $scope.loadingTelnet = true;
         var url = baseApiUrl + "Net/telnet/" + loops + "?hostname=" + hostname + "&port=" + port + "&timeout=2000";
         $http.post(url, null, null)
@@ -406,6 +408,7 @@ function ToolsCtrl($scope, $rootScope, $http, Analytics) {
 
     $scope.curlResult = null;
     $scope.curl = function (url, method) {
+        Analytics.trackEvent('tools', 'curl', url);
         $scope.loadingCurl = true;
         if (url.endsWith(".js"))
             $scope.editorOptions.mode = "javascript";
