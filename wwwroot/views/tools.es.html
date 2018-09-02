@@ -10,7 +10,7 @@
         <brand></brand>
         <ol class="breadcrumb">
             <li>
-                <a ng-click="minimalize()">Inicio</a>
+                <a ui-sref="index.main">Inicio</a>
             </li>
             <li class="active">
                 <strong>Herramientas</strong>
@@ -49,32 +49,34 @@
                 <!-- Curl -->
                 <div class="row">
                     <div class="input-group">
-                        <input focus-me="true" style="max-width: 85%;" type="text" placeholder="URI-scheme://subdomain.domain.tld" name="curl" class="form-control input-lg"
+                        <input focus-me="true" type="text" required placeholder="URI-scheme://subdomain.domain.tld" name="curl" class="form-control input-lg"
                             ng-model="curlUrl" ng-keypress="($event.which === 13)?curl(curlUrl,curlMethod):0">
-                        <input style="max-width: 10%;" type="text" readonly placeholder="GET" name="curl" class="form-control input-lg" ng-model="curlMethod">
-                        <div class="dropdown open" uib-dropdown="">
-                            <button class="btn btn-white dropdown-toggle input-lg" uib-dropdown-toggle="" type="button" aria-haspopup="true" aria-expanded="true">
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="pull-right dropdown-menu" uib-dropdown-menu="">
-                                <li>
-                                    <a ng-click="curlMethod = 'GET'">GET</a>
-                                </li>
-                                <li>
-                                    <a ng-click="curlMethod = 'POST'">POST</a>
-                                </li>
-                                <li>
-                                    <a ng-click="curlMethod = 'PUT'">PUT</a>
-                                </li>
-                                <li>
-                                    <a ng-click="curlMethod = 'DELETE'">DELETE</a>
-                                </li>
-                            </ul>
-                        </div>
+                        <input type="text" readonly placeholder="GET" name="curl" class="form-control input-lg" ng-model="curlMethod">
                         <div class="input-group-btn">
                             <button ladda="loadingCurl" class="ladda-button btn-monitor btn btn-lg btn-primary" data-style="zoom-in" type="submit" ng-click="curl(curlUrl,curlMethod)">
                                 Curl
                             </button>
+                            <div class="input-group-btn">
+                                <div class="dropdown open" uib-dropdown="">
+                                    <button class="btn btn-white dropdown-toggle input-lg" uib-dropdown-toggle="" type="button" aria-haspopup="true" aria-expanded="true">
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="pull-right dropdown-menu" uib-dropdown-menu="">
+                                        <li>
+                                            <a ng-click="curlMethod = 'GET'">GET</a>
+                                        </li>
+                                        <li>
+                                            <a ng-click="curlMethod = 'POST'">POST</a>
+                                        </li>
+                                        <li>
+                                            <a ng-click="curlMethod = 'PUT'">PUT</a>
+                                        </li>
+                                        <li>
+                                            <a ng-click="curlMethod = 'DELETE'">DELETE</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -89,14 +91,18 @@
                 <!-- Telnet -->
                 <div class="row">
                     <div class="input-group">
-                        <input style="max-width: 90%;" type="text" placeholder="hostname o ip" name="telnet" class="form-control input-lg" ng-model="telnetHostname">
-                        <input style="max-width: 10%;" type="text" placeholder="port" name="telnetport" class="form-control input-lg" ng-model="telnetPort"
-                            ng-keypress="($event.which === 13)?telnet(telnetHostname,telnetPort):0">
+                        <input type="text" required placeholder="hostname o ip" name="telnet" class="form-control input-lg" ng-model="telnetHostname">
+                        <input type="text" required placeholder="port" name="telnetport" class="form-control input-lg" ng-model="telnetPort" ng-keypress="($event.which === 13)?telnet(telnetHostname,telnetPort):0">
                         <div class="input-group-btn">
-                            <button ladda="loadingTelnet" class="ladda-button btn-monitor btn btn-lg btn-primary" data-style="zoom-in" type="submit" ng-click="telnet(telnetHostname,telnetPort)">
+                            <button ladda="loadingTelnet" class="ladda-button btn-monitor btn btn-lg btn-primary" data-style="zoom-in" type="submit"
+                                ng-click="telnet(telnetHostname,telnetPort)">
                                 Telnet
                             </button>
+                            <div class="input-group-btn">
+                                 <span class="btn btn-lg">&nbsp;</span>
+                            </div>
                         </div>
+                       
                     </div>
                 </div>
                 <br />

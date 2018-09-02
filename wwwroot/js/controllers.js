@@ -31,7 +31,7 @@ function MainCtrl($scope, $rootScope, $http, $interval, Analytics, socialLoginSe
                 console.log('session invalidated');
                 return false;
             });
-        }
+        };
     };
 
     $scope.checkSession();
@@ -46,7 +46,7 @@ function MainCtrl($scope, $rootScope, $http, $interval, Analytics, socialLoginSe
         } else {
             $("body").removeClass("mini-navbar");
         }
-    }
+    };
     //$scope.minimalize();
 
 
@@ -71,7 +71,7 @@ function MainCtrl($scope, $rootScope, $http, $interval, Analytics, socialLoginSe
         $scope.$apply(function () {
             $scope.user = userDetails;
             localStorage.setItem('user', JSON.stringify($scope.user));
-            $scope.sessiontimer = $interval($scope.checkSession(), sessionCheckInterval);
+            $scope.sessiontimer = $interval($scope.checkSession, sessionCheckInterval);
         });
         // Set the User Id
         Analytics.set('&uid', $scope.user.uid);
@@ -115,15 +115,15 @@ function TorrentsCtrl($http, $scope, $window, Analytics) {
             console.log('getTorrents', response.data)
             return true;
         });
-    }
+    };
     $scope.download = function (val) {
         console.log('downloading', val);
         Analytics.trackEvent('torrent', 'download', val.Name);
         var url = val.Links.filter(link => link.Item2.startsWith('magnet:'));
         if (url.length > 0)
             $window.open(url[0].Item2, '_self');
-    }
-}
+    };
+};
 
 function ProductsCtrl($http, $scope, Analytics) {
     $scope.minimalize = minimalize;
@@ -408,8 +408,8 @@ function ToolsCtrl($scope, $rootScope, $http, Analytics) {
 
     $scope.curlResult = null;
     $scope.curl = function (url, method) {
-        Analytics.trackEvent('tools', 'curl', url);
         $scope.loadingCurl = true;
+        Analytics.trackEvent('tools', 'curl', url);
         if (url.endsWith(".js"))
             $scope.editorOptions.mode = "javascript";
         else if (url.endsWith(".xml"))
@@ -424,13 +424,22 @@ function ToolsCtrl($scope, $rootScope, $http, Analytics) {
             .then(
                 function (response) {
                     // success callback
-                    switch($scope.editorOptions.mode){
+                    switch ($scope.editorOptions.mode) {
                         case "javascript":
-                            $scope.curlResult = js_beautify(response.data, { indent_size: 2, space_in_empty_paren: true });
+                            $scope.curlResult = js_beautify(response.data, {
+                                indent_size: 2,
+                                space_in_empty_paren: true
+                            });
                         case "css":
-                            $scope.curlResult = css_beautify(response.data, { indent_size: 2, space_in_empty_paren: true });
+                            $scope.curlResult = css_beautify(response.data, {
+                                indent_size: 2,
+                                space_in_empty_paren: true
+                            });
                         default:
-                            $scope.curlResult = html_beautify(response.data, { indent_size: 2, space_in_empty_paren: true });                    
+                            $scope.curlResult = html_beautify(response.data, {
+                                indent_size: 2,
+                                space_in_empty_paren: true
+                            });
                     }
                     //console.log('curl ok', response.data);
                 },
@@ -450,7 +459,7 @@ function ToolsCtrl($scope, $rootScope, $http, Analytics) {
         styleActiveLine: true,
         mode: "htmlmixed"
         //,theme:"ambiance"
-    };   
+    };
 }
 
 // End of controllers
@@ -541,9 +550,4 @@ angular
     .filter('capitalize', Capitalize)
     .filter('toArray', toArray)
     .filter('getBrand', getProductBrandType)
-    .filter('getPrice', GetPrice)
-    .filter('to_trusted', ['$sce', function ($sce) {
-        return function (text) {
-            return $sce.trustAsHtml(text);
-        }
-    }]);
+    .filter('getPrice', GetPrice);

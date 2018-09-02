@@ -36,7 +36,7 @@ var httpInterceptor = function ($q, $location) {
     };
 
 function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
-    $urlRouterProvider.otherwise("/index/combustible");
+    $urlRouterProvider.otherwise("/index/main");
 
     $ocLazyLoadProvider.config({
         // Set to true if you want to see what and when is dynamically loaded
@@ -48,6 +48,10 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
             abstract: true,
             url: "/index",
             templateUrl: "views/common/content.html",
+        })
+        .state('index.main', {
+            url: "/main",
+            templateUrl: "views/main.html"
         })
         .state('standalone', {
             abstract: true,
@@ -184,11 +188,6 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
                         {
                             name: 'ui.codemirror',
                             files: ['js/plugins/ui-codemirror/ui-codemirror.min.js']
-                        },
-                        {
-                            serie: true,
-                            name: 'angular-ladda',
-                            files: ['js/plugins/ladda/spin.min.js', 'js/plugins/ladda/ladda.min.js', 'css/plugins/ladda/ladda-themeless.min.css','js/plugins/ladda/angular-ladda.min.js']
                         }
                     ]);
                 }
