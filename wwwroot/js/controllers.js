@@ -386,7 +386,7 @@ function ToolsCtrl($scope, $rootScope, $http, Analytics) {
 
     $scope.telnetResult = [];
     $scope.telnet = function (hostname, port) {;
-        $scope.loadingTelnet=true;
+        $scope.loadingTelnet = true;
         var url = baseApiUrl + "Net/telnet/" + loops + "?hostname=" + hostname + "&port=" + port + "&timeout=2000";
         $http.post(url, null, null)
             .then(
@@ -399,27 +399,36 @@ function ToolsCtrl($scope, $rootScope, $http, Analytics) {
                     // failure callback
                     console.log('fail', response.data);
                 }
-            ).then(function(){
-                $scope.loadingTelnet=false;
+            ).then(function () {
+                $scope.loadingTelnet = false;
             });
     };
 
     $scope.curlResult = null;
     $scope.curl = function (url, method) {
         $scope.loadingCurl = true;
-        if(url.endsWith(".js"))
+        if (url.endsWith(".js"))
             $scope.editorOptions.mode = "javascript";
-        else if(url.endsWith(".xml"))
+        else if (url.endsWith(".xml"))
             $scope.editorOptions.mode = "xml";
+        else if (url.endsWith(".css"))
+            $scope.editorOptions.mode = "css";
         else
             $scope.editorOptions.mode = "htmlmixed";
-        
+
         var url = baseApiUrl + "Net/curl?url=" + url + "&method=" + method + "&timeout=30000&useProxy=false";
         $http.post(url, null, null)
             .then(
                 function (response) {
                     // success callback
-                    $scope.curlResult = response.data;
+                    switch($scope.editorOptions.mode){
+                        case "javascript":
+                            $scope.curlResult = js_beautify(response.data, { indent_size: 2, space_in_empty_paren: true });
+                        case "css":
+                            $scope.curlResult = css_beautify(response.data, { indent_size: 2, space_in_empty_paren: true });
+                        default:
+                            $scope.curlResult = html_beautify(response.data, { indent_size: 2, space_in_empty_paren: true });                    
+                    }
                     //console.log('curl ok', response.data);
                 },
                 function (response) {
@@ -438,7 +447,7 @@ function ToolsCtrl($scope, $rootScope, $http, Analytics) {
         styleActiveLine: true,
         mode: "htmlmixed"
         //,theme:"ambiance"
-    };
+    };   
 }
 
 // End of controllers
