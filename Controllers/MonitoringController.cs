@@ -12,6 +12,7 @@ using JAMTech.Filters;
 
 namespace JAMTech.Controllers
 {
+    [SocialAuth]
     [Route("v1/[controller]")]
     public class MonitoringController : BaseController
     {
@@ -21,7 +22,6 @@ namespace JAMTech.Controllers
         /// <param name="monitors">Collection of monitors configurations</param>
         /// <param name="forUser">This paramemeter is optional and will be completed or validated against access_token</param>
         /// <returns></returns>
-        [GoogleAuth]
         [HttpPost()]
         [Produces(typeof(IEnumerable<Models.UserMonitorConfig>))]
         public async Task<IActionResult> CreateMonitoringTasks([FromBody] List<Models.MonitorConfig> monitors, string forUser=null)
@@ -44,7 +44,6 @@ namespace JAMTech.Controllers
         /// </summary>
         /// <param name="forUser">This paramemeter is optional and will be completed or validated against access_token</param>
         /// <returns></returns>
-        [GoogleAuth]
         [HttpGet()]
         [Produces(typeof(IEnumerable<Models.MonitorConfig>))]
         public async Task<IActionResult> GetMonitoringTasks(string forUser=null)
@@ -60,7 +59,6 @@ namespace JAMTech.Controllers
         /// </summary>
         /// <param name="forUser">This paramemeter is optional and will be completed or validated against access_token</param>
         /// <returns></returns>
-        [GoogleAuth]
         [HttpGet("results")]
         public IActionResult GetResults(string forUser = null, bool onlyErrors=false)
         {

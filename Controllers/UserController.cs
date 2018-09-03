@@ -15,23 +15,20 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace JAMTech.Controllers
 {
+    [SocialAuth]
     [Route("v1/[controller]")]
     public class UserController : BaseController
     {
-        [GoogleAuth]
         [HttpGet()]
         public IActionResult CheckSession()
         {
             return new OkResult();
         }
 
-        [GoogleAuth]
         [HttpGet("me")]
         public IActionResult GetInfo(string userInfo = null)
         {
             return new JsonResult(JsonConvert.DeserializeObject(userInfo));
-        }
-
-        
+        }        
     }
 }

@@ -18,7 +18,7 @@ namespace JAMTech.Filters
     /// If it does contains the header it then will check if the body and query string of the request to find
     /// a rut, finally, it will try to find the rut in the payload of the 
     /// </summary>
-    public class GoogleAuth : ActionFilterAttribute
+    public class SocialAuth : ActionFilterAttribute
     {
         JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
         const string googlePublicKey = "";
@@ -26,7 +26,14 @@ namespace JAMTech.Filters
         public override void OnActionExecuted(ActionExecutedContext context) { }
 
         public override void OnActionExecuting(ActionExecutingContext context)
-        {         
+        {
+            CheckGoogle(context);
+            CheckFacebook(context);
+        }
+
+        private void CheckGoogle(ActionExecutingContext context)
+        {
+            if (GetFromRequest(context, "provider") == "facebook") return;
             try
             {
                 //JWT
@@ -50,7 +57,7 @@ namespace JAMTech.Filters
                             throw new SecurityTokenException("Invalid access token");
                         else
                         {
-                            
+
                             var googleResult = response.Content.ReadAsStringAsync().Result;
                             var result = JsonConvert.DeserializeObject<dynamic>(googleResult);
 
@@ -74,14 +81,61 @@ namespace JAMTech.Filters
                 }
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 context.Result = new ContentResult()
                 {
                     StatusCode = StatusCodes.Status401Unauthorized,
                     Content = "GoogleAuth failed. " + ex.Message
                 };
-            }               
+            }
+        }
+
+        private void CheckFacebook(ActionExecutingContext context)
+        {
+            if (GetFromRequest(context, "provider") == "google") return;
+            try
+            {
+                //Access token
+                var token = GetFromRequest(context, "access_token");
+                var uid = GetFromRequest(context, uidFieldName);
+                if (token != string.Empty)
+                {
+                    //check if token is valid
+                    var response = Helpers.Net.GetResponse("https://graph.facebook.com/me?access_token=" + token).Result;
+                    if (!response.IsSuccessStatusCode)
+                        throw new SecurityTokenException("Invalid access token");
+                    else
+                    {
+                        var facebookResult = response.Content.ReadAsStringAsync().Result;
+                        var result = JsonConvert.DeserializeObject<dynamic>(facebookResult);
+
+                        // validate parameter uid against google uid
+                        if (!string.IsNullOrEmpty(uid))
+                        {
+                            if (uid != result.id.ToString())
+                                throw new SecurityTokenException("Invalid user id");
+                        }
+                        else
+                        {
+                            //add user info to request
+                            context.ActionArguments[uidFieldName] = result.id.ToString();
+                            context.ActionArguments["userInfo"] = facebookResult;
+                        }
+                    }
+                }
+                else
+                    throw new SecurityTokenException("Access token missing");
+
+            }
+            catch (Exception ex)
+            {
+                context.Result = new ContentResult()
+                {
+                    StatusCode = StatusCodes.Status401Unauthorized,
+                    Content = "FacebookAuth failed. " + ex.Message
+                };
+            }
         }
 
         private T GetFromBody<T>(ActionExecutingContext context, string key)
