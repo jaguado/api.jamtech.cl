@@ -10,7 +10,7 @@
         <brand></brand>
         <ol class="breadcrumb">
             <li>
-                <a ng-click="minimalize()">Inicio</a>
+                <a ui-sref="index.main">Inicio</a>
             </li>
             <li class="active">
                 <strong>Buscador de estaciones de combustible</strong>
@@ -154,11 +154,6 @@
                     <div class="col-sm-12">
                         <!-- Stations Grid -->
                         <div ng-include="gridTemplate.url"></div>
-                        <small class="pull-right" ng-show="stations!=null">
-                            <b>{{stations.length}}</b> {{stations.length>1 ? 'estaciones' : 'estaci&oacute;n'}} encontrada{{stations.length>1
-                            ? 's': ''}} en un radio de
-                            <b>{{maxDistance}}</b> metros
-                        </small>
                     </div>
                 </div>
             </div>

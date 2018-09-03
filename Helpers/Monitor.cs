@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
 using static JAMTech.Models.MonitorConfig;
 
-namespace JAMTech
+namespace JAMTech.Helpers
 {
-    public class Monitor:IDisposable
+    public class Monitor : IDisposable
     {
+        public int ResultsLimit { get; }
+        public Models.MonitorConfig Config { get; }
+        public int resultCount = 0;
+        public string Uid { get; }
         readonly string _url;
         readonly AvailableMethods _method;
         readonly int _interval;
@@ -16,28 +21,34 @@ namespace JAMTech
         readonly string _expectResponseBodyContains;
         internal bool _exit=false;
         private Thread _monitoringThread;
-        public List<Tuple<DateTime, bool, string>> Results = new List<Tuple<DateTime, bool, string>>();
+        public Models.MonitorResult[] Results;
 
-        public Monitor(Models.MonitorConfig config)
+        public Monitor(Models.MonitorConfig config, string uid, int resultsLimit = 50)
         {
+            Config = config;
+            Uid = uid;
             _url = config.Url;
             _method = config.Method;
             _interval = config.Interval;
             _expectedStatusCode = config.ExpectedStatusCode;
             _expectResponseBodyContains = config.ExpectedResponseBodyContains;
+            ResultsLimit = resultsLimit;
+            if(ResultsLimit>0)
+                Results = new Models.MonitorResult[ResultsLimit];
         }
 
         public void Start()
         {
-            _monitoringThread = new Thread(Run);
-            _monitoringThread.Start();
+            if (_monitoringThread == null)
+            {
+                _monitoringThread = new Thread(Run);
+                _monitoringThread.Start();
+            }
         }
 
         public void Dispose()
         {
             _exit = true;
-            if (_monitoringThread != null)
-                _monitoringThread.Abort();
             _monitoringThread = null;              
         }
 
@@ -48,6 +59,7 @@ namespace JAMTech
             {
                 Thread.Sleep(_interval);
 
+                var timer = Stopwatch.StartNew();
                 //check status
                 HttpResponseMessage response = null;
                 try
@@ -66,6 +78,7 @@ namespace JAMTech
                 {
                     //TODO log ex and trigger notifications, alerts, etc..
                 }
+                timer.Stop();
                 if (response != null)
                 {
                     var errMsg = "";
@@ -74,8 +87,13 @@ namespace JAMTech
                     if (_expectResponseBodyContains != null && _expectResponseBodyContains != "" && !response.Content.ReadAsStringAsync().Result.Contains(_expectResponseBodyContains))
                         errMsg += "Invalid response body." + Environment.NewLine;
 
-                    //Results.Add(new Tuple<DateTime, bool, string>(DateTime.Now, errMsg == string.Empty, errMsg));
-                    Console.WriteLine((errMsg == string.Empty ? "OK" : "ERR") + $" - Monitoring '{_url}' at {DateTime.Now}");
+                    if (ResultsLimit > 0)
+                    {
+                        if (resultCount > ResultsLimit - 1)
+                            resultCount = 0;
+                        Results[resultCount++] = new Models.MonitorResult(DateTime.Now, errMsg == string.Empty, errMsg) { Duration = timer.ElapsedMilliseconds };
+                    }
+                    Console.WriteLine((errMsg == string.Empty ? "OK" : "ERR") + $" - Monitoring '{_url}' at {DateTime.Now} - Duration {timer.ElapsedMilliseconds} ms.");
                 }
                 else
                 {

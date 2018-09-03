@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,11 +20,11 @@ namespace JAMTech.Extensions
         public static async Task<IActionResult> GetCollections(string database)
         {
             var url = $"{baseUrl}databases/{database}/collections?apiKey={apiKey}";
-            return await GetStringResultAsync(url);
+            return new OkObjectResult(await Helpers.Http.GetStringAsync<string>(url));
         }
 
         private static WebMarkupMin.Core.CrockfordJsMinifier minifyJs = new WebMarkupMin.Core.CrockfordJsMinifier();
-        public static async Task<IActionResult> ToMongoDB<T>(this IEnumerable<T> collection, bool update=false, bool storeMinified=false)
+        public static async Task<IActionResult> ToMongoDB<T>(this object collection, bool update = false, bool storeMinified = false)
         {
             var collectionName = typeof(T).Name.ToLower();
             var collectionUrl = $"{baseUrl}databases/{defaultDatabase}/collections/{collectionName}?apiKey={apiKey}&m=true&u=true";
@@ -34,7 +36,25 @@ namespace JAMTech.Extensions
                     stringPayload = minified.MinifiedContent;
             }
             var httpContent = new StringContent(stringPayload, Encoding.UTF8, "application/json");
-            
+
+            var response = update ? await Helpers.Net.PutResponse(collectionUrl, httpContent) : await Helpers.Net.PostResponse(collectionUrl, httpContent);
+            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsStringAsync();
+            return new OkObjectResult(content);
+        }
+        public static async Task<IActionResult> ToMongoDB<T>(this IEnumerable<T> collection, bool update = false, bool storeMinified = false)
+        {
+            var collectionName = typeof(T).Name.ToLower();
+            var collectionUrl = $"{baseUrl}databases/{defaultDatabase}/collections/{collectionName}?apiKey={apiKey}&m=true&u=true";
+            var stringPayload = JsonConvert.SerializeObject(collection, Startup.jsonSettings);
+            if (storeMinified)
+            {
+                var minified = minifyJs.Minify(stringPayload, false);
+                if (minified.Errors.Count == 0)
+                    stringPayload = minified.MinifiedContent;
+            }
+            var httpContent = new StringContent(stringPayload, Encoding.UTF8, "application/json");
+
             var response = update ? await Helpers.Net.PutResponse(collectionUrl, httpContent) : await Helpers.Net.PostResponse(collectionUrl, httpContent);
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
@@ -50,14 +70,22 @@ namespace JAMTech.Extensions
             return JsonConvert.DeserializeObject<IEnumerable<T>>(content, Startup.jsonSettings);
         }
 
-        private static async Task<IActionResult> GetStringResultAsync(string url)
+        /// <summary>
+        /// Only returns data of specified user
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="uid"></param>
+        /// <returns></returns>
+        public static async Task<IEnumerable<Y>> FromMongoDB<T, Y>(string uid)
         {
-            using (var response = await Helpers.Net.GetResponse(url))
-            {
-                if (response.IsSuccessStatusCode)
-                    return new OkObjectResult(await response.Content.ReadAsStringAsync());
-            }
-            return new NotFoundResult();
+            var collectionName = typeof(T).Name.ToLower();
+            var collectionUrl = $"{baseUrl}databases/{defaultDatabase}/collections/{collectionName}?apiKey={apiKey}";
+            collectionUrl += "&q={\"uid\": \"" + uid + "\"}";
+            var response = await Helpers.Net.GetResponse(collectionUrl);
+            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsAsync<JArray>();
+            if (content.Count == 0) return null;
+            return content.Select(obj => JsonConvert.DeserializeObject<IEnumerable<Y>>(obj["Data"].ToString(), Startup.jsonSettings)).SelectMany(c=>c);  
         }
     }
 }

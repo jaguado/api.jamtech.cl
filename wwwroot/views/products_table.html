@@ -51,6 +51,9 @@
     <tfoot>
         <tr>
             <td colspan="7">
+                <small ng-show="products!=null">
+                    <b>{{products.length}}</b> producto{{products.length>1 ? 's' : ''}} encontrado{{products.length>1 ? 's'
+                    : ''}}</small>
                 <ul class="pagination pull-right"></ul>
             </td>
         </tr>

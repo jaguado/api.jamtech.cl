@@ -134,6 +134,13 @@ namespace JAMTech
                 Directory.GetFiles(GetXmlCommentsPath(), "*.xml")
                          .ToList()
                          .ForEach(f => c.IncludeXmlComments(f));
+                c.AddSecurityDefinition("Access token", new ApiKeyScheme
+                {
+                    Description = "Google access token",
+                    Name = "access_token",
+                    In = "query",
+                    Type = "apiKey"
+                });
             });
         }
 
@@ -160,6 +167,9 @@ namespace JAMTech
                     }
                     context.Response.Headers.Add("X-Robots-Tag", "noindex");
                     context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+                    context.Response.Headers.Add("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
+                    context.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Access-Control-Allow-Origin, Authorization, X-Requested-With, X-Robots-Tag, Content-Disposition, Origin");
+
                     //add cache headers
                     const int durationInSeconds = 0; // 60 * 60 * 24;
                     if (durationInSeconds == 0)

@@ -10,7 +10,7 @@
         <brand></brand>
         <ol class="breadcrumb">
             <li>
-                <a ng-click="minimalize()">Inicio</a>
+                <a ui-sref="index.main">Inicio</a>
             </li>
             <li class="active">
                 <strong>Buscador de Torrents</strong>
@@ -64,11 +64,9 @@
                 <div class="row">
                     <!-- Torrents Grid -->
                     <div ng-include="gridTemplate.url"></div>
-                    <small class="pull-right" ng-show="torrents!=null">
-                        <b>{{torrents.length}}</b> torrent{{torrents.length>1 ? 's' : ''}} encontrado{{torrents.length>1 ? 's'
-                        : ''}}</small>
                 </div>
             </div>
         </div>
     </div>
+
 </div>

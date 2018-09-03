@@ -11,3 +11,7 @@
  .middle td{
      vertical-align: middle !important;
  }
+
+ .btn-monitor{
+     min-width: 87px;
+ }
