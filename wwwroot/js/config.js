@@ -51,7 +51,16 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         })
         .state('index.main', {
             url: "/main",
-            templateUrl: "views/main.html"
+            templateUrl: "views/main.html",
+            resolve: {
+                loadPlugin: function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            files: ['css/plugins/bootstrapSocial/bootstrap-social.css']
+                        }
+                    ]);
+                }
+            }
         })
         .state('standalone', {
             abstract: true,
@@ -209,7 +218,8 @@ angular
     }])
     .config(function (socialProvider) {
         socialProvider.setGoogleKey("95717972095-f3h0t9hmvd0dhjfqctoe39qlsupbrmou.apps.googleusercontent.com");
-        //socialProvider.setLinkedInKey("YOUR LINKEDIN CLIENT ID");
+        socialProvider.setLinkedInKey("77es90vl6bc7gi");
+        socialProvider.setFbKey({appId: "277009742922752", apiVersion: "v3.1"});
     })
     .config(function ($httpProvider) {
         $httpProvider.interceptors.push(httpInterceptor);

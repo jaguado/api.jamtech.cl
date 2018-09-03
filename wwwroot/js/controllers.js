@@ -13,9 +13,13 @@ function minimalize() {
 }
 
 function MainCtrl($scope, $rootScope, $http, $interval, Analytics, socialLoginService) {
+    
+    
+
     $scope.sessiontimer = null;
     $scope.user = localStorage.getItem('user') != null ? JSON.parse(localStorage.getItem('user')) : null;
-
+    this.helloText = 'Bienvenido a JAMTech.cl'
+    this.descriptionText = '';
     $scope.checkSession = function () {
         if ($scope.user != null) {
             console.log('checking session');
@@ -38,8 +42,6 @@ function MainCtrl($scope, $rootScope, $http, $interval, Analytics, socialLoginSe
     if ($scope.user != null) {
         console.log('user logged in', $scope.user.name, $scope.user);
     }
-    this.helloText = 'Welcome to JAM Tech.cl';
-    this.descriptionText = '';
     $scope.minimalize = function () {
         if (!$("body").hasClass("mini-navbar")) {
             $("body").toggleClass("mini-navbar");
