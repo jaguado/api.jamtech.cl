@@ -13,15 +13,12 @@ function minimalize() {
 }
 
 function MainCtrl($scope, $rootScope, $http, $interval, Analytics, socialLoginService) {
-    
-    
-
     $scope.sessiontimer = null;
     $scope.user = localStorage.getItem('user') != null ? JSON.parse(localStorage.getItem('user')) : null;
     this.helloText = 'Bienvenido a JAMTech.cl'
     this.descriptionText = '';
     $scope.checkSession = function () {
-        if ($scope.user != null) {
+        if ($scope.user != null && $scope.user.provider=="google") {
             console.log('checking session');
             var url = baseApiUrl + "User?access_token=" + $scope.user.token;
             //get stations from api.jamtech.cl

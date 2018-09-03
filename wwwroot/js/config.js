@@ -219,7 +219,7 @@ angular
     .config(function (socialProvider) {
         socialProvider.setGoogleKey("95717972095-f3h0t9hmvd0dhjfqctoe39qlsupbrmou.apps.googleusercontent.com");
         socialProvider.setLinkedInKey("77es90vl6bc7gi");
-        socialProvider.setFbKey({appId: "277009742922752", apiVersion: "v3.1"});
+        socialProvider.setFbKey({appId: "277009742922752", apiVersion: "v2.4"});
     })
     .config(function ($httpProvider) {
         $httpProvider.interceptors.push(httpInterceptor);
