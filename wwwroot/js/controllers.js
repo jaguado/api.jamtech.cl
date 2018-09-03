@@ -18,9 +18,9 @@ function MainCtrl($scope, $rootScope, $http, $interval, Analytics, socialLoginSe
     this.helloText = 'Bienvenido a JAMTech.cl'
     this.descriptionText = '';
     $scope.checkSession = function () {
-        if ($scope.user != null && $scope.user.provider=="google") {
+        if ($scope.user != null && ($scope.user.provider=="google" || $scope.user.provider=="facebook")) {
             console.log('checking session');
-            var url = baseApiUrl + "User?access_token=" + $scope.user.token;
+            var url = baseApiUrl + "User?access_token=" + $scope.user.token + '&provider=' + $scope.user.provider;
             //get stations from api.jamtech.cl
             return $http.get(url).then(function (response) {
                 //console.log('status code', response.status);
@@ -67,14 +67,14 @@ function MainCtrl($scope, $rootScope, $http, $interval, Analytics, socialLoginSe
                             idToken: < google idToken >
             };
         */
-        $scope.$apply(function () {
-            $scope.user = userDetails;
-            localStorage.setItem('user', JSON.stringify($scope.user));
-            $scope.sessiontimer = $interval($scope.checkSession, sessionCheckInterval);
-        });
+
+
         // Set the User Id
+        $scope.user = userDetails;
+        localStorage.setItem('user', JSON.stringify($scope.user));
         Analytics.set('&uid', $scope.user.uid);
         Analytics.trackEvent('aio', 'auth', $scope.user.provider);
+        $scope.sessiontimer = $interval($scope.checkSession, sessionCheckInterval);
         console.log('social-sign-in-success', $scope.user);
     });
     $rootScope.$on('event:social-sign-out-success', function (event, logoutStatus) {
