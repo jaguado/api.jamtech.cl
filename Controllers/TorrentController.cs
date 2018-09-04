@@ -56,7 +56,7 @@ namespace JAMTech.Controllers
         public async Task<IActionResult> GetDual(string search, int pages = 1, bool skipLinks = false)
         {
             var torrentPagesTasks = new List<Task<List<TorrentResult>>>();
-            torrentPagesTasks.AddRange(Enumerable.Range(1, pages).Select(page => FindTPBTorrentsAsync(search, page, skipLinks)));
+            torrentPagesTasks.AddRange(Enumerable.Range(1, pages).Select(page => FindZTorrentsAsync(search, page, skipLinks)));
             torrentPagesTasks.AddRange(Enumerable.Range(1, pages).Select(page => FindOtherTorrentsAsync(search, page, skipLinks)));
 
             await Task.WhenAll(torrentPagesTasks);
@@ -230,6 +230,90 @@ namespace JAMTech.Controllers
             using (var response = await Net.GetResponse(otherBaseUrl + url, null, defaultTimeout))
             {
                 if(response.IsSuccessStatusCode)
+                    source = await response.Content.ReadAsStringAsync();
+                else
+                    Console.WriteLine("Error getting download link from " + url);
+            }
+
+            if (string.IsNullOrEmpty(source)) return null;
+
+            var htmlDoc = new HtmlDocument();
+            htmlDoc.LoadHtml(source);
+
+            //Parse results
+            var link = htmlDoc.DocumentNode.Descendants("a")
+                                           .Where(e => e.Attributes["href"] != null)
+                                           .Select(e => e.Attributes["href"].Value)
+                                           .Where(href => href.StartsWith("magnet:"));
+            if (link.Any())
+            {
+                var magnet = WebUtility.HtmlDecode(link.First());
+                return magnet.Substring(0, magnet.IndexOf('&'));
+            }
+            return null;
+        }
+
+
+        private const string rarbgBaseUrl = "https://torrentz2.eu/search?f={0}&p={1}";
+        private static Uri rarbgReferrer = new Uri("https://torrentz2.eu");
+        private static string userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36";
+        private static string cookie = "_cfduid=d9143bee98a245d97ac3dffe37e103cab1535342580; cf_clearance=2558b03de3b7d321aee33debe89d24975b21a123-1536021937-86400-150";
+        private static async Task<List<TorrentResult>> FindZTorrentsAsync(string movie, int page, bool skipLinks)
+        {
+            try
+            {
+                var url = string.Format(rarbgBaseUrl, movie, page);
+                using (var response = await Net.GetResponse(url, rarbgReferrer, defaultTimeout, userAgent, cookie))
+                {
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var source = await response.Content.ReadAsStringAsync();
+                        return GetRarbgTorrents(source, page);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new TimeoutException(ex.Message, ex.InnerException);
+            }
+            return null;
+        }
+        private static List<TorrentResult> GetRarbgTorrents(string source, int page)
+        {
+            if (string.IsNullOrEmpty(source)) return null;
+
+            var torrentResults = new List<TorrentResult>();
+            var htmlDoc = new HtmlDocument();
+            htmlDoc.LoadHtml(source);
+
+            //Parse results
+            var resultsTable = htmlDoc.DocumentNode.Descendants().Where
+                    (x => (x.Name == "div" && x.Attributes["class"] != null &&
+                       x.Attributes["class"].Value.Equals("results"))).ToList();
+            resultsTable.ForEach(results =>
+            {
+                var rows = results.Descendants("dl").ToList(); //skip header
+                rows.ForEach(row =>
+                {
+                    torrentResults.Add(new TorrentResult()
+                    {
+                        Page = page,
+                        Name = row.ChildNodes[0].FirstChild.InnerText,
+                        Seeds = int.Parse(row.ChildNodes[1].ChildNodes[3].InnerText),
+                        Leeds = int.Parse(row.ChildNodes[1].ChildNodes[4].InnerText),
+                        Description = new List<string>() { "Date: " + row.ChildNodes[1].ChildNodes[1].InnerText, "Size: " + row.ChildNodes[1].ChildNodes[2].InnerText},
+                        Link = row.ChildNodes[0].FirstChild.Attributes[0].Value,
+                    });
+                });
+            });
+            return torrentResults;
+        }
+        private static async Task<string> GetZDownloadLink(string url)
+        {
+            var source = string.Empty;
+            using (var response = await Net.GetResponse(otherBaseUrl + url, null, defaultTimeout))
+            {
+                if (response.IsSuccessStatusCode)
                     source = await response.Content.ReadAsStringAsync();
                 else
                     Console.WriteLine("Error getting download link from " + url);
