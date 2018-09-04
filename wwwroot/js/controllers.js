@@ -1,7 +1,7 @@
 var mocksBaseApiUrl = '//aio.jamtech.cl/mocks/torrents.json'
 var baseApiUrl = '//aio.jamtech.cl/v1/';
 var defaultPages = 2;
-var sessionCheckInterval = 30000;
+var sessionCheckInterval = 60000 * 5; //5 minutes
 var loops = 5;
 
 function minimalize() {
@@ -76,13 +76,17 @@ function MainCtrl($scope, $rootScope, $http, $interval, Analytics, socialLoginSe
         Analytics.trackEvent('aio', 'auth', $scope.user.provider);
         $scope.sessiontimer = $interval($scope.checkSession, sessionCheckInterval);
         console.log('social-sign-in-success', $scope.user);
+
+        $scope.$apply(function () {
+            $scope.user = userDetails;
+        });
     });
     $rootScope.$on('event:social-sign-out-success', function (event, logoutStatus) {
         //logout ok
         $scope.sessiontimer = null;
         $scope.user = null;
         localStorage.setItem('user', $scope.user);
-        console.log('social-sign-out-success', logoutStatus);
+        console.log('social-sign-out-success');
     });
 };
 
