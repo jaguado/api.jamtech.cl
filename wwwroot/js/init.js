@@ -1,4 +1,4 @@
-if (document.location.hostname!=="localhost" && document.location.protocol!=="https:"){
+if (document.location.hostname!=="localhost"){
     document.location = "https://aio.jamtech.cl" + document.location.pathname;
 }
 else
