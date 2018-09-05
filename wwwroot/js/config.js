@@ -36,7 +36,7 @@ var httpInterceptor = function ($q, $location) {
     };
 
 function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
-    $urlRouterProvider.otherwise("/index/main");
+    $urlRouterProvider.otherwise("/index/tools");
 
     $ocLazyLoadProvider.config({
         // Set to true if you want to see what and when is dynamically loaded
@@ -51,6 +51,19 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         })
         .state('index.main', {
             url: "/main",
+            templateUrl: "views/main.html",
+            resolve: {
+                loadPlugin: function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            files: ['css/plugins/bootstrapSocial/bootstrap-social.css']
+                        }
+                    ]);
+                }
+            }
+        })
+        .state('login', {
+            url: "/login",
             templateUrl: "views/main.html",
             resolve: {
                 loadPlugin: function ($ocLazyLoad) {

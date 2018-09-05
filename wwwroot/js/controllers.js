@@ -53,7 +53,7 @@ function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, so
 
     $scope.logoff = function () {
         socialLoginService.logout();
-        $location.path("/");
+        $location.path("/login");
     };
 
     $rootScope.$on('event:social-sign-in-success', function (event, userDetails) {
@@ -81,6 +81,7 @@ function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, so
         $scope.$apply(function () {
             $scope.user = userDetails;
         });
+        $location.path("/");
     });
     $rootScope.$on('event:social-sign-out-success', function (event, logoutStatus) {
         //logout ok
