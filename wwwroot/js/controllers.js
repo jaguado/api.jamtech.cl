@@ -3,6 +3,7 @@ var baseApiUrl = '//aio.jamtech.cl/v1/';
 var defaultPages = 2;
 var sessionCheckInterval = 60000 * 5; //5 minutes
 var loops = 5;
+var loginPath="/login";
 
 function minimalize() {
     if (!$("body").hasClass("mini-navbar")) {
@@ -30,6 +31,7 @@ function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, so
                 $scope.sessiontimer = null;
                 localStorage.setItem('user', $scope.user);
                 console.log('session invalidated');
+                $location.path(loginPath);
                 return false;
             });
         };
@@ -39,6 +41,10 @@ function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, so
     if ($scope.user != null) {
         console.log('user logged in', $scope.user.name, $scope.user);
     }
+    else
+        if($location.path!=loginPath)
+            $location.path(loginPath);
+
     $scope.minimalize = function () {
         if (!$("body").hasClass("mini-navbar")) {
             $("body").toggleClass("mini-navbar");
