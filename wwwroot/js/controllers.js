@@ -12,7 +12,7 @@ function minimalize() {
     }
 }
 
-function MainCtrl($scope, $rootScope, $http, $interval, Analytics, socialLoginService) {
+function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, socialLoginService) {
     $scope.sessiontimer = null;
     $scope.user = localStorage.getItem('user') != null ? JSON.parse(localStorage.getItem('user')) : null;
     this.helloText = 'Bienvenido a JAMTech.cl'
@@ -53,6 +53,7 @@ function MainCtrl($scope, $rootScope, $http, $interval, Analytics, socialLoginSe
 
     $scope.logoff = function () {
         socialLoginService.logout();
+        $location.path("/");
     };
 
     $rootScope.$on('event:social-sign-in-success', function (event, userDetails) {

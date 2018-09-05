@@ -42,7 +42,7 @@
 <script src="js/init.js"></script>
 <!-- ControllerAs syntax -->
 <!-- Main controller with serveral data used in Inspinia theme on diferent view -->
-<body ng-controller="MainCtrl as main" class="mini-navbar" >
+<body ng-controller="MainCtrl as main" ng-class="user!=null ? 'mini-navbar' : ''" >
 <!-- Main view  -->
 <div ui-view></div>
 <!-- jQuery and Bootstrap -->
