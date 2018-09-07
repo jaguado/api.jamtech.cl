@@ -6,6 +6,7 @@ namespace JAMTech.Models
 {
     public class MonitorConfig
     {
+        public string Name { get; set; }
         public string Url { get; set; }
         public AvailableMethods Method { get; set; }
         public int Interval { get; set; }
