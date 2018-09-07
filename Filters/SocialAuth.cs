@@ -23,12 +23,16 @@ namespace JAMTech.Filters
         JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
         const string googlePublicKey = "";
         const string uidFieldName = "forUser";
+        private static readonly bool checkAuth = Environment.GetEnvironmentVariable("disableAuth") == null || bool.Parse(Environment.GetEnvironmentVariable("disableAuth")) == false;
         public override void OnActionExecuted(ActionExecutedContext context) { }
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            CheckGoogle(context);
-            CheckFacebook(context);
+            if (checkAuth)
+            {
+                CheckGoogle(context);
+                CheckFacebook(context);
+            }
         }
 
         private void CheckGoogle(ActionExecutingContext context)
