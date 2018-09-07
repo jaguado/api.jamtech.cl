@@ -46,7 +46,7 @@ namespace JAMTech.Controllers
 
         // GET: api/Torrent/movie
         /// <summary>
-        /// Allow to search for a torrent on TPB
+        /// Allow to search for a torrent on ZTorrents and other torrents files
         /// </summary>
         /// <param name="search">word to search</param>
         /// <param name="pages">max pages count</param>
@@ -56,8 +56,8 @@ namespace JAMTech.Controllers
         public async Task<IActionResult> GetDual(string search, int pages = 1, bool skipLinks = false)
         {
             var torrentPagesTasks = new List<Task<List<TorrentResult>>>();
-            torrentPagesTasks.AddRange(Enumerable.Range(1, pages).Select(page => FindZTorrentsAsync(search, page, skipLinks)));
             torrentPagesTasks.AddRange(Enumerable.Range(1, pages).Select(page => FindOtherTorrentsAsync(search, page, skipLinks)));
+            torrentPagesTasks.AddRange(Enumerable.Range(1, pages).Select(page => FindZTorrentsAsync(search, page, skipLinks)));
 
             await Task.WhenAll(torrentPagesTasks);
             var flattenResult = torrentPagesTasks.Where(t => t.IsCompletedSuccessfully && t.Result != null)
@@ -257,13 +257,13 @@ namespace JAMTech.Controllers
         private const string rarbgBaseUrl = "https://torrentz2.eu/search?f={0}&p={1}";
         private static Uri rarbgReferrer = new Uri("https://torrentz2.eu");
         private static string userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36";
-        private static string cookie = "_cfduid=d9143bee98a245d97ac3dffe37e103cab1535342580; cf_clearance=2558b03de3b7d321aee33debe89d24975b21a123-1536021937-86400-150";
+        private static string zTorrentsCookie = Environment.GetEnvironmentVariable("zTorrentsCookie") ?? throw new ApplicationException("zTorrentsCookie variable missing");
         private static async Task<List<TorrentResult>> FindZTorrentsAsync(string movie, int page, bool skipLinks)
         {
             try
             {
                 var url = string.Format(rarbgBaseUrl, movie, page);
-                using (var response = await Net.GetResponse(url, rarbgReferrer, defaultTimeout, userAgent, cookie))
+                using (var response = await Net.GetResponse(url, rarbgReferrer, defaultTimeout, userAgent, zTorrentsCookie))
                 {
                     if (response.IsSuccessStatusCode)
                     {
