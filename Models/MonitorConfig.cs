@@ -12,6 +12,10 @@ namespace JAMTech.Models
         public int ExpectedStatusCode { get; set; }
         public string ExpectedResponseBodyContains { get; set; }
 
+        public long ErrDuration { get; set; }
+        public long WrnDuration { get; set; }
+
+        public MonitorConfig NextConfig { get; set; }
 
         public enum AvailableMethods
         {
