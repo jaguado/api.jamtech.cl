@@ -102,7 +102,7 @@ function TorrentsCtrl($http, $scope, $window, Analytics) {
     $scope.minimalize = minimalize;
 
     $scope.useMocks = false; //mocks mode
-    var searchUrl = baseApiUrl + 'Torrent?skipLinks=false&pages=' + defaultPages + '&search=';
+    var searchUrl = baseApiUrl + '../v2/Torrent?skipLinks=false&pages=' + defaultPages + '&search=';
     $scope.availableTorrentsTemplates = [{
         "name": "Table",
         "url": "views/torrents_table.html",

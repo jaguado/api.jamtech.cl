@@ -36,7 +36,7 @@ var httpInterceptor = function ($q, $location) {
     };
 
 function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
-    $urlRouterProvider.otherwise("/index/tools");
+    $urlRouterProvider.otherwise("/index/dashboard");
 
     $ocLazyLoadProvider.config({
         // Set to true if you want to see what and when is dynamically loaded
@@ -61,6 +61,10 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
                     ]);
                 }
             }
+        })
+        .state('index.dashboard', {
+            url: "/dashboard",
+            templateUrl: "views/minor.html"
         })
         .state('login', {
             url: "/login",
