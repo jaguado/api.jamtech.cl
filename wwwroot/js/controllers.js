@@ -39,11 +39,18 @@ function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, so
 
     $scope.checkSession();
     if ($scope.user != null) {
-        console.log('user logged in', $scope.user.name, $scope.user);
+        console.log('user logged in', $scope.user.name, $scope.user); 
+        if($location.path()==loginPath){
+            $location.path("/");
+        }
     }
     else
-        if($location.path!=loginPath)
+    {
+        
+        if($location.path!==loginPath){
             $location.path(loginPath);
+        }
+    }
 
     $scope.minimalize = function () {
         if (!$("body").hasClass("mini-navbar")) {
@@ -59,22 +66,13 @@ function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, so
 
     $scope.logoff = function () {
         socialLoginService.logout();
-        $location.path("/login");
+        $scope.user=null;
+        localStorage.setItem('user', $scope.user);
+        $location.path(loginPath);
     };
 
     $rootScope.$on('event:social-sign-in-success', function (event, userDetails) {
-        /*  Login ok
-            userDetails = {
-                            name: <user_name>, 
-                            email: <user_email>, 
-                            imageUrl: <image_url>, 
-                            uid: <UID by social vendor>, 
-                            provider: <Google/Facebook/LinkedIN>, 
-                            token: < accessToken for Facebook & google, no token for linkedIN>}, 
-                            idToken: < google idToken >
-            };
-        */
-
+        /*  Login ok */
 
         // Set the User Id
         $scope.user = userDetails;
@@ -83,10 +81,12 @@ function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, so
         Analytics.trackEvent('aio', 'auth', $scope.user.provider);
         $scope.sessiontimer = $interval($scope.checkSession, sessionCheckInterval);
         console.log('social-sign-in-success', $scope.user);
-
-        $scope.$apply(function () {
-            $scope.user = userDetails;
-        });
+        
+        if($scope.user.provider==="google"){
+            $scope.$apply(function () {
+                $scope.user = userDetails;
+            });
+        }
         $location.path("/");
     });
     $rootScope.$on('event:social-sign-out-success', function (event, logoutStatus) {
@@ -95,6 +95,7 @@ function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, so
         $scope.user = null;
         localStorage.setItem('user', $scope.user);
         console.log('social-sign-out-success');
+        $location.path(loginPath);
     });
 };
 

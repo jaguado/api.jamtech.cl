@@ -2,9 +2,6 @@
     <div class="sidebar-collapse">
         <ul side-navigation class="nav metismenu" id="side-menu">
             <li>
-                <a ng-if="user == null" ui-sref="/login">
-                    <i class="fas fa-sign-in-alt"></i>
-                </a>
                 <a ng-if="user != null" ng-click="logoff()">
                     <i class="fas fa-sign-out-alt"></i>
                 </a>
