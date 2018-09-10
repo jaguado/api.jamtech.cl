@@ -12,10 +12,16 @@
 var httpInterceptor = function ($q, $location) {
         return {
             request: function (config) {//req
-                //add access token
-                //config.url += config.url.contains("?") ? "&" : "?";
-                //config.url += "access_token=blablbla";
-                //console.log('req', config);
+                //add access token if url is from the base api domain
+                if(config.url.startsWith(baseApiUrl)){          
+                    if(!config.url.contains("access_token")){
+                        //console.log('httpInterceptor', 'request', 'adding access token for user', user);
+                        config.url += config.url.contains("?") ? "&" : "?";
+                        config.url += "access_token=" + user.token;
+                        config.url += "&provider=" + user.provider;
+                    }
+                }
+                //console.log('httpInterceptor', 'request', 'baseApiUrl', baseApiUrl);
                 return config;
             },
 

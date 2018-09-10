@@ -3,7 +3,8 @@ var baseApiUrl = '//aio.jamtech.cl/v1/';
 var defaultPages = 2;
 var sessionCheckInterval = 60000 * 5; //5 minutes
 var loops = 5;
-var loginPath="/login";
+var loginPath = "/login";
+var user = localStorage.getItem('user') != null ? JSON.parse(localStorage.getItem('user')) : null;
 
 function minimalize() {
     if (!$("body").hasClass("mini-navbar")) {
@@ -13,23 +14,25 @@ function minimalize() {
     }
 }
 
+
 function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, socialLoginService) {
     $scope.sessiontimer = null;
-    $scope.user = localStorage.getItem('user') != null ? JSON.parse(localStorage.getItem('user')) : null;
     this.helloText = 'Bienvenido a JAMTech.cl'
     this.descriptionText = '';
+    $scope.user = user;
     $scope.checkSession = function () {
-        if ($scope.user != null && ($scope.user.provider=="google" || $scope.user.provider=="facebook")) {
+        if (user != null && (user.provider == "google" || user.provider == "facebook")) {
             console.log('checking session');
-            var url = baseApiUrl + "User?access_token=" + $scope.user.token + '&provider=' + $scope.user.provider;
+            var url = baseApiUrl + "User?access_token=" + user.token + '&provider=' + user.provider;
             //get stations from api.jamtech.cl
             return $http.get(url).then(function (response) {
                 //console.log('status code', response.status);
                 return response.status == 201;
             }, function (response) {
-                $scope.user = null;
+                user = null;
+                $scope.user = user;
                 $scope.sessiontimer = null;
-                localStorage.setItem('user', $scope.user);
+                localStorage.setItem('user', user);
                 console.log('session invalidated');
                 $location.path(loginPath);
                 return false;
@@ -38,16 +41,14 @@ function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, so
     };
 
     $scope.checkSession();
-    if ($scope.user != null) {
-        console.log('user logged in', $scope.user.name, $scope.user); 
-        if($location.path()==loginPath){
+    if (user != null) {
+        console.log('user logged in', user.name, user);
+        if ($location.path() == loginPath) {
             $location.path("/");
         }
-    }
-    else
-    {
-        
-        if($location.path!==loginPath){
+    } else {
+
+        if ($location.path !== loginPath) {
             $location.path(loginPath);
         }
     }
@@ -65,26 +66,25 @@ function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, so
     $scope.sessiontimer = $interval($scope.checkSession, sessionCheckInterval);
 
     $scope.logoff = function () {
+        user = null;
+        $scope.user = user;
+        localStorage.setItem('user', user);
         socialLoginService.logout();
-        $scope.user=null;
-        localStorage.setItem('user', $scope.user);
         $location.path(loginPath);
     };
 
     $rootScope.$on('event:social-sign-in-success', function (event, userDetails) {
         /*  Login ok */
-
-        // Set the User Id
-        $scope.user = userDetails;
-        localStorage.setItem('user', JSON.stringify($scope.user));
-        Analytics.set('&uid', $scope.user.uid);
-        Analytics.trackEvent('aio', 'auth', $scope.user.provider);
+        user = userDetails;
+        $scope.user = user;
+        localStorage.setItem('user', JSON.stringify(user));
+        Analytics.set('&uid', user.uid);
+        Analytics.trackEvent('aio', 'auth', user.provider);
         $scope.sessiontimer = $interval($scope.checkSession, sessionCheckInterval);
-        console.log('social-sign-in-success', $scope.user);
-        
-        if($scope.user.provider==="google"){
+        console.log('social-sign-in-success', user);
+        if (user.provider == "google") {
             $scope.$apply(function () {
-                $scope.user = userDetails;
+                $scope.user = user;
             });
         }
         $location.path("/");
@@ -92,8 +92,9 @@ function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, so
     $rootScope.$on('event:social-sign-out-success', function (event, logoutStatus) {
         //logout ok
         $scope.sessiontimer = null;
-        $scope.user = null;
-        localStorage.setItem('user', $scope.user);
+        user = null;
+        $scope.user = user;
+        localStorage.setItem('user', user);
         console.log('social-sign-out-success');
         $location.path(loginPath);
     });
