@@ -23,6 +23,8 @@ namespace JAMTech.Filters
         JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
         const string googlePublicKey = "";
         const string uidFieldName = "forUser";
+        const string authHeader = "Authorization";
+        const string tokenName = "access_token";
         private static readonly bool checkAuth = Environment.GetEnvironmentVariable("disableAuth") == null || bool.Parse(Environment.GetEnvironmentVariable("disableAuth")) == false;
         public override void OnActionExecuted(ActionExecutedContext context) { }
 
@@ -30,60 +32,27 @@ namespace JAMTech.Filters
         {
             if (checkAuth)
             {
-                CheckGoogle(context);
-                CheckFacebook(context);
+                //Get access token and check state
+                var accessToken = GetFromHeader(context, authHeader);
+                if (accessToken == string.Empty)
+                    accessToken = GetFromRequest(context, tokenName);
+                else
+                    accessToken = accessToken.Replace("Bearer ", "");
+
+                if (string.IsNullOrEmpty(accessToken))
+                    throw new SecurityTokenException("Access token missing");
+                var uid = GetFromRequest(context, uidFieldName);
+                CheckGoogle(context, accessToken, uid);
+                CheckFacebook(context, accessToken, uid);
             }
         }
 
-        private void CheckGoogle(ActionExecutingContext context)
+        private void CheckGoogle(ActionExecutingContext context, string accessToken, string uid)
         {
             if (GetFromRequest(context, "provider") == "facebook") return;
             try
             {
-                //JWT
-                var jwt = JwtHeader(context, "Authorization");
-                if (jwt != null)
-                {
-                    var token = ValidateAndDecode(jwt.Replace("Bearer ", ""), null);
-                    if (!JwtContains(token, "sub", "105560751972558300957")) //TODO get uid from parameters
-                        throw new SecurityTokenException();
-                }
-                else
-                {
-                    //Access token
-                    var token = GetFromRequest(context, "access_token");
-                    var uid = GetFromRequest(context, uidFieldName);
-                    if (token != string.Empty)
-                    {
-                        //check if token is valid
-                        var response = Helpers.Net.GetResponse("https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=" + token).Result;
-                        if (!response.IsSuccessStatusCode)
-                            throw new SecurityTokenException("Invalid access token");
-                        else
-                        {
-
-                            var googleResult = response.Content.ReadAsStringAsync().Result;
-                            var result = JsonConvert.DeserializeObject<dynamic>(googleResult);
-
-                            // validate parameter uid against google uid
-                            if (!string.IsNullOrEmpty(uid))
-                            {
-                                if (uid != result.id.ToString())
-                                    throw new SecurityTokenException("Invalid user id");
-                            }
-                            else
-                            {
-                                //add user info to request
-                                context.ActionArguments[uidFieldName] = result.id.ToString();
-                                context.ActionArguments["userInfo"] = googleResult;
-
-                            }
-                        }
-                    }
-                    else
-                        throw new SecurityTokenException("Access token missing");
-                }
-
+                ValidateAccessTokenWithGoogle(context, accessToken, uid);
             }
             catch (Exception ex)
             {
@@ -95,42 +64,38 @@ namespace JAMTech.Filters
             }
         }
 
-        private void CheckFacebook(ActionExecutingContext context)
+        private static void ValidateAccessTokenWithGoogle(ActionExecutingContext context, string token, string uid)
+        {
+            //check if token is valid
+            const string baseUrl = "https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=";
+            var response = Helpers.Net.GetResponse(baseUrl + token).Result;
+            if (!response.IsSuccessStatusCode)
+                throw new SecurityTokenException("Invalid access token");
+            else
+            {
+                var googleResult = response.Content.ReadAsStringAsync().Result;
+                var result = JsonConvert.DeserializeObject<dynamic>(googleResult);
+                // validate parameter uid against google uid
+                if (!string.IsNullOrEmpty(uid))
+                {
+                    if (uid != result.id.ToString())
+                        throw new SecurityTokenException("Invalid user id");
+                }
+                else
+                {
+                    //add user info to request
+                    context.ActionArguments[uidFieldName] = result.id.ToString();
+                    context.ActionArguments["userInfo"] = googleResult;
+                }
+            }
+        }
+
+        private void CheckFacebook(ActionExecutingContext context, string accessToken, string uid)
         {
             if (GetFromRequest(context, "provider") == "google") return;
             try
             {
-                //Access token
-                var token = GetFromRequest(context, "access_token");
-                var uid = GetFromRequest(context, uidFieldName);
-                if (token != string.Empty)
-                {
-                    //check if token is valid
-                    var response = Helpers.Net.GetResponse("https://graph.facebook.com/me?access_token=" + token).Result;
-                    if (!response.IsSuccessStatusCode)
-                        throw new SecurityTokenException("Invalid access token");
-                    else
-                    {
-                        var facebookResult = response.Content.ReadAsStringAsync().Result;
-                        var result = JsonConvert.DeserializeObject<dynamic>(facebookResult);
-
-                        // validate parameter uid against google uid
-                        if (!string.IsNullOrEmpty(uid))
-                        {
-                            if (uid != result.id.ToString())
-                                throw new SecurityTokenException("Invalid user id");
-                        }
-                        else
-                        {
-                            //add user info to request
-                            context.ActionArguments[uidFieldName] = result.id.ToString();
-                            context.ActionArguments["userInfo"] = facebookResult;
-                        }
-                    }
-                }
-                else
-                    throw new SecurityTokenException("Access token missing");
-
+                ValidateAccessTokenWithFacebook(context, accessToken, uid);
             }
             catch (Exception ex)
             {
@@ -139,6 +104,32 @@ namespace JAMTech.Filters
                     StatusCode = StatusCodes.Status401Unauthorized,
                     Content = "FacebookAuth failed. " + ex.Message
                 };
+            }
+        }
+
+        private static void ValidateAccessTokenWithFacebook(ActionExecutingContext context, string token, string uid)
+        {
+            //check if token is valid
+            var response = Helpers.Net.GetResponse("https://graph.facebook.com/me?access_token=" + token).Result;
+            if (!response.IsSuccessStatusCode)
+                throw new SecurityTokenException("Invalid access token");
+            else
+            {
+                var facebookResult = response.Content.ReadAsStringAsync().Result;
+                var result = JsonConvert.DeserializeObject<dynamic>(facebookResult);
+
+                // validate parameter uid against google uid
+                if (!string.IsNullOrEmpty(uid))
+                {
+                    if (uid != result.id.ToString())
+                        throw new SecurityTokenException("Invalid user id");
+                }
+                else
+                {
+                    //add user info to request
+                    context.ActionArguments[uidFieldName] = result.id.ToString();
+                    context.ActionArguments["userInfo"] = facebookResult;
+                }
             }
         }
 
@@ -152,9 +143,9 @@ namespace JAMTech.Filters
             return context.ActionArguments.ContainsKey(key) ? context.ActionArguments[key].ToString() : context.HttpContext.Request.Query[key].ToString();
         }
 
-        private string JwtHeader(ActionExecutingContext context, string jwtHeaderName = "X-Authenticated-Userid")
+        private string GetFromHeader(ActionExecutingContext context, string headerName = "X-Authenticated-Userid")
         {
-            return context.HttpContext.Request.Headers[jwtHeaderName];
+            return context.HttpContext.Request.Headers[headerName];
         }
 
         private bool JwtContains(JwtSecurityToken token, string key, string value)
