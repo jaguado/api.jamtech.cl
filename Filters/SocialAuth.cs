@@ -33,7 +33,7 @@ namespace JAMTech.Filters
             if (checkAuth)
             {
                 //Get access token and check state
-                var accessToken = GetFromHeader(context, authHeader);
+                var accessToken = GetFromHeader(context, authHeader) ?? string.Empty;
                 if (accessToken == string.Empty)
                     accessToken = GetFromRequest(context, tokenName);
                 else
