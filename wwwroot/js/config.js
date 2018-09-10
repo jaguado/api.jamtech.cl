@@ -70,7 +70,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         })
         .state('index.dashboard', {
             url: "/dashboard",
-            templateUrl: "views/minor.html"
+            templateUrl: "views/dashboard.html"
         })
         .state('login', {
             url: "/login",

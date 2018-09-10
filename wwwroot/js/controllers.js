@@ -5,6 +5,7 @@ var sessionCheckInterval = 60000 * 5; //5 minutes
 var loops = 5;
 var loginPath = "/login";
 var user = localStorage.getItem('user') != null ? JSON.parse(localStorage.getItem('user')) : null;
+var visibleDataRefreshInterval = 60000 * .5; //30 seconds
 
 function minimalize() {
     if (!$("body").hasClass("mini-navbar")) {
@@ -14,6 +15,23 @@ function minimalize() {
     }
 }
 
+function DashboardCtrl($scope, $rootScope, $http, $interval, $location, Analytics, socialLoginService) {
+    $scope.sensors = null;
+    $scope.refreshSensors = function () {
+        var url = baseApiUrl + "Monitoring/results?onlyErrors=false";
+        return $http.get(url).then(function (response) {
+            //console.log('status code', response.status);
+            $scope.sensors = response.data;
+            console.log('sensors', $scope.sensors);
+            return response.status == 200;
+        }, function (response) {
+            console.log('err', response);
+            return false;
+        });
+    };
+    $scope.refreshSensors();
+    $scope.sensorsTimer = $interval($scope.refreshSensors, visibleDataRefreshInterval);
+}
 
 function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, socialLoginService) {
     $scope.sessiontimer = null;
@@ -23,7 +41,7 @@ function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, so
     $scope.checkSession = function () {
         if (user != null && (user.provider == "google" || user.provider == "facebook")) {
             console.log('checking session');
-            var url = baseApiUrl + "User?access_token=" + user.token + '&provider=' + user.provider;
+            var url = baseApiUrl + "User";
             //get stations from api.jamtech.cl
             return $http.get(url).then(function (response) {
                 //console.log('status code', response.status);
@@ -81,7 +99,7 @@ function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, so
         Analytics.set('&uid', user.uid);
         Analytics.trackEvent('aio', 'auth', user.provider);
         $scope.sessiontimer = $interval($scope.checkSession, sessionCheckInterval);
-        console.log('social-sign-in-success', user);
+        console.log('social-sign-in-success');
         if (user.provider == "google") {
             $scope.$apply(function () {
                 $scope.user = user;
@@ -560,6 +578,7 @@ angular
     .controller('ProductsCtrl', ProductsCtrl)
     .controller('TorrentsCtrl', TorrentsCtrl)
     .controller('ToolsCtrl', ToolsCtrl)
+    .controller('DashboardCtrl', DashboardCtrl)
     .filter('capitalize', Capitalize)
     .filter('toArray', toArray)
     .filter('getBrand', getProductBrandType)
