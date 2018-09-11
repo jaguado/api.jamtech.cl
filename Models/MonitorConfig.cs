@@ -16,6 +16,8 @@ namespace JAMTech.Models
         public long ErrDuration { get; set; }
         public long WrnDuration { get; set; }
 
+        public DateTime CreationDate { get; set; }
+
         public MonitorConfig NextConfig { get; set; }
 
         public enum AvailableMethods
