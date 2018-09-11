@@ -25,7 +25,7 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, Analytic
         return $http.get(url).then(function (response) {
             //console.log('status code', response.status);
             $scope.sensors = response.data;
-            console.log('sensors', $scope.sensors);
+            //console.log('sensors', $scope.sensors);
             return response.status == 200;
         }, function (response) {
             console.log('err', response);
@@ -36,6 +36,7 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, Analytic
     $scope.sensorsTimer = $interval($scope.refreshSensors, visibleDataRefreshInterval);
 
     $scope.selectSensor = function (sensor) {
+        Analytics.trackEvent('dashboard', 'viewSensor', sensor.Config.Name);
         if ($scope.selectedSensor != sensor) {
             $scope.selectedSensor = sensor;
             $scope.selectedSensorData = {
@@ -158,6 +159,7 @@ function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, so
         user = null;
         $scope.user = user;
         localStorage.setItem('user', user);
+        Analytics.set('&uid', null);
         console.log('social-sign-out-success');
         $location.path(loginPath);
     });
