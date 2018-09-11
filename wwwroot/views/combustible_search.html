@@ -48,12 +48,12 @@
                                     </button>
                                     <ul role="menu" uib-dropdown-menu="" class="dropdown-menu">
                                         <li ng-repeat="region in regions" ng-model="region">
-                                            <a href="#" ng-click="setRegion(region)">
+                                            <a ng-click="setRegion(region)">
                                                 {{region.nombre}}
                                             </a>
                                         </li>
                                         <li class="divider"></li>
-                                        <li><a href="#" ng-click="setRegion(null)">All</a></li>
+                                        <li><a ng-click="setRegion(null)">All</a></li>
                                     </ul>
                                 </div>
                             </div>

@@ -15,3 +15,11 @@
  .btn-monitor{
      min-width: 87px;
  }
+
+ .btn-login{
+     margin-bottom: 5px;
+ }
+
+ .centered td, th {
+    text-align: center !important;
+ }

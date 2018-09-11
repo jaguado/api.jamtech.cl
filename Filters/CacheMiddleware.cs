@@ -73,37 +73,41 @@ namespace JAMTech.Filters
             var minifyHtml = new WebMarkupMin.Core.HtmlMinifier();
             files.ForEach(file =>
             {
-                //compress or minify
+                
                 var content = File.ReadAllBytes(file);
                 var ext = Path.GetExtension(file);
-                switch (ext)
+                //compress or minify
+                if (Environment.GetEnvironmentVariable("minifyResponse") != "false")
                 {
-                    case ".js":
-                        //javascript minify
-                        var js = System.Text.UTF8Encoding.Default.GetString(content);
-                        var minifiedJs = minifyJs.Minify(js, false);
-                        if (!minifiedJs.Errors.Any())
-                            content = System.Text.UTF8Encoding.Default.GetBytes(minifiedJs.MinifiedContent);
-                        break;
-                    case ".css":
-                        //css minify
-                        var css = System.Text.UTF8Encoding.Default.GetString(content);
-                        var minifiedCss = minifyCss.Minify(css, false);
-                        if (!minifiedCss.Errors.Any())
-                            content = System.Text.UTF8Encoding.Default.GetBytes(minifiedCss.MinifiedContent);
-                        break;
-                    case ".html":
-                        //html minify
-                        var html = System.Text.UTF8Encoding.Default.GetString(content);
-                        var minifiedHtml = minifyHtml.Minify(html, false);
-                        if (!minifiedHtml.Errors.Any())
-                            content = System.Text.UTF8Encoding.Default.GetBytes(minifiedHtml.MinifiedContent);
-                        break;
+                    switch (ext)
+                    {
+                        case ".js":
+                            //javascript minify
+                            var js = System.Text.UTF8Encoding.Default.GetString(content);
+                            var minifiedJs = minifyJs.Minify(js, false);
+                            if (!minifiedJs.Errors.Any())
+                                content = System.Text.UTF8Encoding.Default.GetBytes(minifiedJs.MinifiedContent);
+                            break;
+                        case ".css":
+                            //css minify
+                            var css = System.Text.UTF8Encoding.Default.GetString(content);
+                            var minifiedCss = minifyCss.Minify(css, false);
+                            if (!minifiedCss.Errors.Any())
+                                content = System.Text.UTF8Encoding.Default.GetBytes(minifiedCss.MinifiedContent);
+                            break;
+                        case ".html":
+                            //html minify
+                            var html = System.Text.UTF8Encoding.Default.GetString(content);
+                            var minifiedHtml = minifyHtml.Minify(html, false);
+                            if (!minifiedHtml.Errors.Any())
+                                content = System.Text.UTF8Encoding.Default.GetBytes(minifiedHtml.MinifiedContent);
+                            break;
+                    }
                 }
                 staticFilesStorage.Add(file, new Tuple<string, byte[]>(MimeMapping.MimeUtility.GetMimeMapping(file), content));
             });
 
-            var usedMemory = Math.Round( staticFilesStorage.Select(s=>s.Value).Sum(s=>s.Item2.Length) / 1024.0 / 1024.0);
+            var usedMemory = Math.Round(staticFilesStorage.Select(s=>s.Value).Sum(s=>s.Item2.Length) / 1024.0 / 1024.0);
             Console.WriteLine($"{staticFilesStorage.Count} static files loaded into memory using {usedMemory} MB");
             return staticFilesStorage;
         }

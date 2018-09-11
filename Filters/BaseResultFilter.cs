@@ -14,7 +14,7 @@ namespace JAMTech.Filters
 {
     public class BaseResultFilter : IActionFilter
     {
-        const int defaultLimit = 100;
+        const int defaultLimit = 50;
         public static string[] Operators = new[] { "==", "!=", "<", ">", "<>", "<=", ">=" };
         private static readonly bool _minifyResponse = Environment.GetEnvironmentVariable("minifyResponse") =="false" ? false : true;
         public void OnActionExecuting(ActionExecutingContext context)

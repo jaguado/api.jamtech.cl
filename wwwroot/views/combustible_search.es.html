@@ -53,12 +53,12 @@
                             </button>
                             <ul role="menu" uib-dropdown-menu="" class="dropdown-menu">
                                 <li>
-                                    <a href="#" ng-click="setCombustible('Vehicular')">
+                                    <a ng-click="setCombustible('Vehicular')">
                                         Vehicular
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" ng-click="setCombustible('Calefaccion')">
+                                    <a ng-click="setCombustible('Calefaccion')">
                                         Calefaccion
                                     </a>
                                 </li>
@@ -71,11 +71,11 @@
                             </button>
                             <ul role="menu" uib-dropdown-menu="" class="dropdown-menu">
                                 <li>
-                                    <a href="#" ng-click="setRegion(null)">Todas</a>
+                                    <a ng-click="setRegion(null)">Todas</a>
                                 </li>
                                 <li class="divider"></li>
                                 <li ng-repeat="region in regions" ng-model="region">
-                                    <a href="#" ng-click="setRegion(region)">
+                                    <a ng-click="setRegion(region)">
                                         {{region.nombre}}
                                     </a>
                                 </li>
@@ -88,13 +88,13 @@
                             </button>
                             <ul role="menu" uib-dropdown-menu="" class="dropdown-menu">
                                 <li ng-repeat="brand in getDistributors()">
-                                    <a href="#" ng-click="setDistributor(brand)">
+                                    <a ng-click="setDistributor(brand)">
                                         {{brand}}
                                     </a>
                                 </li>
                                 <li class="divider"></li>
                                 <li>
-                                    <a href="#" ng-click="setDistributor(null)">Todas</a>
+                                    <a ng-click="setDistributor(null)">Todas</a>
                                 </li>
                             </ul>
                         </div>
@@ -105,7 +105,7 @@
                             </button>
                             <ul role="menu" uib-dropdown-menu="" class="dropdown-menu">
                                 <li ng-repeat="distance in distances" ng-model="maxDistance">
-                                    <a href="#" ng-click="setDistance(distance)">
+                                    <a ng-click="setDistance(distance)">
                                         {{distance}} mts
                                     </a>
                                 </li>
@@ -121,7 +121,7 @@
                             </button>
                             <ul role="menu" uib-dropdown-menu="" class="dropdown-menu">
                                 <li ng-repeat="fuel in fuelTypes" ng-model="fuel">
-                                    <a href="#" ng-click="setFuel(fuel)">
+                                    <a ng-click="setFuel(fuel)">
                                         {{fuel | capitalize}}
                                     </a>
                                 </li>

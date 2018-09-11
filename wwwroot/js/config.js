@@ -12,10 +12,16 @@
 var httpInterceptor = function ($q, $location) {
         return {
             request: function (config) {//req
-                //add access token
-                //config.url += config.url.contains("?") ? "&" : "?";
-                //config.url += "access_token=blablbla";
-                //console.log('req', config);
+                //add access token if url is from the base api domain
+                if(config.url.startsWith(baseApiUrl)){          
+                    if(!config.url.contains("access_token")){
+                        //console.log('httpInterceptor', 'request', 'adding access token for user', user);
+                        config.url += config.url.contains("?") ? "&" : "?";
+                        config.url += "access_token=" + user.token;
+                        config.url += "&provider=" + user.provider;
+                    }
+                }
+                //console.log('httpInterceptor', 'request', 'baseApiUrl', baseApiUrl);
                 return config;
             },
 
@@ -36,7 +42,7 @@ var httpInterceptor = function ($q, $location) {
     };
 
 function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
-    $urlRouterProvider.otherwise("/index/main");
+    $urlRouterProvider.otherwise("/index/dashboard");
 
     $ocLazyLoadProvider.config({
         // Set to true if you want to see what and when is dynamically loaded
@@ -51,6 +57,42 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
         })
         .state('index.main', {
             url: "/main",
+            templateUrl: "views/main.html",
+            resolve: {
+                loadPlugin: function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            files: ['css/plugins/bootstrapSocial/bootstrap-social.css']
+                        }
+                    ]);
+                }
+            }
+        })
+        .state('index.dashboard', {
+            url: "/dashboard",
+            templateUrl: "views/dashboard.html",
+            resolve: {
+                loadPlugin: function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            name: 'angles',
+                            files: ['js/plugins/chartJs/angles.js', 'js/plugins/chartJs/Chart.min.js']
+                        },
+                        {
+                            name: 'angular-peity',
+                            files: ['js/plugins/peity/jquery.peity.min.js', 'js/plugins/peity/angular-peity.js']
+                        },
+                        {
+                            serie: true,
+                            name: 'angular-flot',
+                            files: [ 'js/plugins/flot/jquery.flot.js', 'js/plugins/flot/jquery.flot.time.js', 'js/plugins/flot/jquery.flot.tooltip.min.js', 'js/plugins/flot/jquery.flot.spline.js', 'js/plugins/flot/jquery.flot.resize.js', 'js/plugins/flot/jquery.flot.pie.js', 'js/plugins/flot/curvedLines.js', 'js/plugins/flot/angular-flot.js', ]
+                        }
+                    ]);
+                }
+            }
+        })
+        .state('login', {
+            url: "/login",
             templateUrl: "views/main.html",
             resolve: {
                 loadPlugin: function ($ocLazyLoad) {

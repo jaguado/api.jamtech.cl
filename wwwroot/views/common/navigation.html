@@ -2,29 +2,31 @@
     <div class="sidebar-collapse">
         <ul side-navigation class="nav metismenu" id="side-menu">
             <li>
-                <a ng-if="user == null">
-                    <i class="fas fa-sign-in-alt" g-login></i>
-                </a>
                 <a ng-if="user != null" ng-click="logoff()">
                     <i class="fas fa-sign-out-alt"></i>
                 </a>
             </li>
-            <li ui-sref-active="active">
+            <li ui-sref-active="active" ng-if="user != null">
+                <a ui-sref="index.dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                </a>
+            </li>
+            <li ui-sref-active="active" ng-if="user != null">
                 <a ui-sref="index.tools">
                     <i class="fas fa-toolbox"></i>
                 </a>
             </li>
-            <li ui-sref-active="active">
+            <li ui-sref-active="active" ng-if="user != null">
                 <a ui-sref="index.combustible">
                     <i class="fas fa-gas-pump"></i>
                 </a>
             </li>
-            <li ui-sref-active="active">
+            <li ui-sref-active="active" ng-if="user != null">
                 <a ui-sref="index.products">
                     <i class="fas fa-shopping-cart"></i>
                 </a>
             </li>
-            <li ui-sref-active="active">
+            <li ui-sref-active="active" ng-if="user != null">
                 <a ui-sref="index.torrents">
                     <i class="fas fa-cloud-download-alt"></i>
                 </a>

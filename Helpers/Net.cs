@@ -98,7 +98,7 @@ namespace JAMTech.Helpers
             return await stream.ReadToEndAsync();
         }
 
-        public static async Task<HttpResponseMessage> GetResponse(string tempUrl, Uri customReferrer = null, int timeoutInSeconds=0)
+        public static async Task<HttpResponseMessage> GetResponse(string tempUrl, Uri customReferrer = null, int timeoutInSeconds=0, string userAgent="", string cookie="")
         {
             var handler = new HttpClientHandler()
             {
@@ -109,6 +109,10 @@ namespace JAMTech.Helpers
                 client.Timeout = TimeSpan.FromSeconds(timeoutInSeconds);
             if (customReferrer != null)
                 client.DefaultRequestHeaders.Referrer = customReferrer;
+            if (userAgent != string.Empty)
+                client.DefaultRequestHeaders.Add("User-Agent", userAgent); 
+            if (cookie != string.Empty)
+                client.DefaultRequestHeaders.Add("Cookie", cookie);
             return await client.GetAsync(tempUrl);
         }
         public static async Task<HttpResponseMessage> PostResponse(string tempUrl, HttpContent content, Uri customReferrer = null, int timeoutInSeconds = 0)

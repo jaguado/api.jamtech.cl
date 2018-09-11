@@ -1,24 +1,20 @@
-<div class="wrapper wrapper-content animated fadeInRight">
+<div class="white-bg wrapper wrapper-content animated fadeInRight">
     <div class="row">
         <div class="col-lg-12">
-            <div class="text-center m-t-lg">
+            <div class="text-center text-navy">
+                <img class="pull-right" src="img/favicon/apple-icon-60x60.png" alt="logo" />
                 <h1>
                     {{main.helloText}}
                 </h1>
-                <h2>
-                    {{main.descriptionText}}
-                </h2>
+                <h2>ALL IN ONE</h2>
+                <br />
+                <div class="wow bounceIn animated">
+                    <img src="img/landing/perspective.png" style="max-width: 40%;">
+                </div>
             </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="text-center m-t-lg">
-                <img src="img/favicon/apple-icon.png" />
-            </div>
-        </div>
-    </div>
-    <div ng-if="user!=null">
+    <div ng-if="false">
         <div class="row">
             <div class="col-lg-12">
                 <div class="text-center m-t-lg">
@@ -41,27 +37,27 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="text-center m-t-lg">
-                    <h3>Iniciar sesi&oacute;n con</h3>
+                    <h3>Elige con que cuenta quieres iniciar sesi&oacute;n:</h3>
+                    <br />
                 </div>
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-4">
-                <a class="btn btn-block btn-social btn-google" g-login>
+            <div class="col-sm-6">
+                <a class="btn btn-login btn-block btn-social btn-google" g-login>
                     <span class="fab fa-google"></span>Google
                 </a>
             </div>
-            <div class="col-sm-4">
-                <a class="btn btn-block btn-social btn-facebook" fb-login disable>
+            <div class="col-sm-6">
+                <a class="btn btn-login btn-block btn-social btn-facebook" fb-login disable>
                     <span class="fab fa-facebook"></span>Facebook
                 </a>
             </div>
-            <div class="col-sm-4">
-                <a class="btn btn-block btn-social btn-linkedin" linked-in>
+            <div class="col-sm-4" ng-if="false">
+                <a class="btn btn-login btn-block btn-social btn-linkedin" linked-in>
                     <span class="fab fa-linkedin"></span>LinkedIn
                 </a>
             </div>
         </div>
     </div>
-</div>
 </div>

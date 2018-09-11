@@ -1,8 +1,12 @@
 var mocksBaseApiUrl = '//aio.jamtech.cl/mocks/torrents.json'
 var baseApiUrl = '//aio.jamtech.cl/v1/';
 var defaultPages = 2;
-var sessionCheckInterval = 30000;
+var sessionCheckInterval = 60000 * 5; //5 minutes
 var loops = 5;
+var loginPath = "/login";
+var user = localStorage.getItem('user') != null ? JSON.parse(localStorage.getItem('user')) : null;
+var visibleDataRefreshInterval = 60000 * .5; //30 seconds
+var dashboardChartLimit = 30;
 
 function minimalize() {
     if (!$("body").hasClass("mini-navbar")) {
@@ -12,33 +16,107 @@ function minimalize() {
     }
 }
 
-function MainCtrl($scope, $rootScope, $http, $interval, Analytics, socialLoginService) {
+function DashboardCtrl($scope, $rootScope, $http, $interval, $location, Analytics, socialLoginService) {
+    $scope.sensors = null;
+    $scope.selectedSensor = null;
+    $scope.selectedSensorData = null;
+    $scope.refreshSensors = function () {
+        var url = baseApiUrl + "Monitoring/results?onlyErrors=false";
+        return $http.get(url).then(function (response) {
+            //console.log('status code', response.status);
+            $scope.sensors = response.data;
+            //console.log('sensors', $scope.sensors);
+            return response.status == 200;
+        }, function (response) {
+            console.log('err', response);
+            return false;
+        });
+    };
+    $scope.refreshSensors();
+    $scope.sensorsTimer = $interval($scope.refreshSensors, visibleDataRefreshInterval);
+
+    $scope.selectSensor = function (sensor) {
+        Analytics.trackEvent('dashboard', 'viewSensor', sensor.Config.Name);
+        if ($scope.selectedSensor != sensor) {
+            $scope.selectedSensor = sensor;
+            $scope.selectedSensorData = {
+                labels: $scope.selectedSensor != null ? $scope.selectedSensor.Results.slice(dashboardChartLimit * -1).map(d => new Date(d.Date).toLocaleTimeString()) : [],
+                datasets: [{
+                        label: "Date",
+                        fillColor: "rgba(26,179,148,0.5)",
+                        strokeColor: "rgba(26,179,148,0.7)",
+                        pointColor: "rgba(26,179,148,1)",
+                        pointStrokeColor: "#fff",
+                        pointHighlightFill: "#fff",
+                        pointHighlightStroke: "rgba(26,179,148,1)",
+                        data: $scope.selectedSensor != null ? $scope.selectedSensor.Results.slice(dashboardChartLimit * -1).map(d => d.Duration) : []
+                    }
+                ]
+            };
+        } else
+            $scope.selectedSensor = $scope.selectedSensorData = null;
+    }
+
+
+
+    /**
+     * Options for Line chart
+     */
+    $scope.lineOptions = {
+        scaleShowGridLines: true,
+        scaleGridLineColor: "rgba(0,0,0,.05)",
+        scaleGridLineWidth: 1,
+        bezierCurve: true,
+        bezierCurveTension: 0.4,
+        pointDot: true,
+        pointDotRadius: 4,
+        pointDotStrokeWidth: 1,
+        pointHitDetectionRadius: 20,
+        datasetStroke: true,
+        datasetStrokeWidth: 2,
+        datasetFill: true
+    };
+
+}
+
+function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, socialLoginService) {
     $scope.sessiontimer = null;
-    $scope.user = localStorage.getItem('user') != null ? JSON.parse(localStorage.getItem('user')) : null;
     this.helloText = 'Bienvenido a JAMTech.cl'
     this.descriptionText = '';
+    $scope.user = user;
     $scope.checkSession = function () {
-        if ($scope.user != null && ($scope.user.provider=="google" || $scope.user.provider=="facebook")) {
+        if (user != null && (user.provider == "google" || user.provider == "facebook")) {
             console.log('checking session');
-            var url = baseApiUrl + "User?access_token=" + $scope.user.token + '&provider=' + $scope.user.provider;
+            var url = baseApiUrl + "User";
             //get stations from api.jamtech.cl
             return $http.get(url).then(function (response) {
                 //console.log('status code', response.status);
                 return response.status == 201;
             }, function (response) {
-                $scope.user = null;
+                user = null;
+                $scope.user = user;
                 $scope.sessiontimer = null;
-                localStorage.setItem('user', $scope.user);
+                localStorage.setItem('user', user);
                 console.log('session invalidated');
+                $location.path(loginPath);
                 return false;
             });
         };
     };
 
     $scope.checkSession();
-    if ($scope.user != null) {
-        console.log('user logged in', $scope.user.name, $scope.user);
+    if (user != null) {
+        console.log('user logged in', user.name, user);
+        if ($location.path() == loginPath) {
+            $location.path("/");
+        }
+    } else {
+
+        if ($location.path !== loginPath) {
+            $location.path(loginPath);
+        }
     }
+
     $scope.minimalize = function () {
         if (!$("body").hasClass("mini-navbar")) {
             $("body").toggleClass("mini-navbar");
@@ -50,39 +128,39 @@ function MainCtrl($scope, $rootScope, $http, $interval, Analytics, socialLoginSe
 
 
     $scope.sessiontimer = $interval($scope.checkSession, sessionCheckInterval);
-
     $scope.logoff = function () {
+        user = null;
+        $scope.user = user;
+        localStorage.setItem('user', user);
         socialLoginService.logout();
+        $location.path(loginPath);
     };
 
     $rootScope.$on('event:social-sign-in-success', function (event, userDetails) {
-        /*  Login ok
-            userDetails = {
-                            name: <user_name>, 
-                            email: <user_email>, 
-                            imageUrl: <image_url>, 
-                            uid: <UID by social vendor>, 
-                            provider: <Google/Facebook/LinkedIN>, 
-                            token: < accessToken for Facebook & google, no token for linkedIN>}, 
-                            idToken: < google idToken >
-            };
-        */
-
-
-        // Set the User Id
-        $scope.user = userDetails;
-        localStorage.setItem('user', JSON.stringify($scope.user));
-        Analytics.set('&uid', $scope.user.uid);
-        Analytics.trackEvent('aio', 'auth', $scope.user.provider);
+        /*  Login ok */
+        user = userDetails;
+        $scope.user = user;
+        localStorage.setItem('user', JSON.stringify(user));
+        Analytics.set('&uid', user.uid);
+        Analytics.trackEvent('aio', 'auth', user.provider);
         $scope.sessiontimer = $interval($scope.checkSession, sessionCheckInterval);
-        console.log('social-sign-in-success', $scope.user);
+        console.log('social-sign-in-success');
+        if (user.provider == "google") {
+            $scope.$apply(function () {
+                $scope.user = user;
+            });
+        }
+        $location.path("/");
     });
     $rootScope.$on('event:social-sign-out-success', function (event, logoutStatus) {
         //logout ok
         $scope.sessiontimer = null;
-        $scope.user = null;
-        localStorage.setItem('user', $scope.user);
-        console.log('social-sign-out-success', logoutStatus);
+        user = null;
+        $scope.user = user;
+        localStorage.setItem('user', user);
+        Analytics.set('&uid', null);
+        console.log('social-sign-out-success');
+        $location.path(loginPath);
     });
 };
 
@@ -90,7 +168,7 @@ function TorrentsCtrl($http, $scope, $window, Analytics) {
     $scope.minimalize = minimalize;
 
     $scope.useMocks = false; //mocks mode
-    var searchUrl = baseApiUrl + 'Torrent?skipLinks=false&pages=' + defaultPages + '&search=';
+    var searchUrl = baseApiUrl + '../v2/Torrent?skipLinks=false&pages=' + defaultPages + '&search=';
     $scope.availableTorrentsTemplates = [{
         "name": "Table",
         "url": "views/torrents_table.html",
@@ -546,6 +624,7 @@ angular
     .controller('ProductsCtrl', ProductsCtrl)
     .controller('TorrentsCtrl', TorrentsCtrl)
     .controller('ToolsCtrl', ToolsCtrl)
+    .controller('DashboardCtrl', DashboardCtrl)
     .filter('capitalize', Capitalize)
     .filter('toArray', toArray)
     .filter('getBrand', getProductBrandType)
