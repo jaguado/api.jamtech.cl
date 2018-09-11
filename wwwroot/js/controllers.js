@@ -6,7 +6,7 @@ var loops = 5;
 var loginPath = "/login";
 var user = localStorage.getItem('user') != null ? JSON.parse(localStorage.getItem('user')) : null;
 var visibleDataRefreshInterval = 60000 * .5; //30 seconds
-var dashboardChartLimit = 30;
+var dashboardChartLimit = 20;
 
 function minimalize() {
     if (!$("body").hasClass("mini-navbar")) {
@@ -17,6 +17,17 @@ function minimalize() {
 }
 
 function DashboardCtrl($scope, $rootScope, $http, $interval, $location, Analytics, socialLoginService) {
+    $scope.safeApply = function (fn) {
+        var phase = this.$root.$$phase;
+        if (phase == '$apply' || phase == '$digest') {
+            if (fn && (typeof (fn) === 'function')) {
+                fn();
+            }
+        } else {
+            this.$apply(fn);
+        }
+    };
+
     $scope.sensors = null;
     $scope.selectedSensor = null;
     $scope.selectedSensorData = null;
@@ -37,27 +48,26 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, Analytic
 
     $scope.selectSensor = function (sensor) {
         Analytics.trackEvent('dashboard', 'viewSensor', sensor.Config.Name);
-        if ($scope.selectedSensor != sensor) {
+        if (sensor != $scope.selectedSensor) {
+            //clear chart before change sensor
             $scope.selectedSensor = sensor;
             $scope.selectedSensorData = {
                 labels: $scope.selectedSensor != null ? $scope.selectedSensor.Results.slice(dashboardChartLimit * -1).map(d => new Date(d.Date).toLocaleTimeString()) : [],
                 datasets: [{
-                        label: "Date",
-                        fillColor: "rgba(26,179,148,0.5)",
-                        strokeColor: "rgba(26,179,148,0.7)",
-                        pointColor: "rgba(26,179,148,1)",
-                        pointStrokeColor: "#fff",
-                        pointHighlightFill: "#fff",
-                        pointHighlightStroke: "rgba(26,179,148,1)",
-                        data: $scope.selectedSensor != null ? $scope.selectedSensor.Results.slice(dashboardChartLimit * -1).map(d => d.Duration) : []
-                    }
-                ]
+                    label: "Duration",
+                    fillColor: "rgba(26,179,148,0.5)",
+                    strokeColor: "rgba(26,179,148,0.7)",
+                    pointColor: "rgba(26,179,148,1)",
+                    pointStrokeColor: "#fff",
+                    pointHighlightFill: "#fff",
+                    pointHighlightStroke: "rgba(26,179,148,1)",
+                    data: $scope.selectedSensor != null ? $scope.selectedSensor.Results.slice(dashboardChartLimit * -1).map(d => d.Duration) : []
+                }]
             };
-        } else
+        }
+        else
             $scope.selectedSensor = $scope.selectedSensorData = null;
-    }
-
-
+    };
 
     /**
      * Options for Line chart
