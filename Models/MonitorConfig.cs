@@ -8,7 +8,7 @@ namespace JAMTech.Models
     {
         public string Name { get; set; }
         public string Url { get; set; }
-        public AvailableMethods Method { get; set; }
+        public AvailableMethods Method { get; set; } = AvailableMethods.GET;
         public int Interval { get; set; }
         public int ExpectedStatusCode { get; set; }
         public string ExpectedResponseBodyContains { get; set; }
