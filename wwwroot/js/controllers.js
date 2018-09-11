@@ -6,7 +6,7 @@ var loops = 5;
 var loginPath = "/login";
 var user = localStorage.getItem('user') != null ? JSON.parse(localStorage.getItem('user')) : null;
 var visibleDataRefreshInterval = 60000 * .5; //30 seconds
-var dashboardChartLimit = 15;
+var dashboardChartLimit = 30;
 
 function minimalize() {
     if (!$("body").hasClass("mini-navbar")) {
@@ -40,24 +40,24 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, Analytic
         if ($scope.selectedSensor != sensor) {
             $scope.selectedSensor = sensor;
             $scope.selectedSensorData = {
-                labels: $scope.selectedSensor != null ? $scope.selectedSensor.Results.slice(0, dashboardChartLimit).map(d => new Date(d.Date).toLocaleTimeString()) : [],
+                labels: $scope.selectedSensor != null ? $scope.selectedSensor.Results.slice(dashboardChartLimit * -1).map(d => new Date(d.Date).toLocaleTimeString()) : [],
                 datasets: [{
-                    label: "Date",
-                    fillColor: "rgba(26,179,148,0.5)",
-                    strokeColor: "rgba(26,179,148,0.7)",
-                    pointColor: "rgba(26,179,148,1)",
-                    pointStrokeColor: "#fff",
-                    pointHighlightFill: "#fff",
-                    pointHighlightStroke: "rgba(26,179,148,1)",
-                    data: $scope.selectedSensor != null ? $scope.selectedSensor.Results.slice(0, dashboardChartLimit).map(d => d.Duration) : []
-                }]
+                        label: "Date",
+                        fillColor: "rgba(26,179,148,0.5)",
+                        strokeColor: "rgba(26,179,148,0.7)",
+                        pointColor: "rgba(26,179,148,1)",
+                        pointStrokeColor: "#fff",
+                        pointHighlightFill: "#fff",
+                        pointHighlightStroke: "rgba(26,179,148,1)",
+                        data: $scope.selectedSensor != null ? $scope.selectedSensor.Results.slice(dashboardChartLimit * -1).map(d => d.Duration) : []
+                    }
+                ]
             };
-        }
-        else
+        } else
             $scope.selectedSensor = $scope.selectedSensorData = null;
     }
 
-    
+
 
     /**
      * Options for Line chart
@@ -128,7 +128,6 @@ function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, so
 
 
     $scope.sessiontimer = $interval($scope.checkSession, sessionCheckInterval);
-
     $scope.logoff = function () {
         user = null;
         $scope.user = user;
