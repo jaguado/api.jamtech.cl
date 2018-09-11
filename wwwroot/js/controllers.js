@@ -6,6 +6,7 @@ var loops = 5;
 var loginPath = "/login";
 var user = localStorage.getItem('user') != null ? JSON.parse(localStorage.getItem('user')) : null;
 var visibleDataRefreshInterval = 60000 * .5; //30 seconds
+var dashboardChartLimit = 15;
 
 function minimalize() {
     if (!$("body").hasClass("mini-navbar")) {
@@ -17,6 +18,8 @@ function minimalize() {
 
 function DashboardCtrl($scope, $rootScope, $http, $interval, $location, Analytics, socialLoginService) {
     $scope.sensors = null;
+    $scope.selectedSensor = null;
+    $scope.selectedSensorData = null;
     $scope.refreshSensors = function () {
         var url = baseApiUrl + "Monitoring/results?onlyErrors=false";
         return $http.get(url).then(function (response) {
@@ -31,6 +34,48 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, Analytic
     };
     $scope.refreshSensors();
     $scope.sensorsTimer = $interval($scope.refreshSensors, visibleDataRefreshInterval);
+
+    $scope.selectSensor = function (sensor) {
+        if ($scope.selectedSensor != sensor) {
+            $scope.selectedSensor = sensor;
+            $scope.selectedSensorData = {
+                labels: $scope.selectedSensor != null ? $scope.selectedSensor.Results.slice(0, dashboardChartLimit).map(d => new Date(d.Date).toLocaleTimeString()) : [],
+                datasets: [{
+                    label: "Date",
+                    fillColor: "rgba(26,179,148,0.5)",
+                    strokeColor: "rgba(26,179,148,0.7)",
+                    pointColor: "rgba(26,179,148,1)",
+                    pointStrokeColor: "#fff",
+                    pointHighlightFill: "#fff",
+                    pointHighlightStroke: "rgba(26,179,148,1)",
+                    data: $scope.selectedSensor != null ? $scope.selectedSensor.Results.slice(0, dashboardChartLimit).map(d => d.Duration) : []
+                }]
+            };
+        }
+        else
+            $scope.selectedSensor = $scope.selectedSensorData = null;
+    }
+
+    
+
+    /**
+     * Options for Line chart
+     */
+    $scope.lineOptions = {
+        scaleShowGridLines: true,
+        scaleGridLineColor: "rgba(0,0,0,.05)",
+        scaleGridLineWidth: 1,
+        bezierCurve: true,
+        bezierCurveTension: 0.4,
+        pointDot: true,
+        pointDotRadius: 4,
+        pointDotStrokeWidth: 1,
+        pointHitDetectionRadius: 20,
+        datasetStroke: true,
+        datasetStrokeWidth: 2,
+        datasetFill: true
+    };
+
 }
 
 function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, socialLoginService) {
