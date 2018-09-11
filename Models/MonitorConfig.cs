@@ -20,6 +20,8 @@ namespace JAMTech.Models
 
         public MonitorConfig NextConfig { get; set; }
 
+        public bool Enabled { get; set; } = true;
+
         public enum AvailableMethods
         {
             GET, POST
