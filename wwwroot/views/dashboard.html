@@ -28,7 +28,12 @@
                     <small>{{selectedSensor.Config.Url}}</small>
                 </div>
                 <div>
-                     <canvas style="max-width: 100%;" linechart options="lineOptions" data="selectedSensorData" height="114" responsive="true"></canvas>
+                    <canvas style="max-width: 100%;" linechart options="lineOptions" data="selectedSensorData" height="114" responsive="true"></canvas>
+                </div>
+                <div>
+                    <small>
+                        <strong>This sensor was created on {{selectedSensor.Config.CreationDate}}</strong>
+                    </small>
                 </div>
             </div>
         </div>
@@ -70,7 +75,7 @@
                             <tr>
                                 <th># Results</th>
                                 <th>Name / Url</th>
-                                <th>Interval</th>
+                                <th>Interval (ms)</th>
                                 <th>Status Code Check</th>
                                 <th>Body Content Check </th>
                             </tr>
