@@ -48,11 +48,11 @@ namespace JAMTech.Controllers
                 {
                     var content = await response.Content.ReadAsStringAsync();
                     var productsResult = JsonConvert.DeserializeObject<Models.KnastaSearchResullt>(content);
-                    var categories = productsResult.ktegories.ToDictionary(v => v.value, v => v.label);
+                    var categories = productsResult.ktegories != null ? productsResult.ktegories.ToDictionary(v => v.value, v => v.label) : null;
                     var commonFormat = productsResult.products.Select(p => new
                     {
                         product_id = p.product_id,
-                        product_type = categories[int.Parse(p.kategory)],
+                        product_type = categories != null ? categories[int.Parse(p.kategory)] : null,
                         brand = p.retail,
                         image = p.images,
                         thumb = p.images,
