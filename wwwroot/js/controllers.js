@@ -64,9 +64,26 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, Analytic
                     data: $scope.selectedSensor != null ? $scope.selectedSensor.Results.slice(dashboardChartLimit * -1).map(d => d.Duration) : []
                 }]
             };
-        }
-        else
+        } else
             $scope.selectedSensor = $scope.selectedSensorData = null;
+    };
+
+    $scope.getSensorGroupClass = function (sensor) {
+        var result = sensor.Results.filter(r => r.Success == null || !r.Success);
+        if (result.length > 0)
+            return "btn-danger";
+        else {
+            //check durations
+            if (sensor.Config.WrnDuration != null && sensor.Config.ErrDuration != null) {
+                result = sensor.Results.filter(r => r.Duration >= sensor.Config.WrnDuration);
+                if (result.length > 0)
+                    return "btn-warning";
+                result = sensor.Results.filter(r => r.Duration >= sensor.Config.ErrDuration);
+                if (result.length > 0)
+                    return "btn-danger";
+            }
+            return "btn-info";
+        }
     };
 
     /**
