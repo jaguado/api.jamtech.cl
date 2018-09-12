@@ -173,7 +173,8 @@ namespace JAMTech
                     //add cache headers
                     const int durationInSeconds = 60 * 60 * 24;
                     //context.Response.Headers[HeaderNames.CacheControl] = "no-cache, no-store, must-revalidate";
-                    context.Response.Headers[HeaderNames.CacheControl] = "public,max-age=" + durationInSeconds;
+                    if(!context.Request.QueryString.HasValue)
+                        context.Response.Headers[HeaderNames.CacheControl] = "public,max-age=" + durationInSeconds;
                     return Task.FromResult(0);
                 });
                 await nextMiddleware();
