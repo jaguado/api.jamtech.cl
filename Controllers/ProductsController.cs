@@ -96,6 +96,7 @@ namespace JAMTech.Controllers
                             description= r.Descendants("span").First(f => f.Attributes["class"] != null && f.Attributes["class"].Value.Contains("main-title")).InnerHtml,
                             price= new List<Models.Price> { new Models.Price { price=int.Parse(r.Descendants("span").First(f => f.Attributes["class"] != null && f.Attributes["class"].Value.Contains("price__fraction")).InnerHtml.Replace(".","")) } },
                             thumb= imgUrl,
+                            brand="MercadoLibre.cl",
                             product_type= r.Descendants("a").First(f => f.Attributes["class"] != null && f.Attributes["class"].Value.Contains("item__info-title")).Attributes["href"].Value
                         });
                     });
