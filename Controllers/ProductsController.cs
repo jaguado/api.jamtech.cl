@@ -98,11 +98,18 @@ namespace JAMTech.Controllers
                             description= name != null ? name.InnerHtml.Trim() : "",
                             price= new List<Models.Price> { new Models.Price { price=int.Parse(r.Descendants("span").First(f => f.Attributes["class"] != null && f.Attributes["class"].Value.Contains("price__fraction")).InnerHtml.Replace(".","")) } },
                             thumb= imgUrl,
-                            brand="MercadoLibre.cl"
                             //product_type= link != null && link.Attributes.Contains("href") ? link.Attributes["href"].Value : ""
                         });
                     });
-                    return new OkObjectResult(results);
+                    var commonFormat = results.Select(p => new
+                    {
+                        thumb = p.thumb,
+                        description = p.description,
+                        price = p.price[0].price,
+                        brand = "MercadoLibre.cl",
+                        source = "MercadoLibre.cl"
+                    });
+                    return new OkObjectResult(commonFormat);
                 }
             }
             return new NotFoundResult();
