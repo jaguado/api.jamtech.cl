@@ -8,7 +8,7 @@ namespace JAMTech.Models
     {
         public string Name { get; set; }
         public string Url { get; set; }
-        public AvailableMethods Method { get; set; }
+        public AvailableMethods Method { get; set; } = AvailableMethods.GET;
         public int Interval { get; set; }
         public int ExpectedStatusCode { get; set; }
         public string ExpectedResponseBodyContains { get; set; }
@@ -19,6 +19,8 @@ namespace JAMTech.Models
         public DateTime CreationDate { get; set; }
 
         public MonitorConfig NextConfig { get; set; }
+
+        public bool Enabled { get; set; } = true;
 
         public enum AvailableMethods
         {

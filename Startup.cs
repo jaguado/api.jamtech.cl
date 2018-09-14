@@ -171,11 +171,10 @@ namespace JAMTech
                     context.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Access-Control-Allow-Origin, Authorization, X-Requested-With, X-Robots-Tag, Content-Disposition, Origin");
 
                     //add cache headers
-                    const int durationInSeconds = 0; // 60 * 60 * 24;
-                    if (durationInSeconds == 0)
-                        context.Response.Headers[HeaderNames.CacheControl] = "no-cache, no-store, must-revalidate";
-                    //else
-                    //    ctx.Context.Response.Headers[HeaderNames.CacheControl] = "public,max-age=" + durationInSeconds;
+                    const int durationInSeconds = 60 * 60 * 24;
+                    //context.Response.Headers[HeaderNames.CacheControl] = "no-cache, no-store, must-revalidate";
+                    if(!context.Request.QueryString.HasValue)
+                        context.Response.Headers[HeaderNames.CacheControl] = "public,max-age=" + durationInSeconds;
                     return Task.FromResult(0);
                 });
                 await nextMiddleware();

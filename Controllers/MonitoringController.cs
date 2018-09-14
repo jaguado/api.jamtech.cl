@@ -70,5 +70,18 @@ namespace JAMTech.Controllers
             });
             return new OkObjectResult(results);
         }
+
+        /// <summary>
+        /// Refresh monitors of an authenticated user
+        /// </summary>
+        /// <param name="forUser">This paramemeter is optional and will be completed or validated against access_token</param>
+        /// <returns></returns>
+        [HttpPost("refresh")]
+        public IActionResult Refresh(string forUser = null)
+        {
+            //update monitors
+            ThreadPool.QueueUserWorkItem(async state => await Program.RefreshMonitoringForUserAsync(forUser));
+            return new OkResult();
+        }
     }
 }

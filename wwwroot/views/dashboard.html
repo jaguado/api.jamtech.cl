@@ -11,14 +11,15 @@
         </div>
     </div>
     <div class="row">
-        <div id="detail" ng-if="selectedSensor!=null" ng-model="selectedSensor">
+        <div ng-if="selectedSensor!=null" ng-model="selectedSensor">
             <div class="ibox-content">
                 <div>
                     <span class="pull-right text-right">
                         <small>
-                            <strong>Wrn:</strong> {{selectedSensor.Config.WrnDuration}}
-                            <br />
-                            <strong>Err:</strong>{{selectedSensor.Config.ErrDuration}}
+                            Wrn:&nbsp;
+                            <strong>{{selectedSensor.Config.WrnDuration}}</strong>
+                            <br /> Err:&nbsp;
+                            <strong>{{selectedSensor.Config.ErrDuration}}</strong>
                         </small>
                     </span>
                     <h3 class="font-bold no-margins">
@@ -26,22 +27,12 @@
                     </h3>
                     <small>{{selectedSensor.Config.Url}}</small>
                 </div>
-                <div class="m-t-sm">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <canvas linechart options="lineOptions" data="selectedSensorData" height="114" responsive="true"></canvas>
-                        </div>
-                    </div>
-
+                <div>
+                    <canvas style="max-width: 100%;" linechart options="lineOptions" data="selectedSensorData" height="114" responsive="true"></canvas>
                 </div>
-                <div class="m-t-md" ng-if="false">
-                    <small class="pull-right">
-                        <i class="fa fa-clock-o"> </i>
-                        Update on 16.07.2015
-                    </small>
+                <div>
                     <small>
-                        <strong>Analysis of sales:</strong> The value has been changed over time, and last month reached a level
-                        over $50,000.
+                        <strong>This sensor was created on {{selectedSensor.Config.CreationDate}}</strong>
                     </small>
                 </div>
             </div>
@@ -77,44 +68,47 @@
                     </div>
                 </div>
             </div>
-            <div class="table-responsive">
-                <table class="table table-striped middle centered">
-                    <thead>
-                        <tr>
-                            <th># Results</th>
-                            <th>Name / Url</th>
-                            <th>Interval</th>
-                            <th>Status Code Check</th>
-                            <th>Body Content Check </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr ng-repeat="sensor in sensors">
-                            <td>
-                                <button ng-click="selectSensor(sensor)" type="button" class="btn btn-info dim">{{sensor.Results.length}}</button>
-                            </td>
-                            <td>
-                                <strong>{{sensor.Config.Name}}</strong>
-                                <small>
-                                    <br />{{sensor.Config.Url}}</small>
-                            </td>
-                            <td>
-                                {{sensor.Config.Interval}}
-                            </td>
-                            <td>
-                                <button ng-if="sensor.Config.ExpectedStatusCode != null" class="btn btn-outline btn-primary dim" type="button">
-                                    <i class="fa fa-check"></i>
-                                </button>
-                            </td>
-                            <td>
-                                <button ng-if="sensor.Config.ExpectedResponseBodyContains != null" class="btn btn-outline btn-primary dim" type="button">
-                                    <i class="fa fa-check"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="row">
+                <div class="table-responsive">
+                    <table class="table table-striped middle centered">
+                        <thead>
+                            <tr>
+                                <th># Results</th>
+                                <th>Name / Url</th>
+                                <th>Interval (ms)</th>
+                                <th>Status Code Check</th>
+                                <th>Body Content Check </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="sensor in sensors">
+                                <td>
+                                    <button ng-click="selectSensor(sensor)" ng-class="getSensorGroupClass(sensor)" type="button" class="btn dim">{{sensor.Results.length}}</button>
+                                </td>
+                                <td>
+                                    <strong>{{sensor.Config.Name}}</strong>
+                                    <small>
+                                        <br />{{sensor.Config.Url}}</small>
+                                </td>
+                                <td>
+                                    {{sensor.Config.Interval}}
+                                </td>
+                                <td>
+                                    <button ng-if="sensor.Config.ExpectedStatusCode != null" class="btn btn-outline btn-primary dim" type="button">
+                                        <i class="fa fa-check"></i>
+                                    </button>
+                                </td>
+                                <td>
+                                    <button ng-if="sensor.Config.ExpectedResponseBodyContains != null" class="btn btn-outline btn-primary dim" type="button">
+                                        <i class="fa fa-check"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
         </div>
     </div>
 </div>
