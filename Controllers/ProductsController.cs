@@ -90,14 +90,16 @@ namespace JAMTech.Controllers
                     resultsTable.ForEach(r =>
                     {
                         //TODO include validations
-                        var imgUrl = r.Descendants("img").First().Attributes.Contains("src") ? r.Descendants("img").First().Attributes["src"].Value : r.Descendants("img").First().Attributes["data-src"].Value;
+                        var imgUrl = r.Descendants("img").First().Attributes.Contains("src") ? r.Descendants("img").First().Attributes["src"].Value : r.Descendants("img").First().Attributes["data-src"] != null ? r.Descendants("img").First().Attributes["data-src"].Value : "";
+                        var name = r.Descendants("span").First(f => f.Attributes["class"] != null && f.Attributes["class"].Value.Contains("main-title"));
+                        //var link = r.Descendants("a").FirstOrDefault(f => f.Attributes["class"] != null && f.Attributes["class"].Value.Contains("item__info-title"));
                         results.Add(new Models.Product
                         {
-                            description= r.Descendants("span").First(f => f.Attributes["class"] != null && f.Attributes["class"].Value.Contains("main-title")).InnerHtml,
+                            description= name != null ? name.InnerHtml.Trim() : "",
                             price= new List<Models.Price> { new Models.Price { price=int.Parse(r.Descendants("span").First(f => f.Attributes["class"] != null && f.Attributes["class"].Value.Contains("price__fraction")).InnerHtml.Replace(".","")) } },
                             thumb= imgUrl,
-                            brand="MercadoLibre.cl",
-                            product_type= r.Descendants("a").First(f => f.Attributes["class"] != null && f.Attributes["class"].Value.Contains("item__info-title")).Attributes["href"].Value
+                            brand="MercadoLibre.cl"
+                            //product_type= link != null && link.Attributes.Contains("href") ? link.Attributes["href"].Value : ""
                         });
                     });
                     return new OkObjectResult(results);
