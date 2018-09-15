@@ -6,7 +6,7 @@ var loops = 5;
 var loginPath = "/login";
 var user = localStorage.getItem('user') != null ? JSON.parse(localStorage.getItem('user')) : null;
 var visibleDataRefreshInterval = 60000 * .5; //30 seconds
-var dashboardChartLimit = 20;
+var dashboardChartLimit = 200;
 
 function minimalize() {
     if (!$("body").hasClass("mini-navbar")) {
@@ -28,22 +28,22 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, Analytic
         }
     };
 
-    $scope.newSensor =null;
-    $scope.addSensor = function(){
+    $scope.newSensor = null;
+    $scope.addSensor = function () {
         console.log('add new sensor', $scope.newSensor);
         var url = baseApiUrl + "Monitoring";
         var arr = [];
         arr.push($scope.newSensor);
         var data = JSON.stringify(arr);
         return $http.post(url, data).then(function (response) {
-            $scope.newSensor=null;
+            $scope.newSensor = null;
             //console.log('sensor created', response);
             $scope.refreshSensors();
             return response.status == 200;
         }, function (response) {
             console.log('error adding new sensor', response);
             return false;
-        });        
+        });
     }
     $scope.sensors = null;
     $scope.selectedSensor = null;
@@ -68,19 +68,40 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, Analytic
         if (sensor != $scope.selectedSensor) {
             //clear chart before change sensor
             $scope.selectedSensor = sensor;
-            $scope.selectedSensorData = {
-                labels: $scope.selectedSensor != null ? $scope.selectedSensor.Results.slice(dashboardChartLimit * -1).map(d => new Date(d.Date).toLocaleTimeString()) : [],
-                datasets: [{
-                    label: "Duration",
-                    fillColor: "rgba(26,179,148,0.5)",
-                    strokeColor: "rgba(26,179,148,0.7)",
-                    pointColor: "rgba(26,179,148,1)",
-                    pointStrokeColor: "#fff",
-                    pointHighlightFill: "#fff",
-                    pointHighlightStroke: "rgba(26,179,148,1)",
-                    data: $scope.selectedSensor != null ? $scope.selectedSensor.Results.slice(dashboardChartLimit * -1).map(d => d.Duration) : []
-                }]
-            };
+            var sensorResultsData = $scope.selectedSensor != null ? $scope.selectedSensor.Results.slice(dashboardChartLimit * -1) : [];
+            if (sensorResultsData) {
+                var okData = sensorResultsData.filter(r => r.Success && r.Duration < sensor.Config.WrnDuration).map(d => d.Duration);
+                var wrnData = sensorResultsData.filter(r => r.Success && r.Duration >= sensor.Config.WrnDuration && r.Duration < sensor.Config.ErrDuration).map(d => d.Duration);
+                var errData = sensorResultsData.filter(r => !r.Success || r.Duration >= sensor.Config.ErrDuration).map(d => d.Duration);
+                $scope.selectedSensorData = {
+                    labels: sensorResultsData != null ? sensorResultsData.map(d => new Date(d.Date).toLocaleTimeString()) : [],
+                    datasets: [{
+                            label: "Duration OK",
+                            fillColor: "transparent",
+                            strokeColor: "green",
+                            pointColor: "green",
+                            data: okData
+                        },
+                        {
+                            label: "Duration WRN",
+                            fillColor: "transparent",
+                            strokeColor: "orange",
+                            pointColor: "orange",
+                            data: wrnData
+                        },
+                        {
+                            label: "Duration ERR",
+                            fillColor: "transparent",
+                            strokeColor: "red",
+                            pointColor: "red",
+                            data: errData
+                        }
+                    ],
+                    legend: {
+                        show: true
+                    }
+                };
+            }
         } else
             $scope.selectedSensor = $scope.selectedSensorData = null;
     };
