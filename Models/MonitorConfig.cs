@@ -22,6 +22,7 @@ namespace JAMTech.Models
 
         public bool Enabled { get; set; } = true;
 
+        public int ResultsSizeLimit { get; set; } = 50;
         public enum AvailableMethods
         {
             GET, POST

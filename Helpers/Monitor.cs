@@ -23,7 +23,7 @@ namespace JAMTech.Helpers
         private Thread _monitoringThread;
         public Models.MonitorResult[] Results;
 
-        public Monitor(Models.MonitorConfig config, string uid, int resultsLimit = 50)
+        public Monitor(Models.MonitorConfig config, string uid)
         {
             Config = config;
             Uid = uid;
@@ -32,7 +32,7 @@ namespace JAMTech.Helpers
             _interval = config.Interval;
             _expectedStatusCode = config.ExpectedStatusCode;
             _expectResponseBodyContains = config.ExpectedResponseBodyContains;
-            ResultsLimit = resultsLimit;
+            ResultsLimit = config.ResultsSizeLimit;
             if(ResultsLimit>0)
                 Results = new Models.MonitorResult[ResultsLimit];
         }
@@ -62,6 +62,7 @@ namespace JAMTech.Helpers
                 var timer = Stopwatch.StartNew();
                 //check status
                 HttpResponseMessage response = null;
+                var errMsg = "";
                 try
                 {
                     switch (_method)
@@ -74,34 +75,28 @@ namespace JAMTech.Helpers
                             break;
                     }
                 }
-                catch
+                catch(Exception ex)
                 {
                     //TODO log ex and trigger notifications, alerts, etc..
+                    errMsg += "Http request error. " + Environment.NewLine;
+                    errMsg += ex.Message;
+                    errMsg += ex.StackTrace;
                 }
                 timer.Stop();
                 if (response != null)
                 {
-                    var errMsg = "";
                     if (_expectedStatusCode != 0 && (int)response.StatusCode != _expectedStatusCode)
                         errMsg += "Invalid status code" + Environment.NewLine;
                     if (_expectResponseBodyContains != null && _expectResponseBodyContains != "" && !response.Content.ReadAsStringAsync().Result.Contains(_expectResponseBodyContains))
-                        errMsg += "Invalid response body." + Environment.NewLine;
-
-                    if (ResultsLimit > 0)
-                    {
-                        if (resultCount > ResultsLimit - 1)
-                            resultCount = 0;
-                        Results[resultCount++] = new Models.MonitorResult(DateTime.Now, errMsg == string.Empty, errMsg) { Duration = timer.ElapsedMilliseconds };
-                    }
-                    Console.WriteLine((errMsg == string.Empty ? "OK" : "ERR") + $" - Monitoring '{_url}' at {DateTime.Now} - Duration {timer.ElapsedMilliseconds} ms.");
+                        errMsg += "Invalid response body." + Environment.NewLine;    
                 }
-                else
+                if (ResultsLimit > 0)
                 {
-                    var colorBkp = Console.ForegroundColor;
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"ERR - Monitoring '{_url}' at {DateTime.Now}");
-                    Console.ForegroundColor = colorBkp;
+                    if (resultCount > ResultsLimit - 1)
+                        resultCount = 0;
+                    Results[resultCount++] = new Models.MonitorResult(DateTime.Now, errMsg == string.Empty, errMsg) { Duration = timer.ElapsedMilliseconds };
                 }
+                Console.WriteLine((errMsg == string.Empty ? "OK" : "ERR") + $" - Monitoring '{_url}' at {DateTime.Now} - Duration {timer.ElapsedMilliseconds} ms.");
             }
         }
     }
