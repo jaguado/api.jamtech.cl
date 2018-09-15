@@ -28,6 +28,23 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, Analytic
         }
     };
 
+    $scope.newSensor =null;
+    $scope.addSensor = function(){
+        console.log('add new sensor', $scope.newSensor);
+        var url = baseApiUrl + "Monitoring";
+        var arr = [];
+        arr.push($scope.newSensor);
+        var data = JSON.stringify(arr);
+        return $http.post(url, data).then(function (response) {
+            $scope.newSensor=null;
+            //console.log('sensor created', response);
+            $scope.refreshSensors();
+            return response.status == 200;
+        }, function (response) {
+            console.log('error adding new sensor', response);
+            return false;
+        });        
+    }
     $scope.sensors = null;
     $scope.selectedSensor = null;
     $scope.selectedSensorData = null;
