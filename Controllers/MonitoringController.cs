@@ -26,7 +26,7 @@ namespace JAMTech.Controllers
         [Produces(typeof(IEnumerable<Models.UserMonitorConfig>))]
         public async Task<IActionResult> CreateMonitoringTasks([FromBody] List<Models.MonitorConfig> monitors, string forUser=null)
         {
-            if (monitors == null || forUser == null || !monitors.Any(m=> !string.IsNullOrEmpty(m.Name) && !string.IsNullOrEmpty(m.Url)))
+            if (monitors == null || forUser == null || !monitors.Any(m=> m != null))
                 return new BadRequestResult();
 
             var obj = new Models.UserMonitorConfig()
