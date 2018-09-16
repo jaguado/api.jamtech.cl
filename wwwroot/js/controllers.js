@@ -6,7 +6,7 @@ var loops = 5;
 var loginPath = "/login";
 var user = localStorage.getItem('user') != null ? JSON.parse(localStorage.getItem('user')) : null;
 var visibleDataRefreshInterval = 60000 * .5; //30 seconds
-var dashboardChartLimit = 200;
+var dashboardChartLimit = 20;
 
 function minimalize() {
     if (!$("body").hasClass("mini-navbar")) {
@@ -49,7 +49,7 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, Analytic
     $scope.selectedSensor = null;
     $scope.selectedSensorData = null;
     $scope.refreshSensors = function () {
-        var url = baseApiUrl + "Monitoring/results?onlyErrors=false";
+        var url = baseApiUrl + "Monitoring/results?onlyErrors=false&resultsCount=" + dashboardChartLimit;
         return $http.get(url).then(function (response) {
             //console.log('status code', response.status);
             $scope.sensors = response.data;
@@ -59,49 +59,56 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, Analytic
             console.log('err', response);
             return false;
         });
+
+        if ($scope.selectedSensor != null)
+            $scope.loadSelectedSensorData();
     };
     $scope.refreshSensors();
     $scope.sensorsTimer = $interval($scope.refreshSensors, visibleDataRefreshInterval);
 
+    $scope.loadSelectedSensorData = function () {
+        var sensorResultsData = $scope.selectedSensor != null ? $scope.selectedSensor.Results : [];
+        console.log('sensorResultsData', sensorResultsData);
+        if (sensorResultsData) {
+            var okData = sensorResultsData.filter(r => r.Success && r.Duration < $scope.selectedSensor.Config.WrnDuration).map(d => d.Duration);
+            var wrnData = sensorResultsData.filter(r => r.Success && r.Duration >= $scope.selectedSensor.Config.WrnDuration && r.Duration < $scope.selectedSensor.Config.ErrDuration).map(d => d.Duration);
+            var errData = sensorResultsData.filter(r => !r.Success || r.Duration >= $scope.selectedSensor.Config.ErrDuration).map(d => d.Duration);
+            $scope.selectedSensorData = {
+                labels: sensorResultsData != null ? sensorResultsData.map(d => new Date(d.Date).toLocaleTimeString()) : [],
+                datasets: [{
+                        label: "Duration OK",
+                        fillColor: "transparent",
+                        strokeColor: "green",
+                        pointColor: "green",
+                        data: okData
+                    },
+                    {
+                        label: "Duration WRN",
+                        fillColor: "transparent",
+                        strokeColor: "orange",
+                        pointColor: "orange",
+                        data: wrnData
+                    },
+                    {
+                        label: "Duration ERR",
+                        fillColor: "transparent",
+                        strokeColor: "red",
+                        pointColor: "red",
+                        data: errData
+                    }
+                ],
+                legend: {
+                    show: true
+                }
+            };
+        }
+    }
+
     $scope.selectSensor = function (sensor) {
         Analytics.trackEvent('dashboard', 'viewSensor', sensor.Config.Name);
         if (sensor != $scope.selectedSensor) {
-            //clear chart before change sensor
             $scope.selectedSensor = sensor;
-            var sensorResultsData = $scope.selectedSensor != null ? $scope.selectedSensor.Results.slice(dashboardChartLimit * -1) : [];
-            if (sensorResultsData) {
-                var okData = sensorResultsData.filter(r => r.Success && r.Duration < sensor.Config.WrnDuration).map(d => d.Duration);
-                var wrnData = sensorResultsData.filter(r => r.Success && r.Duration >= sensor.Config.WrnDuration && r.Duration < sensor.Config.ErrDuration).map(d => d.Duration);
-                var errData = sensorResultsData.filter(r => !r.Success || r.Duration >= sensor.Config.ErrDuration).map(d => d.Duration);
-                $scope.selectedSensorData = {
-                    labels: sensorResultsData != null ? sensorResultsData.map(d => new Date(d.Date).toLocaleTimeString()) : [],
-                    datasets: [{
-                            label: "Duration OK",
-                            fillColor: "transparent",
-                            strokeColor: "green",
-                            pointColor: "green",
-                            data: okData
-                        },
-                        {
-                            label: "Duration WRN",
-                            fillColor: "transparent",
-                            strokeColor: "orange",
-                            pointColor: "orange",
-                            data: wrnData
-                        },
-                        {
-                            label: "Duration ERR",
-                            fillColor: "transparent",
-                            strokeColor: "red",
-                            pointColor: "red",
-                            data: errData
-                        }
-                    ],
-                    legend: {
-                        show: true
-                    }
-                };
-            }
+            $scope.loadSelectedSensorData();
         } else
             $scope.selectedSensor = $scope.selectedSensorData = null;
     };
