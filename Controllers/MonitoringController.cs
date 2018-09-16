@@ -26,6 +26,9 @@ namespace JAMTech.Controllers
         [Produces(typeof(IEnumerable<Models.UserMonitorConfig>))]
         public async Task<IActionResult> CreateMonitoringTasks([FromBody] List<Models.MonitorConfig> monitors, string forUser=null)
         {
+            if (monitors == null || forUser == null || !monitors.Any(m=> m != null))
+                return new BadRequestResult();
+
             var obj = new Models.UserMonitorConfig()
             {
                 uid=forUser,
@@ -36,6 +39,16 @@ namespace JAMTech.Controllers
             //update monitors
             ThreadPool.QueueUserWorkItem(async state => await Program.RefreshMonitoringForUserAsync(forUser));
             return new OkObjectResult(result);
+        }
+
+        /// <summary>
+        /// Test configuration of a monitoring task
+        /// </summary>
+      /// <returns></returns>
+        [HttpPost("test")]
+        public IActionResult TestMonitoringTask([FromBody] Models.MonitorConfig config)
+        {
+            return new OkObjectResult(Helpers.Monitor.TestConfig(config));
         }
 
 
@@ -60,13 +73,13 @@ namespace JAMTech.Controllers
         /// <param name="forUser">This paramemeter is optional and will be completed or validated against access_token</param>
         /// <returns></returns>
         [HttpGet("results")]
-        public IActionResult GetResults(string forUser = null, bool onlyErrors=false)
+        public IActionResult GetResults(string forUser = null, bool onlyErrors=false, int resultsCount=0)
         {
             var monitors = Program.Monitors.Where(m => m.Uid == forUser);
             var results = monitors.Select(m => new
             {
                 Config = m.Config,
-                Results = m.Results.Where(r=>r!=null && ((onlyErrors && !r.Success) || !onlyErrors))
+                Results = resultsCount == 0 ? m.Results.Where(r=>r!=null && ((onlyErrors && !r.Success) || !onlyErrors)) : m.Results.Where(r => r != null && ((onlyErrors && !r.Success) || !onlyErrors)).TakeLast(resultsCount)
             });
             return new OkObjectResult(results);
         }

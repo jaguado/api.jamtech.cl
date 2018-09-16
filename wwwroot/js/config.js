@@ -54,6 +54,16 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
             abstract: true,
             url: "/index",
             templateUrl: "views/common/content.html",
+            resolve: {
+                loadPlugin: function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+                        {
+                            name: 'cgNotify',
+                            files: ['css/plugins/angular-notify/angular-notify.min.css','js/plugins/angular-notify/angular-notify.min.js']
+                        }
+                    ]);
+                }
+            }
         })
         .state('index.main', {
             url: "/main",

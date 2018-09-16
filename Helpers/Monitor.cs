@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -21,9 +22,9 @@ namespace JAMTech.Helpers
         readonly string _expectResponseBodyContains;
         internal bool _exit=false;
         private Thread _monitoringThread;
-        public Models.MonitorResult[] Results;
+        public IList<Models.MonitorResult> Results;
 
-        public Monitor(Models.MonitorConfig config, string uid, int resultsLimit = 50)
+        public Monitor(Models.MonitorConfig config, string uid)
         {
             Config = config;
             Uid = uid;
@@ -32,9 +33,9 @@ namespace JAMTech.Helpers
             _interval = config.Interval;
             _expectedStatusCode = config.ExpectedStatusCode;
             _expectResponseBodyContains = config.ExpectedResponseBodyContains;
-            ResultsLimit = resultsLimit;
-            if(ResultsLimit>0)
-                Results = new Models.MonitorResult[ResultsLimit];
+            ResultsLimit = config.ResultsSizeLimit;
+            if (ResultsLimit > 0)
+                Results = new List<Models.MonitorResult>();
         }
 
         public void Start()
@@ -60,49 +61,63 @@ namespace JAMTech.Helpers
                 Thread.Sleep(_interval);
 
                 var timer = Stopwatch.StartNew();
-                //check status
-                HttpResponseMessage response = null;
-                try
-                {
-                    switch (_method)
-                    {
-                        case AvailableMethods.GET:
-                            response = new HttpClient().GetAsync(_url).Result;
-                            break;
-                        case AvailableMethods.POST:
-                            response = new HttpClient().PostAsync(_url, null).Result;
-                            break;
-                    }
-                }
-                catch
-                {
-                    //TODO log ex and trigger notifications, alerts, etc..
-                }
+                GetResponse(out HttpResponseMessage response, out string errMsg);
                 timer.Stop();
+                SaveResult(timer.ElapsedMilliseconds, errMsg);
+                Console.WriteLine((errMsg == string.Empty ? "OK" : "ERR") + $" - Monitoring '{_url}' at {DateTime.Now} - Duration {timer.ElapsedMilliseconds} ms.");
+            }
+        }
+
+        private void SaveResult(long elapsedMilliseconds, string errMsg)
+        {
+            if (ResultsLimit > 0)
+            {
+                if (Results.Count > ResultsLimit + 20)
+                    Results = Results.TakeLast(ResultsLimit).ToList();
+
+                Results.Add(new Models.MonitorResult(DateTime.Now, errMsg == string.Empty, errMsg) { Duration = elapsedMilliseconds });
+            }
+        }
+
+        private bool GetResponse(out HttpResponseMessage response, out string errMsg)
+        {
+            response = null;
+            errMsg = "";
+            try
+            {
+                switch (_method)
+                {
+                    case AvailableMethods.GET:
+                        response = new HttpClient().GetAsync(_url).Result;
+                        break;
+                    case AvailableMethods.POST:
+                        response = new HttpClient().PostAsync(_url, null).Result;
+                        break;
+                }
                 if (response != null)
                 {
-                    var errMsg = "";
                     if (_expectedStatusCode != 0 && (int)response.StatusCode != _expectedStatusCode)
                         errMsg += "Invalid status code" + Environment.NewLine;
                     if (_expectResponseBodyContains != null && _expectResponseBodyContains != "" && !response.Content.ReadAsStringAsync().Result.Contains(_expectResponseBodyContains))
                         errMsg += "Invalid response body." + Environment.NewLine;
-
-                    if (ResultsLimit > 0)
-                    {
-                        if (resultCount > ResultsLimit - 1)
-                            resultCount = 0;
-                        Results[resultCount++] = new Models.MonitorResult(DateTime.Now, errMsg == string.Empty, errMsg) { Duration = timer.ElapsedMilliseconds };
-                    }
-                    Console.WriteLine((errMsg == string.Empty ? "OK" : "ERR") + $" - Monitoring '{_url}' at {DateTime.Now} - Duration {timer.ElapsedMilliseconds} ms.");
                 }
-                else
-                {
-                    var colorBkp = Console.ForegroundColor;
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"ERR - Monitoring '{_url}' at {DateTime.Now}");
-                    Console.ForegroundColor = colorBkp;
-                }
+                return true;
             }
+            catch (Exception ex)
+            {
+                //TODO log ex and trigger notifications, alerts, etc..
+                errMsg += "Http request error. " + Environment.NewLine;
+                errMsg += ex.Message;
+                errMsg += ex.StackTrace;
+                return false;
+            }
+        }
+
+
+        public static bool TestConfig(Models.MonitorConfig config)
+        {
+            var tempMonitor = new Monitor(config, string.Empty);
+            return tempMonitor.GetResponse(out HttpResponseMessage response, out string errMsg);
         }
     }
 }
