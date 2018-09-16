@@ -6,7 +6,7 @@ var loops = 5;
 var loginPath = "/login";
 var user = localStorage.getItem('user') != null ? JSON.parse(localStorage.getItem('user')) : null;
 var visibleDataRefreshInterval = 60000 * .5; //30 seconds
-var dashboardChartLimit = 20;
+var dashboardChartLimit = 30;
 
 function minimalize() {
     if (!$("body").hasClass("mini-navbar")) {
@@ -60,24 +60,6 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, Analytic
     $scope.sensors = null;
     $scope.selectedSensor = null;
     $scope.selectedSensorData = null;
-    $scope.refreshSensors = function () {
-        var url = baseApiUrl + "Monitoring/results?onlyErrors=false&resultsCount=" + dashboardChartLimit;
-        return $http.get(url).then(function (response) {
-            //console.log('status code', response.status);
-            $scope.sensors = response.data;
-            //console.log('sensors', $scope.sensors);
-            return response.status == 200;
-        }, function (response) {
-            console.log('err', response);
-            return false;
-        });
-
-        if ($scope.selectedSensor != null)
-            $scope.loadSelectedSensorData();
-    };
-    $scope.refreshSensors();
-    $scope.sensorsTimer = $interval($scope.refreshSensors, visibleDataRefreshInterval);
-
     $scope.loadSelectedSensorData = function () {
         var sensorResultsData = $scope.selectedSensor != null ? $scope.selectedSensor.Results : [];
         console.log('sensorResultsData', sensorResultsData);
@@ -112,7 +94,26 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, Analytic
             };
         }
     }
-
+    $scope.refreshSensors = function () {
+        var url = baseApiUrl + "Monitoring/results?onlyErrors=false&resultsCount=" + dashboardChartLimit;
+        return $http.get(url).then(function (response) {
+            //console.log('status code', response.status);
+            $scope.sensors = response.data;
+            
+            if($scope.selectedSensor!=null){
+                //refresh selected
+                $scope.selectedSensor = $scope.sensors.filter(s=> s.Config.Name == $scope.selectedSensor.Config.Name)[0];
+                $scope.loadSelectedSensorData();
+            }
+            //console.log('sensors', $scope.sensors);
+            return response.status == 200;
+        }, function (response) {
+            console.log('err', response);
+            return false;
+        });
+    };
+    $scope.refreshSensors();
+    $scope.sensorsTimer = $interval($scope.refreshSensors, visibleDataRefreshInterval);
     $scope.selectSensor = function (sensor) {
         Analytics.trackEvent('dashboard', 'viewSensor', sensor.Config.Name);
         if (sensor != $scope.selectedSensor) {
