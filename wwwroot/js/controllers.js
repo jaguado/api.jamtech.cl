@@ -7,6 +7,8 @@ var loginPath = "/login";
 var user = localStorage.getItem('user') != null ? JSON.parse(localStorage.getItem('user')) : null;
 var visibleDataRefreshInterval = 60000 * .5; //30 seconds
 var dashboardChartLimit = 30;
+var notifyTemplate = 'views/common/notify.html';
+
 
 function minimalize() {
     if (!$("body").hasClass("mini-navbar")) {
@@ -16,7 +18,44 @@ function minimalize() {
     }
 }
 
-function DashboardCtrl($scope, $rootScope, $http, $interval, $location, Analytics, socialLoginService) {
+function DashboardCtrl($scope, $rootScope, $http, $interval, $location, notify, Analytics, socialLoginService) {
+    Warning = function (msg) {
+        if (notify != null) {
+            notify({
+                message: msg,
+                classes: 'alert-warning',
+                templateUrl: notifyTemplate
+            });
+        }
+    };
+
+    Alert = function(msg) {
+        if (notify != null) {
+            notify({
+                message: msg,
+                classes: 'alert-danger',
+                templateUrl: notifyTemplate
+            });
+        }
+    };
+
+    Success = function(msg) {
+        if (notify != null) {
+            notify({
+                message: msg,
+                classes: 'alert-success',
+                templateUrl: notifyTemplate
+            });
+        }
+    }
+    
+    
+
+    // Config notify behavior
+    notify.config({
+        duration: '5000'
+    });
+
     $scope.safeApply = function (fn) {
         var phase = this.$root.$$phase;
         if (phase == '$apply' || phase == '$digest') {
@@ -28,41 +67,50 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, Analytic
         }
     };
 
-    $scope.newSensor = [];
-    $scope.addSensor = function (newSensor) {
-        console.log('add new sensor', newSensor);
+    $scope.newSensor = null;
+    $scope.addSensor = function () {
+        console.log('add new sensor', $scope.newSensor);
         var url = baseApiUrl + "Monitoring";
         var arr = [];
         arr.push($scope.newSensor);
         var data = JSON.stringify(arr);
         return $http.post(url, data).then(function (response) {
+            Success('Sensor created');
             $scope.newSensor = null;
             //console.log('sensor created', response);
             $scope.refreshSensors();
             return response.status == 200;
         }, function (response) {
-            console.log('error adding new sensor', response);
+            Alert('Error creating new sensor.');
+            //console.log('error adding new sensor', response);
             return false;
         });
-    }
-    $scope.testSensor = function (newSensor) {
-        console.log('test new sensor', newSensor);
+    };
+    $scope.testSensor = function () {
+        console.log('test new sensor', $scope.newSensor);
         var url = baseApiUrl + "Monitoring/test";
         var data = JSON.stringify($scope.newSensor);
         return $http.post(url, data).then(function (response) {
-            console.log('sensor tested', response);
+            var result = response.data;
+            if(result)
+                Success('Sensor OK');
+            else
+                Warning('Sensor Invalid');
+                
+            //console.log('sensor tested', response);
             return response.status == 200;
         }, function (response) {
-            console.log('error testing new sensor', response);
+            Alert('Error testing new sensor.');
+            console.log('error testing new sensor', response, data);
             return false;
         });
-    }
+    };
     $scope.sensors = null;
     $scope.selectedSensor = null;
     $scope.selectedSensorData = null;
     $scope.loadSelectedSensorData = function () {
         var sensorResultsData = $scope.selectedSensor != null ? $scope.selectedSensor.Results : [];
-        console.log('sensorResultsData', sensorResultsData);
+        //console.log('sensorResultsData', sensorResultsData);
         if (sensorResultsData) {
             var okData = sensorResultsData.filter(r => r.Success && r.Duration < $scope.selectedSensor.Config.WrnDuration).map(d => d.Duration);
             var wrnData = sensorResultsData.filter(r => r.Success && r.Duration >= $scope.selectedSensor.Config.WrnDuration && r.Duration < $scope.selectedSensor.Config.ErrDuration).map(d => d.Duration);
@@ -99,15 +147,16 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, Analytic
         return $http.get(url).then(function (response) {
             //console.log('status code', response.status);
             $scope.sensors = response.data;
-            
-            if($scope.selectedSensor!=null){
+
+            if ($scope.selectedSensor != null) {
                 //refresh selected
-                $scope.selectedSensor = $scope.sensors.filter(s=> s.Config.Name == $scope.selectedSensor.Config.Name)[0];
+                $scope.selectedSensor = $scope.sensors.filter(s => s.Config.Name == $scope.selectedSensor.Config.Name)[0];
                 $scope.loadSelectedSensorData();
             }
             //console.log('sensors', $scope.sensors);
             return response.status == 200;
         }, function (response) {
+            Alert('Error getting sensors results');
             console.log('err', response);
             return false;
         });
