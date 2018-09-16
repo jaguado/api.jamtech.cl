@@ -45,6 +45,18 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, Analytic
             return false;
         });
     }
+    $scope.testSensor = function (newSensor) {
+        console.log('test new sensor', newSensor);
+        var url = baseApiUrl + "Monitoring/test";
+        var data = JSON.stringify($scope.newSensor);
+        return $http.post(url, data).then(function (response) {
+            console.log('sensor tested', response);
+            return response.status == 200;
+        }, function (response) {
+            console.log('error testing new sensor', response);
+            return false;
+        });
+    }
     $scope.sensors = null;
     $scope.selectedSensor = null;
     $scope.selectedSensorData = null;
@@ -96,10 +108,7 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, Analytic
                         pointColor: "red",
                         data: errData
                     }
-                ],
-                legend: {
-                    show: true
-                }
+                ]
             };
         }
     }
