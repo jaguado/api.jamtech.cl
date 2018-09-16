@@ -46,7 +46,6 @@ namespace JAMTech.Controllers
         /// </summary>
       /// <returns></returns>
         [HttpPost("test")]
-        [Produces(typeof(IEnumerable<Models.UserMonitorConfig>))]
         public IActionResult TestMonitoringTask([FromBody] Models.MonitorConfig config)
         {
             return new OkObjectResult(Helpers.Monitor.TestConfig(config));
