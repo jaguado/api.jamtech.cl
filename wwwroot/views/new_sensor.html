@@ -1,0 +1,82 @@
+<div class="ibox float-e-margins">
+    <div class="ibox-title">
+        <h5>Sensors Configuration
+            <small>Add new sensor</small>
+        </h5>
+    </div>
+    <div class="ibox-content">
+        <div class="row">
+            <div class="col-sm-6 b-r">
+                <form role="form">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" placeholder="Sensor name" class="form-control" ng-model="newSensor.Name">
+                    </div>
+                    <div class="form-group">
+                        <label>Url</label>
+                        <div class="dropdown open" uib-dropdown="">
+                            <div>
+                                <input type="text" placeholder="https://www.mysecuresite.com" class="form-control" ng-model="newSensor.Url">
+                                <button class="btn btn-white dropdown-toggle" uib-dropdown-toggle="" type="button" aria-haspopup="true" aria-expanded="true">
+                                    <span class="caret"></span>
+                                </button>
+                            </div>
+                            <ul class="dropdown-menu" uib-dropdown-menu="">
+                                <li>
+                                    <a ng-click="newSensor.Method = 'GET'">GET</a>
+                                </li>
+                                <li>
+                                    <a ng-click="newSensor.Method = 'POST'">POST</a>
+                                </li>
+                                <li>
+                                    <a ng-click="newSensor.Method = 'PUT'">PUT</a>
+                                </li>
+                                <li>
+                                    <a ng-click="newSensor.Method = 'DELETE'">DELETE</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Interval</label>
+                        <input type="number" placeholder="60000" class="form-control" ng-model="newSensor.Interval">
+                    </div>
+                    <div class="form-group">
+                        <label>Results Max Size</label>
+                        <input type="number" placeholder="50" class="form-control" ng-model="newSensor.ResultsSizeLimit">
+                    </div>
+                </form>
+            </div>
+            <div class="col-sm-6">
+                <form role="form">
+                    <div class="form-group">
+                        <label>Expected Status</label>
+                        <input type="number" placeholder="200" class="form-control" ng-model="newSensor.ExpectedStatusCode">
+                    </div>
+                    <div class="form-group">
+                        <label>Expected Response Body Contains</label>
+                        <input type="text" placeholder="" class="form-control" ng-model="newSensor.ExpectedResponseBodyContains">
+                    </div>
+                    <div class="form-group">
+                        <label>Warning Duration</label>
+                        <input type="number" placeholder="500" class="form-control" ng-model="newSensor.WrnDuration">
+                    </div>
+                    <div class="form-group">
+                        <label>Error Duration</label>
+                        <input type="number" placeholder="1500" class="form-control" ng-model="newSensor.ErrDuration">
+                    </div>
+                    <div>
+                        <button class="btn btn-sm btn-primary pull-right m-t-n-xs" ng-click="addSensor()">
+                            <strong>Add
+                            </strong>
+                        </button>
+                        <button class="btn btn-sm btn-primary pull-right m-t-n-xs" ng-click="testSensor()">
+                            <strong>Test
+                            </strong>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

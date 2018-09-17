@@ -146,9 +146,7 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, notify, 
         var url = baseApiUrl + "Monitoring/results?onlyErrors=false&resultsCount=" + dashboardChartLimit;
         if ($scope.sensorsTimer != null && user == null) {
             $scope.sensorsTimer = null;
-        } else {
-            $scope.sensorsTimer = $interval($scope.refreshSensors, visibleDataRefreshInterval);
-        }
+        } 
         return $http.get(url).then(function (response) {
             //console.log('status code', response.status);
             $scope.sensors = response.data;
@@ -166,6 +164,7 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, notify, 
         });
     };
     $scope.refreshSensors();
+    $scope.sensorsTimer = $interval($scope.refreshSensors, visibleDataRefreshInterval);
     $scope.selectSensor = function (sensor) {
         Analytics.trackEvent('dashboard', 'viewSensor', sensor.Config.Name);
         if (sensor != $scope.selectedSensor) {
