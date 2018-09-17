@@ -25,7 +25,7 @@ namespace JAMTech.Controllers
         /// <param name="rut"></param>
         /// <param name="pwd"></param>
         /// <returns></returns>
-        [HttpGet("santander/accounts")]
+        [HttpGet("Santander/Accounts")]
         [Produces(typeof(List<Models.Santander.E1>))]
         public async Task<IActionResult> GetSantanderAccountsAsync(string rut, int pwd)
         {
@@ -42,7 +42,7 @@ namespace JAMTech.Controllers
         /// <param name="rut"></param>
         /// <param name="pwd"></param>
         /// <returns></returns>
-        [HttpGet("santander/movements")]
+        [HttpGet("Santander/Movements")]
         [Produces(typeof(IList<MovimientosDeposito>))]
         public async Task<IActionResult> GetSantanderMovementsAsync(string rut, int pwd)
         {
@@ -60,7 +60,7 @@ namespace JAMTech.Controllers
         /// <param name="pwd"></param>
         /// <param name="amount"></param>
         /// <returns></returns>
-        [HttpGet("santander/movements/{amount}")]
+        [HttpGet("Santander/Movements/{amount}")]
         [Produces(typeof(IList<MovimientosDeposito>))]
         public async Task<IActionResult> GetSantanderMovementsAsync(string rut, int pwd, int amount)
         {
