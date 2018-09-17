@@ -213,6 +213,23 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, notify, 
 }
 
 function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, socialLoginService) {
+    $scope.checkUser = function(){
+        if (user != null) {
+            console.log('user logged in', user.name, user);
+            if ($location.path() == loginPath) {
+                $location.path("/");
+            }
+        } else {
+    
+            if ($location.path !== loginPath) {
+                $location.path(loginPath);
+            }
+        }
+    };
+    $rootScope.$on("logoff", function(){
+        $scope.logoff();
+    });
+
     $scope.sessiontimer = null;
     this.helloText = 'Bienvenido a JAMTech.cl'
     this.descriptionText = '';
@@ -238,17 +255,7 @@ function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, so
     };
 
     $scope.checkSession();
-    if (user != null) {
-        console.log('user logged in', user.name, user);
-        if ($location.path() == loginPath) {
-            $location.path("/");
-        }
-    } else {
-
-        if ($location.path !== loginPath) {
-            $location.path(loginPath);
-        }
-    }
+    $scope.checkUser();
 
     $scope.minimalize = function () {
         if (!$("body").hasClass("mini-navbar")) {
