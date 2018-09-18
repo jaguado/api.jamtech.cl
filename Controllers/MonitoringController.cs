@@ -45,7 +45,7 @@ namespace JAMTech.Controllers
         /// Delete monitor
         /// </summary>
         /// <returns></returns>
-        [HttpDelete("id")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteConfigAsync(string id, string forUser = null)
         {
             var obj = new Models.UserMonitorConfig()
