@@ -170,6 +170,9 @@ namespace JAMTech
                     context.Response.Headers.Add("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
                     context.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Access-Control-Allow-Origin, Authorization, X-Requested-With, X-Robots-Tag, Content-Disposition, Origin");
 
+                    //Security fixes
+                    context.Response.Headers.Add("X-Frame-Options", "DENY"); //Prevent Clickjacking
+
                     //add cache headers
                     const int durationInSeconds = 60 * 60 * 24;
                     //context.Response.Headers[HeaderNames.CacheControl] = "no-cache, no-store, must-revalidate";
