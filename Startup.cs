@@ -29,7 +29,7 @@ namespace JAMTech
 {
     public class Startup
     {
-        public const string ApiTitle = "JAM Tech Public API";
+        public const string ApiTitle = "JAM Tech AIO API";
         /// <summary>
         /// useCache=false to disable mem cache
         /// </summary>
