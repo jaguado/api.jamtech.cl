@@ -17,3 +17,11 @@ var config = {
     messagingSenderId: "181464837188"
 };
 firebase.initializeApp(config);
+
+
+// Pace options
+paceOptions = {
+    ajax: true, // disabled
+    document: false, // disabled
+    eventLag: true // disabled
+  };
