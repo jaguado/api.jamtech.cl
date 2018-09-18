@@ -45,16 +45,18 @@ namespace JAMTech.Controllers
         /// Delete monitor
         /// </summary>
         /// <returns></returns>
-        [HttpDelete()]
-        public async Task<IActionResult> DeleteConfigAsync([FromBody] Models.MonitorConfig config, string forUser = null)
+        [HttpDelete("id")]
+        public async Task<IActionResult> DeleteConfigAsync(string id, string forUser = null)
         {
             var obj = new Models.UserMonitorConfig()
             {
                 uid = forUser,
-                _id = new Models.UserMonitorConfig.id { oid = config.Id },
-                Data = new[] { config }
+                _id = new Models.UserMonitorConfig.id { oid = id}
             };
-            //TODO check if id correspond to the authenticated user (forUser)
+            //check if sensor id correspond to the authenticated user (forUser)
+            var userResults = await Extensions.MongoDB.FromMongoDB<Models.UserMonitorConfig, Models.MonitorConfig>(forUser);
+            if (userResults == null || !userResults.Any(t => t.Id == id))
+                return new UnauthorizedResult();
             await obj.DeleteFromMongoDB<Models.UserMonitorConfig>();
             return new OkResult();
         }
