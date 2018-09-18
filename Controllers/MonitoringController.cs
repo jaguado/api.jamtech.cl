@@ -42,9 +42,27 @@ namespace JAMTech.Controllers
         }
 
         /// <summary>
+        /// Delete monitor
+        /// </summary>
+        /// <returns></returns>
+        [HttpDelete()]
+        public async Task<IActionResult> DeleteConfigAsync([FromBody] Models.MonitorConfig config, string forUser = null)
+        {
+            var obj = new Models.UserMonitorConfig()
+            {
+                uid = forUser,
+                _id = new Models.UserMonitorConfig.id { oid = config.Id },
+                Data = new[] { config }
+            };
+            //TODO check if id correspond to the authenticated user (forUser)
+            await obj.DeleteFromMongoDB<Models.UserMonitorConfig>();
+            return new OkResult();
+        }
+
+        /// <summary>
         /// Test configuration of a monitoring task
         /// </summary>
-      /// <returns></returns>
+        /// <returns></returns>
         [HttpPost("test")]
         public IActionResult TestMonitoringTask([FromBody] Models.MonitorConfig config)
         {
@@ -62,8 +80,6 @@ namespace JAMTech.Controllers
         public async Task<IActionResult> GetMonitoringTasks(string forUser=null)
         {
             var result = await Extensions.MongoDB.FromMongoDB<Models.UserMonitorConfig, Models.MonitorConfig> (forUser);
-            //update monitors
-            ThreadPool.QueueUserWorkItem(async state => await Program.RefreshMonitoringForUserAsync(forUser));
             return new OkObjectResult(result as IEnumerable<Models.MonitorConfig>);
         }
 

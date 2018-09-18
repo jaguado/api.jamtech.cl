@@ -142,6 +142,19 @@ namespace JAMTech.Helpers
             return await client.PutAsync(tempUrl, content);
         }
 
+        public static async Task<HttpResponseMessage> DeleteResponse(string tempUrl, Uri customReferrer = null, int timeoutInSeconds = 0)
+        {
+            var handler = new HttpClientHandler()
+            {
+                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+            };
+            var client = new HttpClient(handler);
+            if (timeoutInSeconds > 0)
+                client.Timeout = TimeSpan.FromSeconds(timeoutInSeconds);
+            if (customReferrer != null)
+                client.DefaultRequestHeaders.Referrer = customReferrer;
+            return await client.DeleteAsync(tempUrl);
+        }
         ///
         /// Checks the file exists or not.
         ///
