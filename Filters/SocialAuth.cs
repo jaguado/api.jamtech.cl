@@ -30,7 +30,8 @@ namespace JAMTech.Filters
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            if (checkAuth)
+            //remove auth when method is OPTIONS
+            if (checkAuth && context.HttpContext.Request.Method != "OPTIONS")
             {
                 //Get access token and check state
                 var accessToken = GetFromHeader(context, authHeader) ?? string.Empty;
