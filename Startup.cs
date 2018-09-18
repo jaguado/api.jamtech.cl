@@ -166,7 +166,8 @@ namespace JAMTech
                         Console.Out.WriteLineAsync(msg);
                     }
                     context.Response.Headers.Add("X-Robots-Tag", "noindex");
-                    context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+                    //TODO add dynamic CORS depending on a whitelist
+                    //context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
                     context.Response.Headers.Add("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
                     context.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Access-Control-Allow-Origin, Authorization, X-Requested-With, X-Robots-Tag, Content-Disposition, Origin");
 
