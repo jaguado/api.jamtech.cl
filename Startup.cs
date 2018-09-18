@@ -173,6 +173,7 @@ namespace JAMTech
 
                     //Security fixes
                     context.Response.Headers.Add("X-Frame-Options", "DENY"); //Prevent Clickjacking
+                    context.Response.Headers.Add("X-Content-Type-Options", "nosniff"); //Prevent MIME type sniffing
 
                     //add cache headers
                     const int durationInSeconds = 60 * 60 * 24;
