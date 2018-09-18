@@ -56,7 +56,7 @@ namespace JAMTech.Controllers
             //check if sensor id correspond to the authenticated user (forUser)
             var userResults = await Extensions.MongoDB.FromMongoDB<Models.UserMonitorConfig, Models.MonitorConfig>(forUser);
             if (userResults == null || !userResults.Any(t => t.Id == id))
-                return new UnauthorizedResult();
+                return new ForbidResult();
             await obj.DeleteFromMongoDB<Models.UserMonitorConfig>();
             return new OkResult();
         }
