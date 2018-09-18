@@ -156,6 +156,18 @@ namespace JAMTech
                 app.UseBrowserLink();
             }
 
+            //cors
+            if (corsWhitelist != null)
+            {
+                app.UseCors(policyBuilder =>
+                {
+                    policyBuilder
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .WithOrigins(corsWhitelist);
+                });
+            }
+
             // Middleware to add headers       
             app.Use(async (context, nextMiddleware) =>
             {
@@ -168,12 +180,9 @@ namespace JAMTech
                         Console.Out.WriteLineAsync(msg);
                     }
                     context.Response.Headers.Add("X-Robots-Tag", "noindex");
-                    //dynamic CORS depending on a whitelist
-                    if(corsWhitelist!=null)
-                        if(corsWhitelist.Contains(context.Request.Host.Host))
-                            context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
-                    context.Response.Headers.Add("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
-                    context.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Access-Control-Allow-Origin, Authorization, X-Requested-With, X-Robots-Tag, Content-Disposition, Origin");
+
+                    //context.Response.Headers.Add("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
+                    //context.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Access-Control-Allow-Origin, Authorization, X-Requested-With, X-Robots-Tag, Content-Disposition, Origin");
 
                     //Security fixes
                     context.Response.Headers.Add("X-Frame-Options", "DENY"); //Prevent Clickjacking
