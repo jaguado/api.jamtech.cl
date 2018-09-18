@@ -185,7 +185,7 @@ namespace JAMTech
                     //context.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Access-Control-Allow-Origin, Authorization, X-Requested-With, X-Robots-Tag, Content-Disposition, Origin");
 
                     //Security fixes
-                    context.Response.Headers.Add("X-Frame-Options", "DENY"); //Prevent Clickjacking
+                    context.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN"); //Prevent Clickjacking
                     context.Response.Headers.Add("X-Content-Type-Options", "nosniff"); //Prevent MIME type sniffing
                     context.Response.Headers.Add("Referrer-Policy", "origin"); //add referrer policy
 
