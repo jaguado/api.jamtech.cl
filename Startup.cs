@@ -35,6 +35,8 @@ namespace JAMTech
         /// </summary>
         internal static bool useMemCache = Environment.GetEnvironmentVariable("useCache") != null && Environment.GetEnvironmentVariable("useCache") == "false" ? false : true; //default true
 
+        internal static string[] corsWhitelist = Environment.GetEnvironmentVariable("CORS") != null ? Environment.GetEnvironmentVariable("CORS").Split(",") : null;
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -166,8 +168,10 @@ namespace JAMTech
                         Console.Out.WriteLineAsync(msg);
                     }
                     context.Response.Headers.Add("X-Robots-Tag", "noindex");
-                    //TODO add dynamic CORS depending on a whitelist
-                    //context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+                    //dynamic CORS depending on a whitelist
+                    if(corsWhitelist!=null)
+                        if(corsWhitelist.Contains(context.Request.Host.Host))
+                            context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
                     context.Response.Headers.Add("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
                     context.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Access-Control-Allow-Origin, Authorization, X-Requested-With, X-Robots-Tag, Content-Disposition, Origin");
 
