@@ -78,6 +78,7 @@
                                 <th>Interval (ms)</th>
                                 <th>Status Code Check</th>
                                 <th>Body Content Check </th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -102,6 +103,9 @@
                                     <button ng-if="sensor.Config.ExpectedResponseBodyContains != null" class="btn btn-outline btn-primary dim" type="button">
                                         <i class="fa fa-check"></i>
                                     </button>
+                                </td>
+                                <td>
+                                    <a><i class="fa fa-times" ng-click="deleteSensor(sensor)"></i></a>
                                 </td>
                             </tr>
                         </tbody>

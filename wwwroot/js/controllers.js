@@ -192,6 +192,10 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, notify, 
         }
     };
 
+    $scope.deleteSensor = function(sensor){
+        console.log('deleting sensor', sensor);
+    };
+
     /**
      * Options for Line chart
      */
