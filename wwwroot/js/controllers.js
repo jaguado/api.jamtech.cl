@@ -67,7 +67,7 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, notify, 
         }
     };
 
-    $scope.newSensor = [];
+    $scope.newSensor = {"Id": null};
     $scope.addSensor = function () {
         console.log('add new sensor', $scope.newSensor);
         var url = baseApiUrl + "Monitoring";
@@ -76,7 +76,7 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, notify, 
         var data = JSON.stringify(arr);
         return $http.post(url, data).then(function (response) {
             Success('Sensor created');
-            $scope.newSensor = null;
+            $scope.newSensor = {"Id": null};
             //console.log('sensor created', response);
             $scope.refreshSensors();
             return response.status == 200;
