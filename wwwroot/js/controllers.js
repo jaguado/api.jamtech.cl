@@ -67,7 +67,7 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, notify, 
         }
     };
 
-    $scope.newSensor = null;
+    $scope.newSensor = [];
     $scope.addSensor = function () {
         console.log('add new sensor', $scope.newSensor);
         var url = baseApiUrl + "Monitoring";
