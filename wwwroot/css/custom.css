@@ -1,25 +1,35 @@
 .center-block {
     float: none !important
 }
+
 .product-imitation-small {
     text-align: center;
     padding: 50px 0;
     color: #bebec3;
     font-weight: 600;
- }
+}
 
- .middle td{
-     vertical-align: middle !important;
- }
+.middle td {
+    vertical-align: middle !important;
+}
 
- .btn-monitor{
-     min-width: 87px;
- }
+.btn-monitor {
+    min-width: 87px;
+}
 
- .btn-login{
-     margin-bottom: 5px;
- }
+.btn-login {
+    margin-bottom: 5px;
+}
 
- .centered td, th {
+.centered td,
+th {
     text-align: center !important;
- }
+}
+
+/* Set the size of the div element that contains the map */
+#map {
+    height: 400px;
+    /* The height is 400 pixels */
+    width: 100%;
+    /* The width is the width of the web page */
+}

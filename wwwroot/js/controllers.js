@@ -9,6 +9,9 @@ var visibleDataRefreshInterval = 60000 * .5; //30 seconds
 var dashboardChartLimit = 30;
 var notifyTemplate = 'views/common/notify.html';
 var atmsDistanceKms = 5;
+var globalPosition = null;
+var atmsMap = null;
+
 
 function minimalize() {
     if (!$("body").hasClass("mini-navbar")) {
@@ -21,13 +24,22 @@ function minimalize() {
 function AtmsCtrl($scope, $rootScope, $http, $interval, $location, notify, Analytics, socialLoginService) {
     $scope.atms = [];
     $scope.availableTemplates = [{
-        "name": "Table",
-        "url": "views/atms_table.html",
-        "iconClass": "fas fa-table"
-    }];
+            "name": "Map",
+            "url": "views/atms_map.html",
+            "iconClass": "fas fa-map"
+        },
+        {
+            "name": "Table",
+            "url": "views/atms_table.html",
+            "iconClass": "fas fa-table"
+        }
+    ];
     $scope.gridTemplate = $scope.availableTemplates[0];
-    $scope.position=null;
-    $scope.searchAtms = function(){
+    $scope.setTemplate = function (template) {
+        $scope.gridTemplate = template;
+    };
+    $scope.position = null;
+    $scope.searchAtms = function () {
         var url = baseApiUrl + "Cajeros?distance=" + atmsDistanceKms;
         //add position
         if ($scope.position != null) {
@@ -35,8 +47,9 @@ function AtmsCtrl($scope, $rootScope, $http, $interval, $location, notify, Analy
             url += '&lng=' + $scope.position.coords.longitude;
         }
         return $http.get(url).then(function (response) {
-            console.log('searchAtms', response.data);
+            //console.log('searchAtms', response.data);
             $scope.atms = response.data;
+            $scope.addMarkers();
             return response.status == 200;
         }, function (response) {
             Alert('Error getting atms');
@@ -44,11 +57,29 @@ function AtmsCtrl($scope, $rootScope, $http, $interval, $location, notify, Analy
             return false;
         });
     };
-
+    $scope.addMarkers = function () {
+        var bounds = new google.maps.LatLngBounds();
+        $scope.atms.forEach(atm => {
+            //console.log('foreach', atm);
+            var pos = {
+                lat: atm.latitude,
+                lng: atm.longitude
+            };
+            var url = "http://www.google.com/maps/place/" + atm.latitude + "," + atm.longitude;
+            addMarker(pos, atm.location == null ? "Cajero" : atm.location, atmsMap, url);
+            var loc = new google.maps.LatLng(pos.lat, pos.lng);
+            bounds.extend(loc);
+        });
+        if (atmsMap != null) {
+            atmsMap.fitBounds(bounds); // auto-zoom
+            atmsMap.panToBounds(bounds); //auto-center
+        }
+    }
     //try to read geolocation from browser
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function (position) {
                 $scope.$apply(function () {
+                    globalPosition = position;
                     $scope.position = position;
                     $scope.showLocationWarning = false;
                     Analytics.trackEvent('atms', 'geolocation', 'true');
@@ -806,6 +837,21 @@ function GetPrice() {
         return 'no price yet';
     }
 };
+
+function addMarker(location, text, map, uri) {
+    var marker = new google.maps.Marker({
+        position: location,
+        title: text,
+        map: map,
+        url: uri
+    });
+    (function (marker) {
+        google.maps.event.addListener(marker, "click", function (e) {
+            console.log('open route to atm in new window');
+            window.open(marker.url);
+        });
+    })(marker);
+}
 
 String.prototype.replaceAll = function (searchStr, replaceStr) {
     var str = this;
