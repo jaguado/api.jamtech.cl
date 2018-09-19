@@ -35,7 +35,7 @@ function AtmsCtrl($scope, $rootScope, $http, $interval, $location, notify, Analy
             url += '&lng=' + $scope.position.coords.longitude;
         }
         return $http.get(url).then(function (response) {
-            console.log('searchAtms', response.data);
+            //console.log('searchAtms', response.data);
             $scope.atms = response.data;
             return response.status == 200;
         }, function (response) {
