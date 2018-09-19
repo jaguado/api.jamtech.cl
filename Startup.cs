@@ -29,11 +29,13 @@ namespace JAMTech
 {
     public class Startup
     {
-        public const string ApiTitle = "JAM Tech Public API";
+        public const string ApiTitle = "JAM Tech AIO API";
         /// <summary>
         /// useCache=false to disable mem cache
         /// </summary>
         internal static bool useMemCache = Environment.GetEnvironmentVariable("useCache") != null && Environment.GetEnvironmentVariable("useCache") == "false" ? false : true; //default true
+
+        internal static string[] corsWhitelist = Environment.GetEnvironmentVariable("CORS") != null ? Environment.GetEnvironmentVariable("CORS").Split(",") : null;
 
         public Startup(IConfiguration configuration)
         {
@@ -154,6 +156,18 @@ namespace JAMTech
                 app.UseBrowserLink();
             }
 
+            //cors
+            if (corsWhitelist != null)
+            {
+                app.UseCors(policyBuilder =>
+                {
+                    policyBuilder
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .WithOrigins(corsWhitelist);
+                });
+            }
+
             // Middleware to add headers       
             app.Use(async (context, nextMiddleware) =>
             {
@@ -166,9 +180,18 @@ namespace JAMTech
                         Console.Out.WriteLineAsync(msg);
                     }
                     context.Response.Headers.Add("X-Robots-Tag", "noindex");
-                    context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
-                    context.Response.Headers.Add("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
-                    context.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Access-Control-Allow-Origin, Authorization, X-Requested-With, X-Robots-Tag, Content-Disposition, Origin");
+
+                    //context.Response.Headers.Add("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
+                    //context.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Access-Control-Allow-Origin, Authorization, X-Requested-With, X-Robots-Tag, Content-Disposition, Origin");
+
+                    //Security fixes
+                    context.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN"); //Prevent Clickjacking
+                    context.Response.Headers.Add("X-Content-Type-Options", "nosniff"); //Prevent MIME type sniffing
+                    context.Response.Headers.Add("Referrer-Policy", "origin"); //add referrer policy
+
+                    // Use HTTP Strict Transport Security
+                    if (context.Request.IsHttps)
+                        context.Response.Headers.Add("Strict-Transport-Security", "max-age=10886400; includeSubDomains; preload"); //Prevent Clickjacking
 
                     //add cache headers
                     const int durationInSeconds = 60 * 60 * 24;

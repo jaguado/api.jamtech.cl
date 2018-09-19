@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -6,6 +7,7 @@ namespace JAMTech.Models
 {
     public class MonitorConfig
     {
+        public string Id { get; set; }
         public string Name { get; set; }
         public string Url { get; set; }
         public AvailableMethods Method { get; set; } = AvailableMethods.GET;

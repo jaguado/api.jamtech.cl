@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using JAMTech.Models;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -69,6 +70,16 @@ namespace JAMTech.Extensions
             var content = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<IEnumerable<T>>(content, Startup.jsonSettings);
         }
+        public static async Task DeleteFromMongoDB<T>(this T obj)
+        {
+            if (typeof(UserMonitorConfig) != typeof(T))
+                throw new NotImplementedException("DELETE only works for UserMonitorConfig objects");
+            var collectionName = typeof(T).Name.ToLower();
+            var objectId = (obj as UserMonitorConfig)._id.oid;
+            var collectionUrl = $"{baseUrl}databases/{defaultDatabase}/collections/{collectionName}/{objectId}?apiKey={apiKey}";
+            var response = await Helpers.Net.DeleteResponse(collectionUrl);
+            response.EnsureSuccessStatusCode();
+        }
 
         /// <summary>
         /// Only returns data of specified user
@@ -85,7 +96,21 @@ namespace JAMTech.Extensions
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsAsync<JArray>();
             if (content.Count == 0) return null;
-            return content.Select(obj => JsonConvert.DeserializeObject<IEnumerable<Y>>(obj["Data"].ToString(), Startup.jsonSettings)).SelectMany(c=>c);  
+            var result = new List<IEnumerable<Y>>();
+            foreach (var obj in content)
+            {
+                var data = JsonConvert.DeserializeObject<IEnumerable<Y>>(obj["Data"].ToString(), Startup.jsonSettings).ToList();
+                if (typeof(T) == typeof(UserMonitorConfig) && typeof(Y) == typeof(MonitorConfig))
+                {
+                    data.ForEach(d =>
+                    {
+                        var t = d as MonitorConfig;
+                        t.Id = obj["_id"]["$oid"].ToString();
+                    });
+                }
+                result.Add(data);
+            }
+            return result.SelectMany(c => c);
         }
     }
 }

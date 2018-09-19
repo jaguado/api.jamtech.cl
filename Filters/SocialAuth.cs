@@ -30,7 +30,8 @@ namespace JAMTech.Filters
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            if (checkAuth)
+            //remove auth when method is OPTIONS
+            if (checkAuth && context.HttpContext.Request.Method != "OPTIONS")
             {
                 //Get access token and check state
                 var accessToken = GetFromHeader(context, authHeader) ?? string.Empty;
@@ -40,10 +41,20 @@ namespace JAMTech.Filters
                     accessToken = accessToken.Replace("Bearer ", "");
 
                 if (string.IsNullOrEmpty(accessToken))
-                    throw new SecurityTokenException("Access token missing");
-                var uid = GetFromRequest(context, uidFieldName);
-                CheckGoogle(context, accessToken, uid);
-                CheckFacebook(context, accessToken, uid);
+                {
+                    //throw new SecurityTokenException("Access token missing");
+                    context.Result = new ContentResult()
+                    {
+                        StatusCode = StatusCodes.Status401Unauthorized,
+                        Content = "Access token missing"
+                    };
+                }
+                else
+                {
+                    var uid = GetFromRequest(context, uidFieldName);
+                    CheckGoogle(context, accessToken, uid);
+                    CheckFacebook(context, accessToken, uid);
+                }
             }
         }
 
@@ -70,7 +81,11 @@ namespace JAMTech.Filters
             const string baseUrl = "https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=";
             var response = Helpers.Net.GetResponse(baseUrl + token).Result;
             if (!response.IsSuccessStatusCode)
-                throw new SecurityTokenException("Invalid access token");
+                context.Result = new ContentResult()
+                {
+                    StatusCode = StatusCodes.Status401Unauthorized,
+                    Content = "Invalid access token"
+                };
             else
             {
                 var googleResult = response.Content.ReadAsStringAsync().Result;
@@ -79,7 +94,11 @@ namespace JAMTech.Filters
                 if (!string.IsNullOrEmpty(uid))
                 {
                     if (uid != result.id.ToString())
-                        throw new SecurityTokenException("Invalid user id");
+                        context.Result = new ContentResult()
+                        {
+                            StatusCode = StatusCodes.Status401Unauthorized,
+                            Content = "Invalid user id"
+                        };
                 }
                 else
                 {
@@ -112,7 +131,11 @@ namespace JAMTech.Filters
             //check if token is valid
             var response = Helpers.Net.GetResponse("https://graph.facebook.com/me?access_token=" + token).Result;
             if (!response.IsSuccessStatusCode)
-                throw new SecurityTokenException("Invalid access token");
+                context.Result = new ContentResult()
+                {
+                    StatusCode = StatusCodes.Status401Unauthorized,
+                    Content = "Invalid access token"
+                };
             else
             {
                 var facebookResult = response.Content.ReadAsStringAsync().Result;
@@ -122,7 +145,11 @@ namespace JAMTech.Filters
                 if (!string.IsNullOrEmpty(uid))
                 {
                     if (uid != result.id.ToString())
-                        throw new SecurityTokenException("Invalid user id");
+                        context.Result = new ContentResult()
+                        {
+                            StatusCode = StatusCodes.Status401Unauthorized,
+                            Content = "Invalid user id"
+                        };
                 }
                 else
                 {

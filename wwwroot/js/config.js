@@ -8,38 +8,38 @@
  */
 
 
- /* Intercept all http calls*/
-var httpInterceptor = function ($q, $location) {
-        return {
-            request: function (config) {//req
-                //add access token if url is from the base api domain
-                if(config.url.startsWith(baseApiUrl)){          
-                    if(!config.url.contains("access_token") && user != null){
-                        //console.log('httpInterceptor', 'request', 'adding access token for user', user);
-                        config.url += config.url.contains("?") ? "&" : "?";
-                        config.url += "access_token=" + user.token;
-                        config.url += "&provider=" + user.provider;
-                    }
+/* Intercept all http calls*/
+var httpInterceptor = function ($q, $location, $rootScope) {
+    return {
+        request: function (config) { //req
+            //add access token if url is from the base api domain
+            if (config.url.startsWith(baseApiUrl)) {
+                if (!config.url.contains("access_token") && user != null) {
+                    //console.log('httpInterceptor', 'request', 'adding access token for user', user);
+                    config.url += config.url.contains("?") ? "&" : "?";
+                    config.url += "access_token=" + user.token;
+                    config.url += "&provider=" + user.provider;
                 }
-                //console.log('httpInterceptor', 'request', 'baseApiUrl', baseApiUrl);
-                return config;
-            },
-
-            response: function (result) {//res
-                //console.log('res',result.status);
-                return result;
-            },
-
-            responseError: function (rejection) {//error
-                console.log('Failed with', rejection.status, 'status');
-                if (rejection.status == 403) {
-                    //$location.url('/dashboard');
-                }
-
-                return $q.reject(rejection);
             }
+            //console.log('httpInterceptor', 'request', 'baseApiUrl', baseApiUrl);
+            return config;
+        },
+
+        response: function (result) { //res
+            //console.log('res',result.status);
+            return result;
+        },
+
+        responseError: function (rejection) { //error
+            console.log('Failed with', rejection.status);
+            if (rejection.status == 401 || rejection.status == 403) {
+                //force logoff
+                $rootScope.$broadcast("logoff");             
+            }
+            return $q.reject(rejection);
         }
-    };
+    }
+};
 
 function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
     $urlRouterProvider.otherwise("/index/dashboard");
@@ -56,12 +56,10 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
             templateUrl: "views/common/content.html",
             resolve: {
                 loadPlugin: function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
-                            name: 'cgNotify',
-                            files: ['css/plugins/angular-notify/angular-notify.min.css','js/plugins/angular-notify/angular-notify.min.js']
-                        }
-                    ]);
+                    return $ocLazyLoad.load([{
+                        name: 'cgNotify',
+                        files: ['css/plugins/angular-notify/angular-notify.min.css', 'js/plugins/angular-notify/angular-notify.min.js']
+                    }]);
                 }
             }
         })
@@ -70,11 +68,9 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
             templateUrl: "views/main.html",
             resolve: {
                 loadPlugin: function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
-                            files: ['css/plugins/bootstrapSocial/bootstrap-social.css']
-                        }
-                    ]);
+                    return $ocLazyLoad.load([{
+                        files: ['css/plugins/bootstrapSocial/bootstrap-social.css']
+                    }]);
                 }
             }
         })
@@ -83,8 +79,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
             templateUrl: "views/dashboard.html",
             resolve: {
                 loadPlugin: function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
+                    return $ocLazyLoad.load([{
                             name: 'angles',
                             files: ['js/plugins/chartJs/angles.js', 'js/plugins/chartJs/Chart.min.js']
                         },
@@ -95,7 +90,7 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
                         {
                             serie: true,
                             name: 'angular-flot',
-                            files: [ 'js/plugins/flot/jquery.flot.js', 'js/plugins/flot/jquery.flot.time.js', 'js/plugins/flot/jquery.flot.tooltip.min.js', 'js/plugins/flot/jquery.flot.spline.js', 'js/plugins/flot/jquery.flot.resize.js', 'js/plugins/flot/jquery.flot.pie.js', 'js/plugins/flot/curvedLines.js', 'js/plugins/flot/angular-flot.js', ]
+                            files: ['js/plugins/flot/jquery.flot.js', 'js/plugins/flot/jquery.flot.time.js', 'js/plugins/flot/jquery.flot.tooltip.min.js', 'js/plugins/flot/jquery.flot.spline.js', 'js/plugins/flot/jquery.flot.resize.js', 'js/plugins/flot/jquery.flot.pie.js', 'js/plugins/flot/curvedLines.js', 'js/plugins/flot/angular-flot.js', ]
                         }
                     ]);
                 }
@@ -106,11 +101,9 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
             templateUrl: "views/main.html",
             resolve: {
                 loadPlugin: function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
-                            files: ['css/plugins/bootstrapSocial/bootstrap-social.css']
-                        }
-                    ]);
+                    return $ocLazyLoad.load([{
+                        files: ['css/plugins/bootstrapSocial/bootstrap-social.css']
+                    }]);
                 }
             }
         })
@@ -241,10 +234,9 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
             },
             resolve: {
                 loadPlugin: function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-                        {
+                    return $ocLazyLoad.load([{
                             serie: true,
-                            files: ['css/plugins/codemirror/codemirror.css','css/plugins/codemirror/ambiance.css','js/plugins/codemirror/codemirror.js','js/plugins/codemirror/mode/javascript/javascript.js', 'js/plugins/codemirror/mode/css/css.js', 'js/plugins/codemirror/mode/xml/xml.js', 'js/plugins/codemirror/mode/htmlmixed/htmlmixed.js']
+                            files: ['css/plugins/codemirror/codemirror.css', 'css/plugins/codemirror/ambiance.css', 'js/plugins/codemirror/codemirror.js', 'js/plugins/codemirror/mode/javascript/javascript.js', 'js/plugins/codemirror/mode/css/css.js', 'js/plugins/codemirror/mode/xml/xml.js', 'js/plugins/codemirror/mode/htmlmixed/htmlmixed.js']
                         },
                         {
                             name: 'ui.codemirror',
@@ -261,6 +253,25 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
                 pageTitle: 'Projects view'
             }
         })
+        .state('index.atms', {
+            url: "/atms",
+            templateUrl: "views/atms_search.es.html",
+            data: {
+                pageTitle: 'ATM Search'
+            },
+            resolve: {
+                loadPlugin: function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([{
+                            files: ['js/plugins/footable/footable.all.min.js', 'css/plugins/footable/footable.core.css']
+                        },
+                        {
+                            name: 'ui.footable',
+                            files: ['js/plugins/footable/angular-footable.js']
+                        }
+                    ]);
+                }
+            }
+        })
 }
 angular
     .module('inspinia')
@@ -271,7 +282,10 @@ angular
     .config(function (socialProvider) {
         socialProvider.setGoogleKey("95717972095-f3h0t9hmvd0dhjfqctoe39qlsupbrmou.apps.googleusercontent.com");
         socialProvider.setLinkedInKey("77es90vl6bc7gi");
-        socialProvider.setFbKey({appId: "277009742922752", apiVersion: "v3.1"});
+        socialProvider.setFbKey({
+            appId: "277009742922752",
+            apiVersion: "v3.1"
+        });
     })
     .config(function ($httpProvider) {
         $httpProvider.interceptors.push(httpInterceptor);

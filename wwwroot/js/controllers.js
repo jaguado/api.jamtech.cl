@@ -8,7 +8,7 @@ var user = localStorage.getItem('user') != null ? JSON.parse(localStorage.getIte
 var visibleDataRefreshInterval = 60000 * .5; //30 seconds
 var dashboardChartLimit = 30;
 var notifyTemplate = 'views/common/notify.html';
-
+var atmsDistanceKms = 5;
 
 function minimalize() {
     if (!$("body").hasClass("mini-navbar")) {
@@ -16,6 +16,50 @@ function minimalize() {
     } else {
         $("body").removeClass("mini-navbar");
     }
+}
+
+function AtmsCtrl($scope, $rootScope, $http, $interval, $location, notify, Analytics, socialLoginService) {
+    $scope.atms = [];
+    $scope.availableTemplates = [{
+        "name": "Table",
+        "url": "views/atms_table.html",
+        "iconClass": "fas fa-table"
+    }];
+    $scope.gridTemplate = $scope.availableTemplates[0];
+    $scope.position=null;
+    $scope.searchAtms = function(){
+        var url = baseApiUrl + "Cajeros?distance=" + atmsDistanceKms;
+        //add position
+        if ($scope.position != null) {
+            url += '&lat=' + $scope.position.coords.latitude;
+            url += '&lng=' + $scope.position.coords.longitude;
+        }
+        return $http.get(url).then(function (response) {
+            console.log('searchAtms', response.data);
+            $scope.atms = response.data;
+            return response.status == 200;
+        }, function (response) {
+            Alert('Error getting atms');
+            console.log('Error getting atms', response, data);
+            return false;
+        });
+    };
+
+    //try to read geolocation from browser
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+                $scope.$apply(function () {
+                    $scope.position = position;
+                    $scope.showLocationWarning = false;
+                    Analytics.trackEvent('atms', 'geolocation', 'true');
+                    $scope.searchAtms();
+                });
+            },
+            function (error) {
+                Analytics.trackEvent('atms', 'geolocation', 'false');
+                $scope.showLocationWarning = true;
+            });
+    };
 }
 
 function DashboardCtrl($scope, $rootScope, $http, $interval, $location, notify, Analytics, socialLoginService) {
@@ -29,7 +73,7 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, notify, 
         }
     };
 
-    Alert = function(msg) {
+    Alert = function (msg) {
         if (notify != null) {
             notify({
                 message: msg,
@@ -39,7 +83,7 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, notify, 
         }
     };
 
-    Success = function(msg) {
+    Success = function (msg) {
         if (notify != null) {
             notify({
                 message: msg,
@@ -48,8 +92,8 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, notify, 
             });
         }
     }
-    
-    
+
+
 
     // Config notify behavior
     notify.config({
@@ -67,7 +111,9 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, notify, 
         }
     };
 
-    $scope.newSensor = null;
+    $scope.newSensor = {
+        "Id": null
+    };
     $scope.addSensor = function () {
         console.log('add new sensor', $scope.newSensor);
         var url = baseApiUrl + "Monitoring";
@@ -76,7 +122,9 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, notify, 
         var data = JSON.stringify(arr);
         return $http.post(url, data).then(function (response) {
             Success('Sensor created');
-            $scope.newSensor = null;
+            $scope.newSensor = {
+                "Id": null
+            };
             //console.log('sensor created', response);
             $scope.refreshSensors();
             return response.status == 200;
@@ -92,11 +140,11 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, notify, 
         var data = JSON.stringify($scope.newSensor);
         return $http.post(url, data).then(function (response) {
             var result = response.data;
-            if(result)
+            if (result)
                 Success('Sensor OK');
             else
                 Warning('Sensor Invalid');
-                
+
             //console.log('sensor tested', response);
             return response.status == 200;
         }, function (response) {
@@ -144,10 +192,12 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, notify, 
     }
     $scope.refreshSensors = function () {
         var url = baseApiUrl + "Monitoring/results?onlyErrors=false&resultsCount=" + dashboardChartLimit;
+        if ($scope.sensorsTimer != null && user == null) {
+            $scope.sensorsTimer = null;
+        }
         return $http.get(url).then(function (response) {
             //console.log('status code', response.status);
             $scope.sensors = response.data;
-
             if ($scope.selectedSensor != null) {
                 //refresh selected
                 $scope.selectedSensor = $scope.sensors.filter(s => s.Config.Name == $scope.selectedSensor.Config.Name)[0];
@@ -156,8 +206,8 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, notify, 
             //console.log('sensors', $scope.sensors);
             return response.status == 200;
         }, function (response) {
-            Alert('Error getting sensors results');
-            console.log('err', response);
+            Alert('Error getting sensors results. ' + response.statusText);
+            // console.log('err', response);
             return false;
         });
     };
@@ -190,6 +240,21 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, notify, 
         }
     };
 
+    $scope.deleteSensor = function (sensor) {
+        var url = baseApiUrl + "Monitoring/" + sensor.Config.Id;
+        console.log('deleting sensor', sensor.Config);
+        Analytics.trackEvent('dashboard', 'deleteSensor', sensor.Config.Name);
+        return $http.delete(url).then(function (response) {
+            Success("Sensor deleted");
+            $scope.refreshSensors();
+            return response.status == 200;
+        }, function (response) {
+            Alert('Error deleting sensor. ' + response.statusText);
+            console.log('err', response);
+            return false;
+        });
+    };
+
     /**
      * Options for Line chart
      */
@@ -211,6 +276,23 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, notify, 
 }
 
 function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, socialLoginService) {
+    $scope.checkUser = function () {
+        if (user != null) {
+            console.log('user logged in', user.name, user);
+            if ($location.path() == loginPath) {
+                $location.path("/");
+            }
+        } else {
+
+            if ($location.path !== loginPath) {
+                $location.path(loginPath);
+            }
+        }
+    };
+    $rootScope.$on("logoff", function () {
+        $scope.logoff();
+    });
+
     $scope.sessiontimer = null;
     this.helloText = 'Bienvenido a JAMTech.cl'
     this.descriptionText = '';
@@ -236,17 +318,7 @@ function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, so
     };
 
     $scope.checkSession();
-    if (user != null) {
-        console.log('user logged in', user.name, user);
-        if ($location.path() == loginPath) {
-            $location.path("/");
-        }
-    } else {
-
-        if ($location.path !== loginPath) {
-            $location.path(loginPath);
-        }
-    }
+    $scope.checkUser();
 
     $scope.minimalize = function () {
         if (!$("body").hasClass("mini-navbar")) {
@@ -264,6 +336,8 @@ function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, so
         $scope.user = user;
         localStorage.setItem('user', user);
         socialLoginService.logout();
+        $scope.sessiontimer = null;
+        Analytics.set('&uid', null);
         $location.path(loginPath);
     };
 
@@ -285,12 +359,8 @@ function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, so
     });
     $rootScope.$on('event:social-sign-out-success', function (event, logoutStatus) {
         //logout ok
-        $scope.sessiontimer = null;
-        user = null;
-        $scope.user = user;
-        localStorage.setItem('user', user);
-        Analytics.set('&uid', null);
         console.log('social-sign-out-success');
+        $scope.logoff();
         $location.path(loginPath);
     });
 };
@@ -756,6 +826,7 @@ angular
     .controller('TorrentsCtrl', TorrentsCtrl)
     .controller('ToolsCtrl', ToolsCtrl)
     .controller('DashboardCtrl', DashboardCtrl)
+    .controller('AtmsCtrl', AtmsCtrl)
     .filter('capitalize', Capitalize)
     .filter('toArray', toArray)
     .filter('getBrand', getProductBrandType)

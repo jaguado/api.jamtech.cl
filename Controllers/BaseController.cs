@@ -16,9 +16,9 @@ namespace JAMTech.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpOptions]
-        public HttpResponseMessage Options()
+        public IActionResult Options()
         {
-            return new HttpResponseMessage(HttpStatusCode.OK);
+            return new OkResult();
         }
 
         internal IActionResult HandleException(Exception ex)

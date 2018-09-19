@@ -27,7 +27,7 @@ namespace JAMTech.Helpers
         public Monitor(Models.MonitorConfig config, string uid)
         {
             Config = config;
-            Uid = uid;
+            Uid = uid ?? "";
             _url = config.Url;
             _method = config.Method;
             _interval = config.Interval;
