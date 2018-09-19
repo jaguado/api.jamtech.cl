@@ -69,6 +69,8 @@ namespace JAMTech.Controllers
         [HttpPost("test")]
         public IActionResult TestMonitoringTask([FromBody] Models.MonitorConfig config)
         {
+            if (config == null)
+                return new BadRequestResult();
             return new OkObjectResult(Helpers.Monitor.TestConfig(config));
         }
 
