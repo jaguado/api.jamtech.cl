@@ -42,6 +42,7 @@ namespace JAMTech
                 {
                     Console.WriteLine($"Loading '{user.Data.Count()}' monitors of user '{user.uid}'");
                     Monitors.AddRange(user.Data.Select(config => new Monitor(config, user.uid)).ToList());
+                    Monitors.ForEach(m => m.Config.Id = user._id.oid); //add mongodb id
                     Monitors.ForEach(m => m.Start());
                 });     
             }
