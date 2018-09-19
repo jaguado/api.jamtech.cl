@@ -253,6 +253,25 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
                 pageTitle: 'Projects view'
             }
         })
+        .state('index.atms', {
+            url: "/atms",
+            templateUrl: "views/atms_search.es.html",
+            data: {
+                pageTitle: 'ATM Search'
+            },
+            resolve: {
+                loadPlugin: function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([{
+                            files: ['js/plugins/footable/footable.all.min.js', 'css/plugins/footable/footable.core.css']
+                        },
+                        {
+                            name: 'ui.footable',
+                            files: ['js/plugins/footable/angular-footable.js']
+                        }
+                    ]);
+                }
+            }
+        })
 }
 angular
     .module('inspinia')

@@ -1,0 +1,50 @@
+<table class="footable table table-stripped toggle-arrow-tiny middle" data-page-size="20">
+    <thead>
+        <tr>
+            <th data-hide="">Distancia</th>
+            <th data-hide="phone">Direcci&oacute;n</th>
+            <th data-hide="phone">Comuna</th>
+            <th data-hide="phone">Ciudad</th>       
+            <th data-hide="all">Abre a las</th>
+            <th data-hide="all">Cierra a las</th>
+            <th data-hide="all">¿C&oacute;mo llegar?</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="atm in atms" footable-refresh>
+            <td>
+                {{atm.distance | number:2}} kms.
+            </td>
+            <td>
+                {{atm.street}}
+            </td>
+            <td>
+                {{atm.zip}}
+            </td>
+            <td>
+                {{atm.city}}
+            </td>
+            <td>
+                {{atm.openingTime}}
+            </td>
+            <td>
+                {{atm.closingTime}}
+            </td>
+            <td>
+                <a target="_blank" ng-href="http://www.google.com/maps/place/{{atm.latitude}},{{atm.longitude}}">
+                    <i class="fas fa-map-marked-alt"></i>
+                </a>
+            </td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="7">
+                <small ng-show="products!=null">
+                    <b>{{products.length}}</b> producto{{products.length>1 ? 's' : ''}} encontrado{{products.length>1 ? 's'
+                    : ''}}</small>
+                <ul class="pagination pull-right"></ul>
+            </td>
+        </tr>
+    </tfoot>
+</table>
