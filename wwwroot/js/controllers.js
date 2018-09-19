@@ -288,6 +288,8 @@ function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, so
         $scope.user = user;
         localStorage.setItem('user', user);
         socialLoginService.logout();
+        $scope.sessiontimer =null;
+        Analytics.set('&uid', null);
         $location.path(loginPath);
     };
 
@@ -309,12 +311,8 @@ function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, so
     });
     $rootScope.$on('event:social-sign-out-success', function (event, logoutStatus) {
         //logout ok
-        $scope.sessiontimer = null;
-        user = null;
-        $scope.user = user;
-        localStorage.setItem('user', user);
-        Analytics.set('&uid', null);
         console.log('social-sign-out-success');
+        $scope.logoff();      
         $location.path(loginPath);
     });
 };
