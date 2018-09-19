@@ -2,24 +2,27 @@
 <script>
     // Initialize and add the map
     function initMap() {
-        // The location of Uluru
+        if(globalPosition==null){
+            console.log('waiting for position');
+            setTimeout(initMap, 100);
+            return;
+        }
         var me = {
             lat: globalPosition.coords.latitude,
             lng: globalPosition.coords.longitude
         };
-        // The map, centered at Uluru
         atmsMap = new google.maps.Map(
             document.getElementById('map'), {
                 zoom: 4,
                 center: me
             });
-        // The marker, positioned at Uluru
         var marker = new google.maps.Marker({
             position: me,
-            map: atmsMap
+            map: atmsMap,
+            icon: {
+                url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+            }
         });
-
-        
     }
 </script>
 <!--Load the API from the specified URL

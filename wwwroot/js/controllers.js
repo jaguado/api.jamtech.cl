@@ -24,17 +24,17 @@ function minimalize() {
 function AtmsCtrl($scope, $rootScope, $http, $interval, $location, notify, Analytics, socialLoginService) {
     $scope.atms = [];
     $scope.availableTemplates = [{
-            "name": "Table",
-            "url": "views/atms_table.html",
-            "iconClass": "fas fa-table"
-        },
-        {
             "name": "Map",
             "url": "views/atms_map.html",
             "iconClass": "fas fa-map"
+        },
+        {
+            "name": "Table",
+            "url": "views/atms_table.html",
+            "iconClass": "fas fa-table"
         }
     ];
-    $scope.gridTemplate = $scope.availableTemplates[1];
+    $scope.gridTemplate = $scope.availableTemplates[0];
     $scope.setTemplate = function (template) {
         $scope.gridTemplate = template;
     };
@@ -65,12 +65,15 @@ function AtmsCtrl($scope, $rootScope, $http, $interval, $location, notify, Analy
                 lat: atm.latitude,
                 lng: atm.longitude
             };
-            addMarker(pos, atm.location == null ? "Cajero" : atm.location, atmsMap);
+            var url = "http://www.google.com/maps/place/" + atm.latitude + "," + atm.longitude;
+            addMarker(pos, atm.location == null ? "Cajero" : atm.location, atmsMap, url);
             var loc = new google.maps.LatLng(pos.lat, pos.lng);
             bounds.extend(loc);
         });
-        atmsMap.fitBounds(bounds); // auto-zoom
-        atmsMap.panToBounds(bounds); //auto-center
+        if (atmsMap != null) {
+            atmsMap.fitBounds(bounds); // auto-zoom
+            atmsMap.panToBounds(bounds); //auto-center
+        }
     }
     //try to read geolocation from browser
     if (navigator.geolocation) {
@@ -835,12 +838,19 @@ function GetPrice() {
     }
 };
 
-function addMarker(location, text, map) {
+function addMarker(location, text, map, uri) {
     var marker = new google.maps.Marker({
         position: location,
         title: text,
-        map: map
+        map: map,
+        url: uri
     });
+    (function (marker) {
+        google.maps.event.addListener(marker, "click", function (e) {
+            console.log('open route to atm in new window');
+            window.open(marker.url);
+        });
+    })(marker);
 }
 
 String.prototype.replaceAll = function (searchStr, replaceStr) {
