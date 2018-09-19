@@ -58,7 +58,7 @@ namespace JAMTech.Controllers
             if (userResults == null || !userResults.Any(t => t.Id == id))
                 return new ForbidResult();
             await obj.DeleteFromMongoDB<Models.UserMonitorConfig>();
-            ThreadPool.QueueUserWorkItem(state => Program.DeleteMonitorForUserAsync(forUser, id));
+            ThreadPool.QueueUserWorkItem(async state => await Program.RefreshMonitoringForUserAsync(forUser));
             return new OkResult();
         }
 

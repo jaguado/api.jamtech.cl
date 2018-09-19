@@ -63,13 +63,6 @@ namespace JAMTech
                 Monitors.ForEach(m => m.Start());
             }
         }
-        public static void DeleteMonitorForUserAsync(string user, string id)
-        {
-            //remove all active monitors of the user
-            if (Monitors == null) return;
-            Monitors.Where(m => m.Uid == user && m.Config.Id == id).ToList().ForEach(m => m.Dispose());
-            Monitors.RemoveAll(m => m.Uid == user && m.Config.Id == id);
-        }
 
         public static IWebHost BuildWebHost(string[] args, string url) =>
             WebHost.CreateDefaultBuilder(args)
