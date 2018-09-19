@@ -31,6 +31,7 @@
                 {{atm.closingTime}}
             </td>
             <td>
+                {{atm.location}}&nbsp;
                 <a target="_blank" ng-href="http://www.google.com/maps/place/{{atm.latitude}},{{atm.longitude}}">
                     <i class="fas fa-map-marked-alt"></i>
                 </a>
@@ -41,7 +42,7 @@
         <tr>
             <td colspan="7">
                 <small ng-show="products!=null">
-                    <b>{{products.length}}</b> producto{{products.length>1 ? 's' : ''}} encontrado{{products.length>1 ? 's'
+                    <b>{{atms.length}}</b> cajero{{atms.length>1 ? 's' : ''}} encontrado{{atms.length>1 ? 's'
                     : ''}}</small>
                 <ul class="pagination pull-right"></ul>
             </td>

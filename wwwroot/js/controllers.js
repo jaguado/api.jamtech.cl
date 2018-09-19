@@ -39,8 +39,8 @@ function AtmsCtrl($scope, $rootScope, $http, $interval, $location, notify, Analy
             $scope.atms = response.data;
             return response.status == 200;
         }, function (response) {
-            Alert('Error getting amts');
-            console.log('Error getting amts', response, data);
+            Alert('Error getting atms');
+            console.log('Error getting atms', response, data);
             return false;
         });
     };
@@ -51,12 +51,12 @@ function AtmsCtrl($scope, $rootScope, $http, $interval, $location, notify, Analy
                 $scope.$apply(function () {
                     $scope.position = position;
                     $scope.showLocationWarning = false;
-                    Analytics.trackEvent('product', 'geolocation', 'true');
+                    Analytics.trackEvent('atms', 'geolocation', 'true');
                     $scope.searchAtms();
                 });
             },
             function (error) {
-                Analytics.trackEvent('product', 'geolocation', 'false');
+                Analytics.trackEvent('atms', 'geolocation', 'false');
                 $scope.showLocationWarning = true;
             });
     };
