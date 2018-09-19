@@ -193,7 +193,7 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, notify, 
     };
 
     $scope.deleteSensor = function(sensor){
-        var url = baseApiUrl + "Monitoring/" + sensor.Id;
+        var url = baseApiUrl + "Monitoring/" + sensor.Config.Id;
         console.log('deleting sensor', sensor.Config);
         Analytics.trackEvent('dashboard', 'deleteSensor', sensor.Config.Name);
         return $http.delete(url).then(function (response) {
