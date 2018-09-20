@@ -211,7 +211,7 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, notify, 
     $scope.refreshSensors = function () {
         var url = baseApiUrl + "Monitoring/results?onlyErrors=false&resultsCount=" + dashboardChartLimit;
         if ($scope.sensorsTimer != null && user == null) {
-            $scope.sensorsTimer = null;
+            $interval.cancel($scope.sensorsTimer);
         }
         return $http.get(url).then(function (response) {
             //console.log('status code', response.status);
@@ -324,12 +324,7 @@ function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, so
                 //console.log('status code', response.status);
                 return response.status == 201;
             }, function (response) {
-                user = null;
-                $scope.user = user;
-                $scope.sessiontimer = null;
-                localStorage.setItem('user', user);
-                console.log('session invalidated');
-                $location.path(loginPath);
+                $scope.logoff();
                 return false;
             });
         };
@@ -354,7 +349,7 @@ function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, so
         $scope.user = user;
         localStorage.setItem('user', user);
         socialLoginService.logout();
-        $scope.sessiontimer = null;
+        $interval.cancel($scope.sessiontimer);
         Analytics.set('&uid', null);
         $location.path(loginPath);
     };
