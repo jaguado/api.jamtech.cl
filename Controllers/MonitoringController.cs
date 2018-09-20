@@ -40,7 +40,7 @@ namespace JAMTech.Controllers
 
              var result = await obj.ToMongoDB<Models.UserMonitorConfig>();
             //update monitors
-            ThreadPool.QueueUserWorkItem(async state => await Program.RefreshMonitoringForUserAsync(forUser));
+            ThreadPool.QueueUserWorkItem(async state => await Program.RefreshMonitoringForUserAsync(forUser, HttpContext.Request.QueryString.Value));
             return new OkObjectResult(result);
         }
 
@@ -61,7 +61,7 @@ namespace JAMTech.Controllers
             if (userResults == null || !userResults.Any(t => t.Id == id))
                 return new ForbidResult();
             await obj.DeleteFromMongoDB<Models.UserMonitorConfig>();
-            ThreadPool.QueueUserWorkItem(async state => await Program.RefreshMonitoringForUserAsync(forUser));
+            ThreadPool.QueueUserWorkItem(async state => await Program.RefreshMonitoringForUserAsync(forUser, HttpContext.Request.QueryString.Value));
             return new OkResult();
         }
 
@@ -110,27 +110,33 @@ namespace JAMTech.Controllers
             else
             {
                 //proxy to monitoring workers
-                var workersUrl = Environment.GetEnvironmentVariable("monitoring_worker_url") != null ? Environment.GetEnvironmentVariable("monitoring_worker_url").Split(",") : null;
-                if (workersUrl != null)
-                {
-                    var workers = workersUrl.Select(async workerUrl => {
-                        using (var http = new HttpClient())
-                        {
-                            var result = await http.GetAsync(workerUrl + HttpContext.Request.Path + HttpContext.Request.QueryString.Value);
-                            if (result.IsSuccessStatusCode)
-                            {
-                                var jsonData = await result.Content.ReadAsStringAsync();
-                                return JsonConvert.DeserializeObject<IEnumerable<MonitorResultGroup>>(jsonData, Startup.jsonSettings);
-                            }
-                            return null;                            
-                        }
-                    });
-                    await Task.WhenAll(workers.ToArray());
-                    return new OkObjectResult(workers.Where(r=>r.Result!=null).SelectMany(w=>w.Result));
-
-                }
-                return new NotFoundResult();
+                return await GetResultsFromWorkers();
             }
+        }
+
+        private async Task<IActionResult> GetResultsFromWorkers()
+        {
+            var workersUrl = Environment.GetEnvironmentVariable("monitoring_worker_url") != null ? Environment.GetEnvironmentVariable("monitoring_worker_url").Split(",") : null;
+            if (workersUrl != null)
+            {
+                var workers = workersUrl.Select(async workerUrl =>
+                {
+                    using (var http = new HttpClient())
+                    {
+                        var result = await http.GetAsync(workerUrl + HttpContext.Request.Path + HttpContext.Request.QueryString.Value);
+                        if (result.IsSuccessStatusCode)
+                        {
+                            var jsonData = await result.Content.ReadAsStringAsync();
+                            return JsonConvert.DeserializeObject<IEnumerable<MonitorResultGroup>>(jsonData, Startup.jsonSettings);
+                        }
+                        return null;
+                    }
+                });
+                await Task.WhenAll(workers.ToArray());
+                return new OkObjectResult(workers.Where(r => r.Result != null).SelectMany(w => w.Result));
+
+            }
+            return new NotFoundResult();
         }
 
         /// <summary>
@@ -142,7 +148,7 @@ namespace JAMTech.Controllers
         public IActionResult Refresh(string forUser = null)
         {
             //update monitors
-            ThreadPool.QueueUserWorkItem(async state => await Program.RefreshMonitoringForUserAsync(forUser));
+            ThreadPool.QueueUserWorkItem(async state => await Program.RefreshMonitoringForUserAsync(forUser, HttpContext.Request.QueryString.Value));
             return new OkResult();
         }
     }
