@@ -10,6 +10,8 @@ using JAMTech.Extensions;
 using System.Threading;
 using JAMTech.Filters;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using JAMTech.Models;
 
 namespace JAMTech.Controllers
 {
@@ -95,18 +97,14 @@ namespace JAMTech.Controllers
         /// <param name="forUser">This paramemeter is optional and will be completed or validated against access_token</param>
         /// <returns></returns>
         [HttpGet("results")]
-        [Produces("application/json")]
+        [Produces(typeof(IEnumerable<MonitorResultGroup>))]
         public async Task<IActionResult> GetResultsAsync(string forUser = null, bool onlyErrors=false, int resultsCount=0)
         {
             //handle when exists external workers
             if (Program.isMonitoringWorker)
             {
                 var monitors = Program.Monitors.Where(m => m.Uid == forUser);
-                var results = monitors.Select(m => new
-                {
-                    Config = m.Config,
-                    Results = resultsCount == 0 ? m.Results.Where(r => r != null && ((onlyErrors && !r.Success) || !onlyErrors)) : m.Results.Where(r => r != null && ((onlyErrors && !r.Success) || !onlyErrors)).TakeLast(resultsCount)
-                });
+                var results = monitors.Select(m => new MonitorResultGroup(m.Config, resultsCount == 0 ? m.Results.Where(r => r != null && ((onlyErrors && !r.Success) || !onlyErrors)) : m.Results.Where(r => r != null && ((onlyErrors && !r.Success) || !onlyErrors)).TakeLast(resultsCount)));
                 return new OkObjectResult(results);
             }
             else
@@ -116,13 +114,8 @@ namespace JAMTech.Controllers
                 using (var http = new HttpClient())
                 {
                     var result = await http.GetAsync(workerUrl + HttpContext.Request.Path + HttpContext.Request.QueryString.Value);
-                    if (result.IsSuccessStatusCode)
-                    {
-                        var content = await result.Content.ReadAsStringAsync();
-                        return new OkObjectResult(JsonConvert.DeserializeObject(content));
-                    }
-                    else
-                        return new StatusCodeResult((int)result.StatusCode);
+                    var data = await result.Content.ReadAsAsync<IEnumerable<MonitorResultGroup>>();
+                    return new OkObjectResult(data);
                 }
             }
         }
