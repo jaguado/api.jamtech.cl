@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using JAMTech.Extensions;
 using System.Threading;
 using JAMTech.Filters;
+using Newtonsoft.Json;
 
 namespace JAMTech.Controllers
 {
@@ -94,6 +95,7 @@ namespace JAMTech.Controllers
         /// <param name="forUser">This paramemeter is optional and will be completed or validated against access_token</param>
         /// <returns></returns>
         [HttpGet("results")]
+        [Produces("application/json")]
         public async Task<IActionResult> GetResultsAsync(string forUser = null, bool onlyErrors=false, int resultsCount=0)
         {
             //handle when exists external workers
@@ -114,7 +116,13 @@ namespace JAMTech.Controllers
                 using (var http = new HttpClient())
                 {
                     var result = await http.GetAsync(workerUrl + HttpContext.Request.Path + HttpContext.Request.QueryString.Value);
-                    return await result.Content.ReadAsAsync<IActionResult>();
+                    if (result.IsSuccessStatusCode)
+                    {
+                        var content = await result.Content.ReadAsStringAsync();
+                        return new OkObjectResult(JsonConvert.DeserializeObject(content));
+                    }
+                    else
+                        return new StatusCodeResult((int)result.StatusCode);
                 }
             }
         }
