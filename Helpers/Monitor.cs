@@ -111,6 +111,11 @@ namespace JAMTech.Helpers
                 errMsg += ex.StackTrace;
                 return false;
             }
+            finally
+            {
+                if (response != null)
+                    response.Dispose();
+            }
         }
 
 

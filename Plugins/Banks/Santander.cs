@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace JAMTech.Plugins.Banks
 {
-    public class Santander
+    public class Santander: IDisposable
     {
         const string _tplLoginPayload = "{{  \"RUTCLIENTE\": \"{0}\",  \"PASSWORD\": \"{1}\",  \"APP\": \"007\",  \"CANAL\": \"003\" }}";
         const string _tplMovements = "{{  \"Cabecera\": {{    \"HOST\": {{      \"USUARIO-ALT\": \"GAPPS2P\",      \"TERMINAL-ALT\": \"\",      \"CANAL-ID\": \"078\"    }},    \"CanalFisico\": \"78\",    \"CanalLogico\": \"74\",   \"RutCliente\": \"{0}\",    \"RutUsuario\": \"{0}\",    \"IpCliente\": \"\",    \"InfoDispositivo\": \"xx\"  }},  \"Entrada\": {{    \"NumeroCuenta\": \"{1}\"   }}}}";
@@ -30,49 +30,54 @@ namespace JAMTech.Plugins.Banks
         public async Task<bool> Login()
         {
             var loginContent = new StringContent(loginPayload, Encoding.UTF8, "application/json");
-            var response = await new HttpClient().PostAsync(urlLogin, loginContent);
-            if (response.IsSuccessStatusCode)
+            using (var response = await new HttpClient().PostAsync(urlLogin, loginContent))
             {
-                
-                var result = JsonConvert.DeserializeObject<Models.Santander.Account>(await response.Content.ReadAsStringAsync());
-                if (result != null) {
-                    //extract token
-                    if (result.METADATA != null)
-                        token = result.METADATA.KEY;
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = JsonConvert.DeserializeObject<Models.Santander.Account>(await response.Content.ReadAsStringAsync());
+                    if (result != null)
+                    {
+                        //extract token
+                        if (result.METADATA != null)
+                            token = result.METADATA.KEY;
 
-                    //extract accounts and personal info
-                    if (result.DATA != null && result.DATA.OUTPUT != null && result.DATA.OUTPUT.MATRICES != null && result.DATA.OUTPUT.MATRICES.MATRIZCAPTACIONES != null)
-                        Accounts = result.DATA.OUTPUT.MATRICES.MATRIZCAPTACIONES.e1;
+                        //extract accounts and personal info
+                        if (result.DATA != null && result.DATA.OUTPUT != null && result.DATA.OUTPUT.MATRICES != null && result.DATA.OUTPUT.MATRICES.MATRIZCAPTACIONES != null)
+                            Accounts = result.DATA.OUTPUT.MATRICES.MATRIZCAPTACIONES.e1;
+                    }
+                    return true;
                 }
-                return true;
             }
             return false;
         }
 
         public async Task<Models.Santander.Movement.DATA> GetMovements(string id)
         {
-            var movementsRequest = string.Format(_tplMovements, customerId, id);
-            var loginContent = new StringContent(movementsRequest, Encoding.UTF8, "application/json");
-            var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("access-token", token);
-            var response = await client.PostAsync(urlMovements, loginContent);
-            if (response.IsSuccessStatusCode)
+            var loginContent = new StringContent(string.Format(_tplMovements, customerId, id), Encoding.UTF8, "application/json");
+            using (var client = new HttpClient())
             {
-                var result = JsonConvert.DeserializeObject<Movements>(await response.Content.ReadAsStringAsync());
-                if (result != null)
-                    return result.DATA;
+                client.DefaultRequestHeaders.Add("access-token", token);
+                using (var response = await client.PostAsync(urlMovements, loginContent))
+                {
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var result = JsonConvert.DeserializeObject<Movements>(await response.Content.ReadAsStringAsync());
+                        if (result != null)
+                            return result.DATA;
+                    }
+                }
             }
             return null;
         }
 
         public async Task<IList<MovimientosDeposito>> GetAllMovements()
         {
-            return Accounts.Select(async account => await GetMovements(account.NUMEROCONTRATO))
-                           .SelectMany(t => t.Result.MovimientosDepositos)
-                           .ToList();
+            return await Task.Run(() => Accounts.Select(async account => await GetMovements(account.NUMEROCONTRATO))
+                            .SelectMany(t => t.Result.MovimientosDepositos)
+                            .ToList());
         }
 
-        public async Task WaitForMovement(int amount, int waitBetweenRequests = 5000)
+        public async Task WaitForMovementAsync(int amount, int waitBetweenRequests = 5000)
         {
             var exit = false;
             while (!exit)
@@ -87,6 +92,12 @@ namespace JAMTech.Plugins.Banks
                 else
                     exit = true;
             }
+        }
+
+        public void Dispose()
+        {
+            if (Accounts != null)
+                Accounts = null;
         }
     }
 }

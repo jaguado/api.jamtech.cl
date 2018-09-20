@@ -79,32 +79,34 @@ namespace JAMTech.Filters
         {
             //check if token is valid
             const string baseUrl = "https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=";
-            var response = Helpers.Net.GetResponse(baseUrl + token).Result;
-            if (!response.IsSuccessStatusCode)
-                context.Result = new ContentResult()
-                {
-                    StatusCode = StatusCodes.Status401Unauthorized,
-                    Content = "Invalid access token"
-                };
-            else
+            using (var response = Helpers.Net.GetResponse(baseUrl + token).Result)
             {
-                var googleResult = response.Content.ReadAsStringAsync().Result;
-                var result = JsonConvert.DeserializeObject<dynamic>(googleResult);
-                // validate parameter uid against google uid
-                if (!string.IsNullOrEmpty(uid))
-                {
-                    if (uid != result.id.ToString())
-                        context.Result = new ContentResult()
-                        {
-                            StatusCode = StatusCodes.Status401Unauthorized,
-                            Content = "Invalid user id"
-                        };
-                }
+                if (!response.IsSuccessStatusCode)
+                    context.Result = new ContentResult()
+                    {
+                        StatusCode = StatusCodes.Status401Unauthorized,
+                        Content = "Invalid access token"
+                    };
                 else
                 {
-                    //add user info to request
-                    context.ActionArguments[uidFieldName] = result.id.ToString();
-                    context.ActionArguments["userInfo"] = googleResult;
+                    var googleResult = response.Content.ReadAsStringAsync().Result;
+                    var result = JsonConvert.DeserializeObject<dynamic>(googleResult);
+                    // validate parameter uid against google uid
+                    if (!string.IsNullOrEmpty(uid))
+                    {
+                        if (uid != result.id.ToString())
+                            context.Result = new ContentResult()
+                            {
+                                StatusCode = StatusCodes.Status401Unauthorized,
+                                Content = "Invalid user id"
+                            };
+                    }
+                    else
+                    {
+                        //add user info to request
+                        context.ActionArguments[uidFieldName] = result.id.ToString();
+                        context.ActionArguments["userInfo"] = googleResult;
+                    }
                 }
             }
         }
@@ -129,33 +131,35 @@ namespace JAMTech.Filters
         private static void ValidateAccessTokenWithFacebook(ActionExecutingContext context, string token, string uid)
         {
             //check if token is valid
-            var response = Helpers.Net.GetResponse("https://graph.facebook.com/me?access_token=" + token).Result;
-            if (!response.IsSuccessStatusCode)
-                context.Result = new ContentResult()
-                {
-                    StatusCode = StatusCodes.Status401Unauthorized,
-                    Content = "Invalid access token"
-                };
-            else
+            using (var response = Helpers.Net.GetResponse("https://graph.facebook.com/me?access_token=" + token).Result)
             {
-                var facebookResult = response.Content.ReadAsStringAsync().Result;
-                var result = JsonConvert.DeserializeObject<dynamic>(facebookResult);
-
-                // validate parameter uid against google uid
-                if (!string.IsNullOrEmpty(uid))
-                {
-                    if (uid != result.id.ToString())
-                        context.Result = new ContentResult()
-                        {
-                            StatusCode = StatusCodes.Status401Unauthorized,
-                            Content = "Invalid user id"
-                        };
-                }
+                if (!response.IsSuccessStatusCode)
+                    context.Result = new ContentResult()
+                    {
+                        StatusCode = StatusCodes.Status401Unauthorized,
+                        Content = "Invalid access token"
+                    };
                 else
                 {
-                    //add user info to request
-                    context.ActionArguments[uidFieldName] = result.id.ToString();
-                    context.ActionArguments["userInfo"] = facebookResult;
+                    var facebookResult = response.Content.ReadAsStringAsync().Result;
+                    var result = JsonConvert.DeserializeObject<dynamic>(facebookResult);
+
+                    // validate parameter uid against google uid
+                    if (!string.IsNullOrEmpty(uid))
+                    {
+                        if (uid != result.id.ToString())
+                            context.Result = new ContentResult()
+                            {
+                                StatusCode = StatusCodes.Status401Unauthorized,
+                                Content = "Invalid user id"
+                            };
+                    }
+                    else
+                    {
+                        //add user info to request
+                        context.ActionArguments[uidFieldName] = result.id.ToString();
+                        context.ActionArguments["userInfo"] = facebookResult;
+                    }
                 }
             }
         }
