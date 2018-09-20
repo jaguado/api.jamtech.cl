@@ -109,15 +109,24 @@ namespace JAMTech.Controllers
             }
             else
             {
-                //proxy to monitoring worker //TODO add support to multiple workers
-                var workerUrl = Environment.GetEnvironmentVariable("monitoring_worker_url");
-                using (var http = new HttpClient())
+                //proxy to monitoring worker
+                var workersUrl = Environment.GetEnvironmentVariable("monitoring_worker_url") != null ? Environment.GetEnvironmentVariable("monitoring_worker_url").Split(",") : null;
+                if (workersUrl != null)
                 {
-                    var result = await http.GetAsync(workerUrl + HttpContext.Request.Path + HttpContext.Request.QueryString.Value);
-                    var jsonData = await result.Content.ReadAsStringAsync();
-                    var resultObject = JsonConvert.DeserializeObject<IEnumerable<MonitorResultGroup>>(jsonData);
-                    return new OkObjectResult(resultObject);
+                    var workers = workersUrl.Select(async workerUrl => {
+                        using (var http = new HttpClient())
+                        {
+                            var result = await http.GetAsync(workerUrl + HttpContext.Request.Path + HttpContext.Request.QueryString.Value);
+                            var jsonData = await result.Content.ReadAsStringAsync();
+                            return JsonConvert.DeserializeObject<IEnumerable<MonitorResultGroup>>(jsonData);
+                            
+                        }
+                    });
+                    await Task.WhenAll(workers.ToArray());
+                    return new OkObjectResult(workers.SelectMany(w=>w.Result));
+
                 }
+                return new NotFoundResult();
             }
         }
 
