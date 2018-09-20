@@ -13,9 +13,12 @@ namespace JAMTech
     public class Program
     {
         public static bool isDev = false;
+        public static bool isMonitoringWorker = false;
         public static void Main(string[] args)
         {
-            System.Threading.ThreadPool.QueueUserWorkItem(async state=> await StartMonitoringAsync());
+            isMonitoringWorker = Environment.GetEnvironmentVariable("monitoring_worker") == null || Environment.GetEnvironmentVariable("monitoring_worker") != "false";
+            if(isMonitoringWorker)
+                System.Threading.ThreadPool.QueueUserWorkItem(async state=> await StartMonitoringAsync());
 
             var url = "http://*:" + Environment.GetEnvironmentVariable("PORT") ?? throw new ApplicationException("'PORT' variable must be defined");
             Console.WriteLine("Starting web server on " + url);

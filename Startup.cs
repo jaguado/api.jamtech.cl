@@ -101,7 +101,7 @@ namespace JAMTech
                 };
             });
 
-           //compress dynamic json content using brotli
+            //compress dynamic json content using brotli
             services.AddResponseCompression(options =>
             {
                 options.EnableForHttps = true;
@@ -168,47 +168,52 @@ namespace JAMTech
                 });
             }
 
-            // Middleware to add headers       
-            app.Use(async (context, nextMiddleware) =>
+            //monitoring worker doesn't need static files and custome headers
+            if (!Program.isMonitoringWorker)
             {
-                context.Response.OnStarting(() =>
+                // Middleware to add headers       
+                app.Use(async (context, nextMiddleware) =>
                 {
-                    if (!env.IsProduction())
+                    context.Response.OnStarting(() =>
                     {
-                        //print request headers
-                        var msg = $"Response starting {context.Request.Method} on {context.Request.Path}.{Environment.NewLine}";
-                        Console.Out.WriteLineAsync(msg);
-                    }
-                    context.Response.Headers.Add("X-Robots-Tag", "noindex");
+                        if (!env.IsProduction())
+                        {
+                            //print request headers
+                            var msg = $"Response starting {context.Request.Method} on {context.Request.Path}.{Environment.NewLine}";
+                            Console.Out.WriteLineAsync(msg);
+                        }
+                        context.Response.Headers.Add("X-Robots-Tag", "noindex");
 
-                    //context.Response.Headers.Add("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
-                    //context.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Access-Control-Allow-Origin, Authorization, X-Requested-With, X-Robots-Tag, Content-Disposition, Origin");
+                        //context.Response.Headers.Add("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
+                        //context.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Access-Control-Allow-Origin, Authorization, X-Requested-With, X-Robots-Tag, Content-Disposition, Origin");
 
-                    //Security fixes
-                    context.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN"); //Prevent Clickjacking
-                    context.Response.Headers.Add("X-Content-Type-Options", "nosniff"); //Prevent MIME type sniffing
-                    context.Response.Headers.Add("Referrer-Policy", "origin"); //add referrer policy
+                        //Security fixes
+                        context.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN"); //Prevent Clickjacking
+                        context.Response.Headers.Add("X-Content-Type-Options", "nosniff"); //Prevent MIME type sniffing
+                        context.Response.Headers.Add("Referrer-Policy", "origin"); //add referrer policy
 
-                    // Use HTTP Strict Transport Security
-                    if (context.Request.IsHttps)
-                        context.Response.Headers.Add("Strict-Transport-Security", "max-age=10886400; includeSubDomains; preload"); //Prevent Clickjacking
+                        // Use HTTP Strict Transport Security
+                        if (context.Request.IsHttps)
+                            context.Response.Headers.Add("Strict-Transport-Security", "max-age=10886400; includeSubDomains; preload"); //Prevent Clickjacking
 
-                    //add cache headers
-                    const int durationInSeconds = 60 * 60 * 24;
-                    //context.Response.Headers[HeaderNames.CacheControl] = "no-cache, no-store, must-revalidate";
-                    if(!context.Request.QueryString.HasValue)
-                        context.Response.Headers[HeaderNames.CacheControl] = "public,max-age=" + durationInSeconds;
-                    return Task.FromResult(0);
+                        //add cache headers
+                        const int durationInSeconds = 60 * 60 * 24;
+                        //context.Response.Headers[HeaderNames.CacheControl] = "no-cache, no-store, must-revalidate";
+                        if (!context.Request.QueryString.HasValue)
+                            context.Response.Headers[HeaderNames.CacheControl] = "public,max-age=" + durationInSeconds;
+                        return Task.FromResult(0);
+                    });
+                    await nextMiddleware();
                 });
-                await nextMiddleware();
-            });
 
-            if (!useMemCache)
-                app.UseStaticFiles();
+                if (!useMemCache)
+                    app.UseStaticFiles();
 
-            app.UseWebMarkupMin();
 
-            app.UseDefaultFiles();
+                app.UseWebMarkupMin();
+                app.UseDefaultFiles();
+            }
+
             app.UseMvc();
             app.UseSwagger(c =>
             {
@@ -221,7 +226,7 @@ namespace JAMTech
             });
 
             //get static files from cache
-            if (useMemCache)
+            if (useMemCache && !Program.isMonitoringWorker)
             {
                 var basePath = Path.GetFullPath("wwwroot");
                 app.UseMiddleware<CacheMiddleware>(basePath);

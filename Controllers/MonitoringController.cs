@@ -94,15 +94,29 @@ namespace JAMTech.Controllers
         /// <param name="forUser">This paramemeter is optional and will be completed or validated against access_token</param>
         /// <returns></returns>
         [HttpGet("results")]
-        public IActionResult GetResults(string forUser = null, bool onlyErrors=false, int resultsCount=0)
+        public async Task<IActionResult> GetResultsAsync(string forUser = null, bool onlyErrors=false, int resultsCount=0)
         {
-            var monitors = Program.Monitors.Where(m => m.Uid == forUser);
-            var results = monitors.Select(m => new
+            //handle when exists external workers
+            if (Program.isMonitoringWorker)
             {
-                Config = m.Config,
-                Results = resultsCount == 0 ? m.Results.Where(r=>r!=null && ((onlyErrors && !r.Success) || !onlyErrors)) : m.Results.Where(r => r != null && ((onlyErrors && !r.Success) || !onlyErrors)).TakeLast(resultsCount)
-            });
-            return new OkObjectResult(results);
+                var monitors = Program.Monitors.Where(m => m.Uid == forUser);
+                var results = monitors.Select(m => new
+                {
+                    Config = m.Config,
+                    Results = resultsCount == 0 ? m.Results.Where(r => r != null && ((onlyErrors && !r.Success) || !onlyErrors)) : m.Results.Where(r => r != null && ((onlyErrors && !r.Success) || !onlyErrors)).TakeLast(resultsCount)
+                });
+                return new OkObjectResult(results);
+            }
+            else
+            {
+                //proxy to monitoring worker //TODO add support to multiple workers
+                var workerUrl = Environment.GetEnvironmentVariable("monitoring_worker_url");
+                using (var http = new HttpClient())
+                {
+                    var result = await http.GetAsync(workerUrl + HttpContext.Request.Path + HttpContext.Request.QueryString.Value);
+                    return await result.Content.ReadAsAsync<IActionResult>();
+                }
+            }
         }
 
         /// <summary>
