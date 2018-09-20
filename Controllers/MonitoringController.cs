@@ -114,8 +114,9 @@ namespace JAMTech.Controllers
                 using (var http = new HttpClient())
                 {
                     var result = await http.GetAsync(workerUrl + HttpContext.Request.Path + HttpContext.Request.QueryString.Value);
-                    var data = await result.Content.ReadAsAsync<IEnumerable<MonitorResultGroup>>();
-                    return new OkObjectResult(data);
+                    var jsonData = await result.Content.ReadAsStringAsync();
+                    var resultObject = JsonConvert.DeserializeObject<IEnumerable<MonitorResultGroup>>(jsonData);
+                    return new OkObjectResult(resultObject);
                 }
             }
         }
