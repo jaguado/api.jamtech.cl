@@ -11,7 +11,10 @@ var notifyTemplate = 'views/common/notify.html';
 var atmsDistanceKms = 5;
 var globalPosition = null;
 var atmsMap = null;
-
+var combustibleMap = null;
+var atms = null;
+var stations = null;
+var loopsWaitInterval = 500;
 
 function minimalize() {
     if (!$("body").hasClass("mini-navbar")) {
@@ -36,6 +39,7 @@ function AtmsCtrl($scope, $rootScope, $http, $interval, $location, notify, Analy
     ];
     $scope.gridTemplate = $scope.availableTemplates[0];
     $scope.setTemplate = function (template) {
+        Analytics.trackEvent('atms', 'template', template.name);
         $scope.gridTemplate = template;
     };
     $scope.position = null;
@@ -49,7 +53,7 @@ function AtmsCtrl($scope, $rootScope, $http, $interval, $location, notify, Analy
         return $http.get(url).then(function (response) {
             //console.log('searchAtms', response.data);
             $scope.atms = response.data;
-            $scope.addMarkers();
+            atms= response.data;
             return response.status == 200;
         }, function (response) {
             Alert('Error getting atms');
@@ -57,24 +61,7 @@ function AtmsCtrl($scope, $rootScope, $http, $interval, $location, notify, Analy
             return false;
         });
     };
-    $scope.addMarkers = function () {
-        var bounds = new google.maps.LatLngBounds();
-        $scope.atms.forEach(atm => {
-            //console.log('foreach', atm);
-            var pos = {
-                lat: atm.latitude,
-                lng: atm.longitude
-            };
-            var url = "http://www.google.com/maps/place/" + atm.latitude + "," + atm.longitude;
-            addMarker(pos, atm.location == null ? "Cajero" : atm.location, atmsMap, url);
-            var loc = new google.maps.LatLng(pos.lat, pos.lng);
-            bounds.extend(loc);
-        });
-        if (atmsMap != null) {
-            atmsMap.fitBounds(bounds); // auto-zoom
-            atmsMap.panToBounds(bounds); //auto-center
-        }
-    }
+
     //try to read geolocation from browser
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function (position) {
@@ -408,7 +395,7 @@ function TorrentsCtrl($http, $scope, $window, Analytics) {
     }];
     $scope.gridTemplate = $scope.availableTorrentsTemplates[0];
     $scope.setTemplate = function (val) {
-        Analytics.trackEvent('torrent', 'template', val);
+        Analytics.trackEvent('torrent', 'template', val.name);
         $scope.gridTemplate = val;
     }
     $scope.torrents = [];
@@ -457,7 +444,7 @@ function ProductsCtrl($http, $scope, Analytics) {
     $scope.showLocationWarning = false;
     $scope.products = [];
     $scope.setTemplate = function (val) {
-        Analytics.trackEvent('product', 'template', val);
+        Analytics.trackEvent('product', 'template', val.name);
         $scope.gridTemplate = val;
     }
     $scope.searchProduct = function (product) {
@@ -542,7 +529,13 @@ function StationsCtrl($http, $scope, Analytics) {
     loadFromLocalStorage();
 
 
-    $scope.availableTemplates = [{
+    $scope.availableTemplates = [
+        {
+            "name": "Map",
+            "url": "views/combustible_map.html",
+            "iconClass": "fas fa-map"
+        },
+        {
             "name": "Table",
             "url": "views/combustible_table.html",
             "iconClass": "fas fa-table"
@@ -555,7 +548,7 @@ function StationsCtrl($http, $scope, Analytics) {
     ];
     $scope.gridTemplate = $scope.availableTemplates[0];
     $scope.setTemplate = function (val) {
-        Analytics.trackEvent('combustible', 'template', val);
+        Analytics.trackEvent('combustible', 'template', val.name);
         $scope.gridTemplate = val;
     }
 
@@ -649,6 +642,7 @@ function StationsCtrl($http, $scope, Analytics) {
         return $http.get(tempStationsUrl).then(function (response) {
             $scope.stations = response.data;
             $scope.searchText = $scope.searchTextTemp;
+            stations = response.data;
             return true;
         });
     };
@@ -658,6 +652,7 @@ function StationsCtrl($http, $scope, Analytics) {
         navigator.geolocation.getCurrentPosition(function (position) {
                 $scope.$apply(function () {
                     $scope.position = position;
+                    globalPosition = position;
                     $scope.showLocationWarning = false;
                     Analytics.trackEvent('product', 'geolocation', 'true');
                     $scope.searchStations();
