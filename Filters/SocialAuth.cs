@@ -90,7 +90,7 @@ namespace JAMTech.Filters
                 else
                 {
                     var googleResult = response.Content.ReadAsStringAsync().Result;
-                    var result = JsonConvert.DeserializeObject<dynamic>(googleResult);
+                    var result = JsonConvert.DeserializeObject<dynamic>(googleResult, Startup.jsonSettings);
                     // validate parameter uid against google uid
                     if (!string.IsNullOrEmpty(uid))
                     {
@@ -142,7 +142,7 @@ namespace JAMTech.Filters
                 else
                 {
                     var facebookResult = response.Content.ReadAsStringAsync().Result;
-                    var result = JsonConvert.DeserializeObject<dynamic>(facebookResult);
+                    var result = JsonConvert.DeserializeObject<dynamic>(facebookResult, Startup.jsonSettings);
 
                     // validate parameter uid against google uid
                     if (!string.IsNullOrEmpty(uid))

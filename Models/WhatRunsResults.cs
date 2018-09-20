@@ -14,7 +14,7 @@ namespace JAMTech.Models
         public List<Section> GetSections()
         {
             var result = new List<Section>();
-            var results = JsonConvert.DeserializeObject<JToken>(apps);
+            var results = JsonConvert.DeserializeObject<JToken>(apps, Startup.jsonSettings);
             foreach (JProperty pages in results)
             {
                 foreach (JProperty section in pages.First)
@@ -22,7 +22,7 @@ namespace JAMTech.Models
                     result.Add(new Section
                     {
                         name = section.Name,
-                        detail = JsonConvert.DeserializeObject<Detail[]>(section.Value.ToString())
+                        detail = JsonConvert.DeserializeObject<Detail[]>(section.Value.ToString(), Startup.jsonSettings)
                     });
                 }
             }

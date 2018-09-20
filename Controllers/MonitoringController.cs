@@ -109,7 +109,7 @@ namespace JAMTech.Controllers
             }
             else
             {
-                //proxy to monitoring worker
+                //proxy to monitoring workers
                 var workersUrl = Environment.GetEnvironmentVariable("monitoring_worker_url") != null ? Environment.GetEnvironmentVariable("monitoring_worker_url").Split(",") : null;
                 if (workersUrl != null)
                 {
@@ -117,13 +117,16 @@ namespace JAMTech.Controllers
                         using (var http = new HttpClient())
                         {
                             var result = await http.GetAsync(workerUrl + HttpContext.Request.Path + HttpContext.Request.QueryString.Value);
-                            var jsonData = await result.Content.ReadAsStringAsync();
-                            return JsonConvert.DeserializeObject<IEnumerable<MonitorResultGroup>>(jsonData);
-                            
+                            if (result.IsSuccessStatusCode)
+                            {
+                                var jsonData = await result.Content.ReadAsStringAsync();
+                                return JsonConvert.DeserializeObject<IEnumerable<MonitorResultGroup>>(jsonData, Startup.jsonSettings);
+                            }
+                            return null;                            
                         }
                     });
                     await Task.WhenAll(workers.ToArray());
-                    return new OkObjectResult(workers.SelectMany(w=>w.Result));
+                    return new OkObjectResult(workers.Where(r=>r.Result!=null).SelectMany(w=>w.Result));
 
                 }
                 return new NotFoundResult();

@@ -34,7 +34,7 @@ namespace JAMTech.Plugins.Banks
             {
                 if (response.IsSuccessStatusCode)
                 {
-                    var result = JsonConvert.DeserializeObject<Models.Santander.Account>(await response.Content.ReadAsStringAsync());
+                    var result = JsonConvert.DeserializeObject<Models.Santander.Account>(await response.Content.ReadAsStringAsync(), Startup.jsonSettings);
                     if (result != null)
                     {
                         //extract token
@@ -61,7 +61,7 @@ namespace JAMTech.Plugins.Banks
                 {
                     if (response.IsSuccessStatusCode)
                     {
-                        var result = JsonConvert.DeserializeObject<Movements>(await response.Content.ReadAsStringAsync());
+                        var result = JsonConvert.DeserializeObject<Movements>(await response.Content.ReadAsStringAsync(), Startup.jsonSettings);
                         if (result != null)
                             return result.DATA;
                     }
