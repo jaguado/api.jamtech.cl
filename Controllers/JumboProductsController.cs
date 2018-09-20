@@ -77,7 +77,7 @@ namespace JAMTech.Controllers
                 var finalResults = results.Select(s => s.Result)
                                    .Where(r => r.IsSuccessStatusCode)
                                    .Select(async r => await r.Content.ReadAsStringAsync())
-                                   .Select(async s => JsonConvert.DeserializeObject<Models.Product>(await s))
+                                   .Select(async s => JsonConvert.DeserializeObject<Models.Product>(await s, Startup.jsonSettings))
                                    .ToArray();
 
 
@@ -162,8 +162,8 @@ namespace JAMTech.Controllers
                 if (result.IsSuccessStatusCode)
                 {
                     var content = await result.Content.ReadAsStringAsync();
-                    var productsResult = JsonConvert.DeserializeObject<JObject>(content)["products"].ToString();
-                    return JsonConvert.DeserializeObject<List<Models.Product>>(productsResult);
+                    var productsResult = JsonConvert.DeserializeObject<JObject>(content, Startup.jsonSettings)["products"].ToString();
+                    return JsonConvert.DeserializeObject<List<Models.Product>>(productsResult, Startup.jsonSettings);
                 }
             }
             return null;
@@ -175,7 +175,7 @@ namespace JAMTech.Controllers
                 if (result.IsSuccessStatusCode && locals == null)
                 {
                     var content = await result.Content.ReadAsStringAsync();
-                    var localsResult = JsonConvert.DeserializeObject<Models.JumboLocals>(content);
+                    var localsResult = JsonConvert.DeserializeObject<Models.JumboLocals>(content, Startup.jsonSettings);
                     return localsResult.locals.ToDictionary(l => l.local_id, l => l.local_name);
                 }
             }

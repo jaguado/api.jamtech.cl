@@ -29,11 +29,13 @@ namespace JAMTech.Controllers
         [Produces(typeof(List<Models.Santander.E1>))]
         public async Task<IActionResult> GetSantanderAccountsAsync(string rut, int pwd)
         {
-            var bank = new Plugins.Banks.Santander(rut.ToCleanRut(), pwd.ToString());
-            if (await bank.Login())
-                return new OkObjectResult(bank.Accounts);
-            else
-                return new UnauthorizedResult();
+            using (var bank = new Plugins.Banks.Santander(rut.ToCleanRut(), pwd.ToString()))
+            {
+                if (await bank.Login())
+                    return new OkObjectResult(bank.Accounts);
+                else
+                    return new UnauthorizedResult();
+            }
         }
 
         /// <summary>
@@ -46,11 +48,13 @@ namespace JAMTech.Controllers
         [Produces(typeof(IList<MovimientosDeposito>))]
         public async Task<IActionResult> GetSantanderMovementsAsync(string rut, int pwd)
         {
-            var bank = new Plugins.Banks.Santander(rut.ToCleanRut(), pwd.ToString());
-            if (await bank.Login())
-                return new OkObjectResult(await bank.GetAllMovements());
-            else
-                return new UnauthorizedResult();
+            using (var bank = new Plugins.Banks.Santander(rut.ToCleanRut(), pwd.ToString()))
+            {
+                if (await bank.Login())
+                    return new OkObjectResult(bank.GetAllMovements());
+                else
+                    return new UnauthorizedResult();
+            }
         }
 
         /// <summary>
@@ -64,13 +68,16 @@ namespace JAMTech.Controllers
         [Produces(typeof(IList<MovimientosDeposito>))]
         public async Task<IActionResult> GetSantanderMovementsAsync(string rut, int pwd, int amount)
         {
-            var bank = new Plugins.Banks.Santander(rut.ToCleanRut(), pwd.ToString());
-            if (await bank.Login()) {
-                var allMovements = await bank.GetAllMovements();
-                return new OkObjectResult(allMovements.Where(filter => filter.Importe == amount.ToImporte()));
+            using (var bank = new Plugins.Banks.Santander(rut.ToCleanRut(), pwd.ToString()))
+            {
+                if (await bank.Login())
+                {
+                    var allMovements = await bank.GetAllMovements();
+                    return new OkObjectResult(allMovements.Where(filter => filter.Importe == amount.ToImporte()));
+                }
+                else
+                    return new UnauthorizedResult();
             }
-            else
-                return new UnauthorizedResult();
         }
     }
 }

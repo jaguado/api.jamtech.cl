@@ -274,7 +274,7 @@ namespace JAMTech.Helpers
                     var json = await streamReader.ReadToEndAsync();
                     if (json != null)
                     {
-                        return JsonConvert.DeserializeObject<T>(json);
+                        return JsonConvert.DeserializeObject<T>(json, Startup.jsonSettings);
                     }
                 }
             }

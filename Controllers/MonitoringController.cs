@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 using JAMTech.Extensions;
 using System.Threading;
 using JAMTech.Filters;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using JAMTech.Models;
 
 namespace JAMTech.Controllers
 {
@@ -37,7 +40,7 @@ namespace JAMTech.Controllers
 
              var result = await obj.ToMongoDB<Models.UserMonitorConfig>();
             //update monitors
-            ThreadPool.QueueUserWorkItem(async state => await Program.RefreshMonitoringForUserAsync(forUser));
+            ThreadPool.QueueUserWorkItem(async state => await Program.RefreshMonitoringForUserAsync(forUser, HttpContext.Request.QueryString.Value));
             return new OkObjectResult(result);
         }
 
@@ -58,7 +61,7 @@ namespace JAMTech.Controllers
             if (userResults == null || !userResults.Any(t => t.Id == id))
                 return new ForbidResult();
             await obj.DeleteFromMongoDB<Models.UserMonitorConfig>();
-            ThreadPool.QueueUserWorkItem(async state => await Program.RefreshMonitoringForUserAsync(forUser));
+            ThreadPool.QueueUserWorkItem(async state => await Program.RefreshMonitoringForUserAsync(forUser, HttpContext.Request.QueryString.Value));
             return new OkResult();
         }
 
@@ -94,15 +97,46 @@ namespace JAMTech.Controllers
         /// <param name="forUser">This paramemeter is optional and will be completed or validated against access_token</param>
         /// <returns></returns>
         [HttpGet("results")]
-        public IActionResult GetResults(string forUser = null, bool onlyErrors=false, int resultsCount=0)
+        [Produces(typeof(IEnumerable<MonitorResultGroup>))]
+        public async Task<IActionResult> GetResultsAsync(string forUser = null, bool onlyErrors=false, int resultsCount=0)
         {
-            var monitors = Program.Monitors.Where(m => m.Uid == forUser);
-            var results = monitors.Select(m => new
+            //handle when exists external workers
+            if (Program.isMonitoringWorker)
             {
-                Config = m.Config,
-                Results = resultsCount == 0 ? m.Results.Where(r=>r!=null && ((onlyErrors && !r.Success) || !onlyErrors)) : m.Results.Where(r => r != null && ((onlyErrors && !r.Success) || !onlyErrors)).TakeLast(resultsCount)
-            });
-            return new OkObjectResult(results);
+                var monitors = Program.Monitors.Where(m => m.Uid == forUser);
+                var results = monitors.Select(m => new MonitorResultGroup(m.Config, resultsCount == 0 ? m.Results.Where(r => r != null && ((onlyErrors && !r.Success) || !onlyErrors)) : m.Results.Where(r => r != null && ((onlyErrors && !r.Success) || !onlyErrors)).TakeLast(resultsCount)));
+                return new OkObjectResult(results);
+            }
+            else
+            {
+                //proxy to monitoring workers
+                return await GetResultsFromWorkers();
+            }
+        }
+
+        private async Task<IActionResult> GetResultsFromWorkers()
+        {
+            var workersUrl = Environment.GetEnvironmentVariable("monitoring_worker_url") != null ? Environment.GetEnvironmentVariable("monitoring_worker_url").Split(",") : null;
+            if (workersUrl != null)
+            {
+                var workers = workersUrl.Select(async workerUrl =>
+                {
+                    using (var http = new HttpClient())
+                    {
+                        var result = await http.GetAsync(workerUrl + HttpContext.Request.Path + HttpContext.Request.QueryString.Value);
+                        if (result.IsSuccessStatusCode)
+                        {
+                            var jsonData = await result.Content.ReadAsStringAsync();
+                            return JsonConvert.DeserializeObject<IEnumerable<MonitorResultGroup>>(jsonData, Startup.jsonSettings);
+                        }
+                        return null;
+                    }
+                });
+                await Task.WhenAll(workers.ToArray());
+                return new OkObjectResult(workers.Where(r => r.Result != null).SelectMany(w => w.Result));
+
+            }
+            return new NotFoundResult();
         }
 
         /// <summary>
@@ -114,7 +148,7 @@ namespace JAMTech.Controllers
         public IActionResult Refresh(string forUser = null)
         {
             //update monitors
-            ThreadPool.QueueUserWorkItem(async state => await Program.RefreshMonitoringForUserAsync(forUser));
+            ThreadPool.QueueUserWorkItem(async state => await Program.RefreshMonitoringForUserAsync(forUser, HttpContext.Request.QueryString.Value));
             return new OkResult();
         }
     }

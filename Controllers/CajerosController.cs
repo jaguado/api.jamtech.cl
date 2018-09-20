@@ -33,19 +33,21 @@ namespace JAMTech.Controllers
             const string apiUrl = "http://200.10.9.190/Redmobile/api/cajeros/";
             var payload = "{\"distance\":" + distance + ".0,\"latitude\":" + lat.ToString().Replace(",",".") + ",\"longitude\":" + lng.ToString().Replace(",", ".") + ",\"apiKey\":\"i5Ceghpo6xRV9nE6esS2\", \"numOfDevices\":50}";
             var httpContent = new StringContent(payload, Encoding.UTF8, "application/json");
-            var response = await Net.PostResponse(apiUrl, httpContent);
-            if (response.IsSuccessStatusCode)
+            using (var response = await Net.PostResponse(apiUrl, httpContent))
             {
-                var result = await response.Content.ReadAsAsync<dynamic>();
-                if (result != null && result.atms != null)
+                if (response.IsSuccessStatusCode)
                 {
-                    return new OkObjectResult(result.atms);
+                    var result = await response.Content.ReadAsAsync<dynamic>();
+                    if (result != null && result.atms != null)
+                    {
+                        return new OkObjectResult(result.atms);
+                    }
+                    else
+                        return new NotFoundResult();
                 }
                 else
-                    return new NotFoundResult();
+                    return new UnauthorizedResult();
             }
-            else
-                return new UnauthorizedResult();
         }
     }
 }

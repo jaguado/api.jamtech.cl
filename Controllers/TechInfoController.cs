@@ -36,19 +36,21 @@ namespace JAMTech.Controllers
             data.Add("data", payload);
             var content = new FormUrlEncodedContent(data);
             //content.Headers.ContentType = new MediaTypeHeaderValue("application/x-www-form-urlencoded");
-            var response = await Net.PostResponse(apiUrl, content);
-            if (response.IsSuccessStatusCode)
+            using (var response = await Net.PostResponse(apiUrl, content))
             {
-                var result = await response.Content.ReadAsAsync<Models.WhatRunsResults>();
-                if (result != null && !string.IsNullOrEmpty(result.apps))
+                if (response.IsSuccessStatusCode)
                 {
-                    return new OkObjectResult(result.GetSections());
+                    var result = await response.Content.ReadAsAsync<Models.WhatRunsResults>();
+                    if (result != null && !string.IsNullOrEmpty(result.apps))
+                    {
+                        return new OkObjectResult(result.GetSections());
+                    }
+                    else
+                        return new NotFoundResult();
                 }
                 else
-                    return new NotFoundResult();
+                    return new UnauthorizedResult();
             }
-            else
-                return new UnauthorizedResult();
         }
     }
 }

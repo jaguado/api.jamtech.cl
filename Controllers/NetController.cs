@@ -127,13 +127,15 @@ namespace JAMTech.Controllers
         {
             try
             {
-                var result = Http.GetStringAsync(url, 5000, internet ? "" : "-");
-                if (await result is HttpWebResponse response)
+                using (var result = Http.GetStringAsync(url, 5000, internet ? "" : "-"))
                 {
-                    return new Tuple<bool, object>(true, (int)response.StatusCode);
-                }
+                    if (await result is HttpWebResponse response)
+                    {
+                        return new Tuple<bool, object>(true, (int)response.StatusCode);
+                    }
 
-                return new Tuple<bool, object>(true, result);
+                    return new Tuple<bool, object>(true, result);
+                }
             }
             catch (WebException wex)
             {

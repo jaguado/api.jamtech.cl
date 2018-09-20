@@ -1,54 +1,54 @@
 <div id="map"></div>
 <script>
     // Initialize and add the map
-    function initMap() {
+    function initMapCombustible() {
         if (globalPosition == null) {
             console.log('waiting for position');
-            setTimeout(initMap, loopsWaitInterval);
+            setTimeout(initMapCombustible, loopsWaitInterval);
             return;
         }
         var me = {
             lat: globalPosition.coords.latitude,
             lng: globalPosition.coords.longitude
         };
-        atmsMap = new google.maps.Map(
+        combustibleMap = new google.maps.Map(
             document.getElementById('map'), {
                 zoom: 4,
                 center: me
             });
         var marker = new google.maps.Marker({
             position: me,
-            map: atmsMap,
+            map: combustibleMap,
             icon: {
                 url: "//maps.google.com/mapfiles/ms/icons/green-dot.png"
             }
         });
-
         loadMarkers();
     }
 
     function loadMarkers() {
-        if (atms == null) {
-            console.log('waiting for atms');
+        if (stations == null) {
+            console.log('waiting for stations');
             setTimeout(loadMarkers, loopsWaitInterval);
             return;
         }
         var bounds = new google.maps.LatLngBounds();
-        atms.forEach(atm => {
+        stations.forEach(station => {
+            //console.log('foreach', atm);
             var pos = {
-                lat: atm.latitude,
-                lng: atm.longitude
+                lat: station.ubicacion.latitud,
+                lng: station.ubicacion.longitud
             };
-            var url = "http://www.google.com/maps/place/" + atm.latitude + "," + atm.longitude;
-            addMarker(pos, atm.location == null ? "Cajero" : atm.location, atmsMap, url);
+            var url = "http://www.google.com/maps/place/" + pos.lat + "," + pos.lng;
+            addMarker(pos, station.distribuidor.nombre, combustibleMap, url);
+            //TODO add ranking, prices and other usefull information
             var loc = new google.maps.LatLng(pos.lat, pos.lng);
             bounds.extend(loc);
         });
-        if (atmsMap != null) {
-            atmsMap.fitBounds(bounds); // auto-zoom
+        if (combustibleMap != null) {
+            combustibleMap.fitBounds(bounds); // auto-zoom
             //atmsMap.panToBounds(bounds); //auto-center
         }
     }
-
-    initMap();
+    initMapCombustible();
 </script>

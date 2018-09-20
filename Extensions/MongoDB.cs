@@ -38,10 +38,12 @@ namespace JAMTech.Extensions
             }
             var httpContent = new StringContent(stringPayload, Encoding.UTF8, "application/json");
 
-            var response = update ? await Helpers.Net.PutResponse(collectionUrl, httpContent) : await Helpers.Net.PostResponse(collectionUrl, httpContent);
-            response.EnsureSuccessStatusCode();
-            var content = await response.Content.ReadAsStringAsync();
-            return new OkObjectResult(content);
+            using (var response = update ? await Helpers.Net.PutResponse(collectionUrl, httpContent) : await Helpers.Net.PostResponse(collectionUrl, httpContent))
+            {
+                response.EnsureSuccessStatusCode();
+                var content = await response.Content.ReadAsStringAsync();
+                return new OkObjectResult(content);
+            }  
         }
         public static async Task<IActionResult> ToMongoDB<T>(this IEnumerable<T> collection, bool update = false, bool storeMinified = false)
         {
@@ -56,19 +58,23 @@ namespace JAMTech.Extensions
             }
             var httpContent = new StringContent(stringPayload, Encoding.UTF8, "application/json");
 
-            var response = update ? await Helpers.Net.PutResponse(collectionUrl, httpContent) : await Helpers.Net.PostResponse(collectionUrl, httpContent);
-            response.EnsureSuccessStatusCode();
-            var content = await response.Content.ReadAsStringAsync();
-            return new OkObjectResult(content);
+            using (var response = update ? await Helpers.Net.PutResponse(collectionUrl, httpContent) : await Helpers.Net.PostResponse(collectionUrl, httpContent))
+            {
+                response.EnsureSuccessStatusCode();
+                var content = await response.Content.ReadAsStringAsync();
+                return new OkObjectResult(content);
+            }
         }
         public static async Task<IEnumerable<T>> FromMongoDB<T>()
         {
             var collectionName = typeof(T).Name.ToLower();
             var collectionUrl = $"{baseUrl}databases/{defaultDatabase}/collections/{collectionName}?apiKey={apiKey}";
-            var response = await Helpers.Net.GetResponse(collectionUrl);
-            response.EnsureSuccessStatusCode();
-            var content = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<IEnumerable<T>>(content, Startup.jsonSettings);
+            using (var response = await Helpers.Net.GetResponse(collectionUrl))
+            {
+                response.EnsureSuccessStatusCode();
+                var content = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<IEnumerable<T>>(content, Startup.jsonSettings);
+            }
         }
         public static async Task DeleteFromMongoDB<T>(this T obj)
         {
@@ -77,8 +83,10 @@ namespace JAMTech.Extensions
             var collectionName = typeof(T).Name.ToLower();
             var objectId = (obj as UserMonitorConfig)._id.oid;
             var collectionUrl = $"{baseUrl}databases/{defaultDatabase}/collections/{collectionName}/{objectId}?apiKey={apiKey}";
-            var response = await Helpers.Net.DeleteResponse(collectionUrl);
-            response.EnsureSuccessStatusCode();
+            using (var response = await Helpers.Net.DeleteResponse(collectionUrl))
+            {
+                response.EnsureSuccessStatusCode();
+            }
         }
 
         /// <summary>
@@ -92,25 +100,27 @@ namespace JAMTech.Extensions
             var collectionName = typeof(T).Name.ToLower();
             var collectionUrl = $"{baseUrl}databases/{defaultDatabase}/collections/{collectionName}?apiKey={apiKey}";
             collectionUrl += "&q={\"uid\": \"" + uid + "\"}";
-            var response = await Helpers.Net.GetResponse(collectionUrl);
-            response.EnsureSuccessStatusCode();
-            var content = await response.Content.ReadAsAsync<JArray>();
-            if (content.Count == 0) return null;
-            var result = new List<IEnumerable<Y>>();
-            foreach (var obj in content)
+            using (var response = await Helpers.Net.GetResponse(collectionUrl))
             {
-                var data = JsonConvert.DeserializeObject<IEnumerable<Y>>(obj["Data"].ToString(), Startup.jsonSettings).ToList();
-                if (typeof(T) == typeof(UserMonitorConfig) && typeof(Y) == typeof(MonitorConfig))
+                response.EnsureSuccessStatusCode();
+                var content = await response.Content.ReadAsAsync<JArray>();
+                if (content.Count == 0) return null;
+                var result = new List<IEnumerable<Y>>();
+                foreach (var obj in content)
                 {
-                    data.ForEach(d =>
+                    var data = JsonConvert.DeserializeObject<IEnumerable<Y>>(obj["Data"].ToString(), Startup.jsonSettings).ToList();
+                    if (typeof(T) == typeof(UserMonitorConfig) && typeof(Y) == typeof(MonitorConfig))
                     {
-                        var t = d as MonitorConfig;
-                        t.Id = obj["_id"]["$oid"].ToString();
-                    });
+                        data.ForEach(d =>
+                        {
+                            var t = d as MonitorConfig;
+                            t.Id = obj["_id"]["$oid"].ToString();
+                        });
+                    }
+                    result.Add(data);
                 }
-                result.Add(data);
+                return result.SelectMany(c => c);
             }
-            return result.SelectMany(c => c);
         }
     }
 }

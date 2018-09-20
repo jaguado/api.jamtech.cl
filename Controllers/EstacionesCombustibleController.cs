@@ -155,8 +155,8 @@ namespace JAMTech.Controllers
                 {
                     if (result.IsSuccessStatusCode)
                     {
-                        var newData = JsonConvert.DeserializeObject<JObject>(await result.Content.ReadAsStringAsync());
-                        var stations = JsonConvert.DeserializeObject<List<Models.CombustibleStation>>(newData["data"].ToString());
+                        var newData = JsonConvert.DeserializeObject<JObject>(await result.Content.ReadAsStringAsync(), Startup.jsonSettings);
+                        var stations = JsonConvert.DeserializeObject<List<Models.CombustibleStation>>(newData["data"].ToString(), Startup.jsonSettings);
 
                         // filter stations
                         var filteredStations = stations.Where(s => s.fecha_hora_actualizacion != null && DateTime.Parse(s.fecha_hora_actualizacion) > DateTime.Now.AddMonths(skipDataBeforeInMonths * -1))

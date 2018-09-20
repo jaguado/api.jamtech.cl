@@ -26,15 +26,17 @@ namespace JAMTech.Helpers
         /// <returns></returns>
         public static async Task<long> Ping(string hostname, int timeout=12000, int ttl=64)
         {
-             var pingSender = new Ping();
-            // Create a buffer of 32 bytes of data to be transmitted.  
-            var data = new String('a', 32);
-            var buffer = Encoding.ASCII.GetBytes(data);
-  
-            var options = new PingOptions(ttl, true);
-            var reply = await pingSender.SendPingAsync(hostname, timeout, buffer, options);
-            if (reply == null || reply.Status!=IPStatus.Success) return -1;
-            return reply.RoundtripTime;
+            using (var pingSender = new Ping())
+            {
+                // Create a buffer of 32 bytes of data to be transmitted.  
+                var data = new String('a', 32);
+                var buffer = Encoding.ASCII.GetBytes(data);
+
+                var options = new PingOptions(ttl, true);
+                var reply = await pingSender.SendPingAsync(hostname, timeout, buffer, options);
+                if (reply == null || reply.Status != IPStatus.Success) return -1;
+                return reply.RoundtripTime;
+            }
         }
 
         /// <summary>
@@ -93,9 +95,11 @@ namespace JAMTech.Helpers
                 var streamWriter = new StreamWriter(requestStream);
                 await streamWriter.WriteAsync(payload);
             }
-            var response = await request.GetResponseAsync();
-            var stream = new StreamReader(response.GetResponseStream());
-            return await stream.ReadToEndAsync();
+            using (var response = await request.GetResponseAsync())
+            {
+                var stream = new StreamReader(response.GetResponseStream());
+                return await stream.ReadToEndAsync();
+            }
         }
 
         public static async Task<HttpResponseMessage> GetResponse(string tempUrl, Uri customReferrer = null, int timeoutInSeconds=0, string userAgent="", string cookie="")
@@ -104,16 +108,18 @@ namespace JAMTech.Helpers
             {
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate                
             };
-            var client = new HttpClient(handler);
-            if(timeoutInSeconds>0)
-                client.Timeout = TimeSpan.FromSeconds(timeoutInSeconds);
-            if (customReferrer != null)
-                client.DefaultRequestHeaders.Referrer = customReferrer;
-            if (userAgent != string.Empty)
-                client.DefaultRequestHeaders.Add("User-Agent", userAgent); 
-            if (cookie != string.Empty)
-                client.DefaultRequestHeaders.Add("Cookie", cookie);
-            return await client.GetAsync(tempUrl);
+            using (var client = new HttpClient(handler))
+            {
+                if (timeoutInSeconds > 0)
+                    client.Timeout = TimeSpan.FromSeconds(timeoutInSeconds);
+                if (customReferrer != null)
+                    client.DefaultRequestHeaders.Referrer = customReferrer;
+                if (userAgent != string.Empty)
+                    client.DefaultRequestHeaders.Add("User-Agent", userAgent);
+                if (cookie != string.Empty)
+                    client.DefaultRequestHeaders.Add("Cookie", cookie);
+                return await client.GetAsync(tempUrl);
+            }
         }
         public static async Task<HttpResponseMessage> PostResponse(string tempUrl, HttpContent content, Uri customReferrer = null, int timeoutInSeconds = 0)
         {
@@ -121,12 +127,14 @@ namespace JAMTech.Helpers
             {
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
             };
-            var client = new HttpClient(handler);
-            if (timeoutInSeconds > 0)
-                client.Timeout = TimeSpan.FromSeconds(timeoutInSeconds);
-            if (customReferrer != null)
-                client.DefaultRequestHeaders.Referrer = customReferrer;
-            return await client.PostAsync(tempUrl, content);
+            using (var client = new HttpClient(handler))
+            {
+                if (timeoutInSeconds > 0)
+                    client.Timeout = TimeSpan.FromSeconds(timeoutInSeconds);
+                if (customReferrer != null)
+                    client.DefaultRequestHeaders.Referrer = customReferrer;
+                return await client.PostAsync(tempUrl, content);
+            }
         }
         public static async Task<HttpResponseMessage> PutResponse(string tempUrl, HttpContent content, Uri customReferrer = null, int timeoutInSeconds = 0)
         {
@@ -134,12 +142,14 @@ namespace JAMTech.Helpers
             {
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
             };
-            var client = new HttpClient(handler);
-            if (timeoutInSeconds > 0)
-                client.Timeout = TimeSpan.FromSeconds(timeoutInSeconds);
-            if (customReferrer != null)
-                client.DefaultRequestHeaders.Referrer = customReferrer;
-            return await client.PutAsync(tempUrl, content);
+            using (var client = new HttpClient(handler))
+            {
+                if (timeoutInSeconds > 0)
+                    client.Timeout = TimeSpan.FromSeconds(timeoutInSeconds);
+                if (customReferrer != null)
+                    client.DefaultRequestHeaders.Referrer = customReferrer;
+                return await client.PutAsync(tempUrl, content);
+            }
         }
 
         public static async Task<HttpResponseMessage> DeleteResponse(string tempUrl, Uri customReferrer = null, int timeoutInSeconds = 0)
@@ -148,12 +158,14 @@ namespace JAMTech.Helpers
             {
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
             };
-            var client = new HttpClient(handler);
-            if (timeoutInSeconds > 0)
-                client.Timeout = TimeSpan.FromSeconds(timeoutInSeconds);
-            if (customReferrer != null)
-                client.DefaultRequestHeaders.Referrer = customReferrer;
-            return await client.DeleteAsync(tempUrl);
+            using (var client = new HttpClient(handler))
+            {
+                if (timeoutInSeconds > 0)
+                    client.Timeout = TimeSpan.FromSeconds(timeoutInSeconds);
+                if (customReferrer != null)
+                    client.DefaultRequestHeaders.Referrer = customReferrer;
+                return await client.DeleteAsync(tempUrl);
+            }
         }
         ///
         /// Checks the file exists or not.

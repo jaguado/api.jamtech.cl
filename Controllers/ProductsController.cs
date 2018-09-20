@@ -51,7 +51,7 @@ namespace JAMTech.Controllers
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
-                    var productsResult = JsonConvert.DeserializeObject<Models.KnastaSearchResullt>(content);
+                    var productsResult = JsonConvert.DeserializeObject<Models.KnastaSearchResullt>(content, Startup.jsonSettings);
                     var categories = productsResult.ktegories != null ? productsResult.ktegories.ToDictionary(v => v.value, v => v.label) : null;
                     var commonFormat = productsResult.products.Select(p => new
                     {
