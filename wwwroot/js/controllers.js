@@ -1,5 +1,5 @@
 var mocksBaseApiUrl = '//aio.jamtech.cl/mocks/torrents.json'
-var baseApiUrl = '//aio.jamtech.cl/v1/';
+var baseApiUrl = '//jamtechapi.herokuapp.com/v1/';
 var defaultPages = 2;
 var sessionCheckInterval = 60000 * 5; //5 minutes
 var loops = 5;
@@ -53,7 +53,7 @@ function AtmsCtrl($scope, $rootScope, $http, $interval, $location, notify, Analy
         return $http.get(url).then(function (response) {
             //console.log('searchAtms', response.data);
             $scope.atms = response.data;
-            atms= response.data;
+            atms = response.data;
             return response.status == 200;
         }, function (response) {
             Alert('Error getting atms');
@@ -81,6 +81,7 @@ function AtmsCtrl($scope, $rootScope, $http, $interval, $location, notify, Analy
 }
 
 function DashboardCtrl($scope, $rootScope, $http, $interval, $location, notify, Analytics, socialLoginService) {
+    console.log('DashboardCtrl init');
     Warning = function (msg) {
         if (notify != null) {
             notify({
@@ -213,21 +214,26 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, notify, 
         if ($scope.sensorsTimer != null && user == null) {
             $interval.cancel($scope.sensorsTimer);
         }
-        return $http.get(url).then(function (response) {
-            //console.log('status code', response.status);
-            $scope.sensors = response.data;
-            if ($scope.selectedSensor != null) {
-                //refresh selected
-                $scope.selectedSensor = $scope.sensors.filter(s => s.Config.Name == $scope.selectedSensor.Config.Name)[0];
-                $scope.loadSelectedSensorData();
-            }
-            //console.log('sensors', $scope.sensors);
-            return response.status == 200;
-        }, function (response) {
-            Alert('Error getting sensors results. ' + response.statusText);
-            // console.log('err', response);
-            return false;
-        });
+        if (user != null) {
+            return $http.get(url).then(function (response) {
+                //console.log('status code', response.status);
+                $scope.sensors = response.data;
+                if ($scope.selectedSensor != null) {
+                    //refresh selected
+                    $scope.selectedSensor = $scope.sensors.filter(s => s.Config.Name == $scope.selectedSensor.Config.Name)[0];
+                    $scope.loadSelectedSensorData();
+                }
+                //console.log('sensors', $scope.sensors);
+                return response.status == 200;
+            }, function (response) {
+                Alert('Error getting sensors results. ' + response.statusText);
+                // console.log('err', response);
+                return false;
+            });
+        }
+        else{
+            console.log('refresh skipped to avoid auth errors');
+        }
     };
     $scope.refreshSensors();
     $scope.sensorsTimer = $interval($scope.refreshSensors, visibleDataRefreshInterval);
@@ -294,6 +300,7 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, notify, 
 }
 
 function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, socialLoginService) {
+    console.log('MainCtrl init');
     $scope.checkUser = function () {
         if (user != null) {
             console.log('user logged in', user.name, user);
@@ -524,8 +531,7 @@ function StationsCtrl($http, $scope, Analytics) {
     loadFromLocalStorage();
 
 
-    $scope.availableTemplates = [
-        {
+    $scope.availableTemplates = [{
             "name": "Map",
             "url": "views/combustible_map.html",
             "iconClass": "fas fa-map"
