@@ -10,6 +10,7 @@ using System.Text;
 using System.Linq;
 using System.Collections;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 namespace JAMTech.Filters
 {
@@ -26,44 +27,13 @@ namespace JAMTech.Filters
         const string authHeader = "Authorization";
         const string tokenName = "access_token";
         private static readonly bool checkAuth = Environment.GetEnvironmentVariable("disableAuth") == null || bool.Parse(Environment.GetEnvironmentVariable("disableAuth")) == false;
-        public override void OnActionExecuted(ActionExecutedContext context) { }
 
-        public override void OnActionExecuting(ActionExecutingContext context)
-        {
-            //remove auth when method is OPTIONS
-            if (checkAuth && context.HttpContext.Request.Method != "OPTIONS")
-            {
-                //Get access token and check state
-                var accessToken = GetFromHeader(context, authHeader) ?? string.Empty;
-                if (accessToken == string.Empty)
-                    accessToken = GetFromRequest(context, tokenName);
-                else
-                    accessToken = accessToken.Replace("Bearer ", "");
-
-                if (string.IsNullOrEmpty(accessToken))
-                {
-                    //throw new SecurityTokenException("Access token missing");
-                    context.Result = new ContentResult()
-                    {
-                        StatusCode = StatusCodes.Status401Unauthorized,
-                        Content = "Access token missing"
-                    };
-                }
-                else
-                {
-                    var uid = GetFromRequest(context, uidFieldName);
-                    CheckGoogle(context, accessToken, uid);
-                    CheckFacebook(context, accessToken, uid);
-                }
-            }
-        }
-
-        private void CheckGoogle(ActionExecutingContext context, string accessToken, string uid)
+        private async Task CheckGoogleAsync(ActionExecutingContext context, string accessToken, string uid)
         {
             if (GetFromRequest(context, "provider") == "facebook") return;
             try
             {
-                ValidateAccessTokenWithGoogle(context, accessToken, uid);
+                await ValidateAccessTokenWithGoogleAsync(context, accessToken, uid);
             }
             catch (Exception ex)
             {
@@ -75,11 +45,11 @@ namespace JAMTech.Filters
             }
         }
 
-        private static void ValidateAccessTokenWithGoogle(ActionExecutingContext context, string token, string uid)
+        private static async Task ValidateAccessTokenWithGoogleAsync(ActionExecutingContext context, string token, string uid)
         {
             //check if token is valid
             const string baseUrl = "https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=";
-            using (var response = Helpers.Net.GetResponse(baseUrl + token).Result)
+            using (var response = await Helpers.Net.GetResponse(baseUrl + token))
             {
                 if (!response.IsSuccessStatusCode)
                     context.Result = new ContentResult()
@@ -111,12 +81,12 @@ namespace JAMTech.Filters
             }
         }
 
-        private void CheckFacebook(ActionExecutingContext context, string accessToken, string uid)
+        private async Task CheckFacebookAsync(ActionExecutingContext context, string accessToken, string uid)
         {
             if (GetFromRequest(context, "provider") == "google") return;
             try
             {
-                ValidateAccessTokenWithFacebook(context, accessToken, uid);
+                await ValidateAccessTokenWithFacebookAsync(context, accessToken, uid);
             }
             catch (Exception ex)
             {
@@ -128,10 +98,10 @@ namespace JAMTech.Filters
             }
         }
 
-        private static void ValidateAccessTokenWithFacebook(ActionExecutingContext context, string token, string uid)
+        private static async Task ValidateAccessTokenWithFacebookAsync(ActionExecutingContext context, string token, string uid)
         {
             //check if token is valid
-            using (var response = Helpers.Net.GetResponse("https://graph.facebook.com/me?access_token=" + token).Result)
+            using (var response = await Helpers.Net.GetResponse("https://graph.facebook.com/me?access_token=" + token))
             {
                 if (!response.IsSuccessStatusCode)
                     context.Result = new ContentResult()
@@ -237,6 +207,39 @@ namespace JAMTech.Filters
                 // TODO: Log it or display an error.
                 throw new Exception($"Token was invalid: {argex.Message}");
             }
+        }
+
+        public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+        {
+            //remove auth when method is OPTIONS
+            if (checkAuth && context.HttpContext.Request.Method != "OPTIONS")
+            {
+                //Get access token and check state
+                var accessToken = GetFromHeader(context, authHeader) ?? string.Empty;
+                if (accessToken == string.Empty)
+                    accessToken = GetFromRequest(context, tokenName);
+                else
+                    accessToken = accessToken.Replace("Bearer ", "");
+
+                if (string.IsNullOrEmpty(accessToken))
+                {
+                    //throw new SecurityTokenException("Access token missing");
+                    context.Result = new ContentResult()
+                    {
+                        StatusCode = StatusCodes.Status401Unauthorized,
+                        Content = "Access token missing"
+                    };
+                }
+                else
+                {
+                    var uid = GetFromRequest(context, uidFieldName);
+                    await CheckGoogleAsync(context, accessToken, uid);
+                    await CheckFacebookAsync(context, accessToken, uid);
+                }
+            }
+
+            var resultContext = await next();
+            // do something after the action executes; resultContext.Result will be set
         }
     }
 }

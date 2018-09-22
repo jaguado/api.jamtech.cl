@@ -9,18 +9,15 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace JAMTech.Filters
 {
-    public class BaseResultFilter : IActionFilter
+    public class BaseResultFilter : IAsyncActionFilter
     {
         const int defaultLimit = 50;
         public static string[] Operators = new[] { "==", "!=", "<", ">", "<>", "<=", ">=" };
         private static readonly bool _minifyResponse = Environment.GetEnvironmentVariable("minifyResponse") =="false" ? false : true;
-        public void OnActionExecuting(ActionExecutingContext context)
-        {
-            // do something before the action executes
-        }
 
         public void OnActionExecuted(ActionExecutedContext context)
         {
@@ -119,6 +116,11 @@ namespace JAMTech.Filters
                 }
             }
             return query;
-        } 
+        }
+
+        public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+        {
+            var resultContext = await next();
+        }
     }
 }
