@@ -230,8 +230,7 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, notify, 
                 // console.log('err', response);
                 return false;
             });
-        }
-        else{
+        } else {
             console.log('refresh skipped to avoid auth errors');
         }
     };
@@ -841,12 +840,10 @@ function addMarker(location, text, map, uri) {
         map: map,
         url: uri
     });
-    (function (marker) {
-        google.maps.event.addListener(marker, "click", function (e) {
-            console.log('open route to atm in new window');
-            window.open(marker.url);
-        });
-    })(marker);
+    google.maps.event.addListener(marker, "click", function (e) {
+        console.log('open route in new window');
+        window.open(marker.url);
+    });
 }
 
 String.prototype.replaceAll = function (searchStr, replaceStr) {

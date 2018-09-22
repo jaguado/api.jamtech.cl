@@ -17,13 +17,21 @@
                 center: me
             });
         var marker = new google.maps.Marker({
+            draggable: true,
+            raiseOnDrag: true,
             position: me,
             map: atmsMap,
             icon: {
                 url: "//maps.google.com/mapfiles/ms/icons/green-dot.png"
             }
         });
-
+        google.maps.event.addListener(marker, "dragend", function (event) {
+            console.log('new position set');
+            var lat = event.latLng.lat();
+            var lng = event.latLng.lng();
+            globalPosition.coords.latitude  = lat;
+            globalPosition.coords.longitude = lng;
+        });
         loadMarkers();
     }
 
