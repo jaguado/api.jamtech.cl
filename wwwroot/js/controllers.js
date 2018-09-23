@@ -102,6 +102,10 @@ function AtmsCtrl($scope, $rootScope, $http, $interval, $location, notify, Analy
         console.log('AtmsCtrl', 'error getting position', error);
         Analytics.trackEvent('atms', 'geolocation', 'false');
     });
+
+    $scope.refresh = function(){
+        updateLocation();
+    }
 }
 
 function DashboardCtrl($scope, $rootScope, $http, $interval, $location, notify, Analytics, socialLoginService) {
@@ -678,6 +682,10 @@ function StationsCtrl($http, $scope, Analytics) {
         $scope.searchStations();
         Analytics.trackEvent('combustible', 'geolocation', 'false');
     });
+
+    $scope.refresh = function(){
+        updateLocation();
+    }
 }
 
 function ToolsCtrl($scope, $rootScope, $http, Analytics) {
