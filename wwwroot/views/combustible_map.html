@@ -1,39 +1,28 @@
 <div id="map"></div>
 <script>
     // Initialize and add the map
-    function initMapCombustible() {
-        if (globalPosition == null) {
-            console.log('waiting for position');
-            setTimeout(initMapCombustible, loopsWaitInterval);
-            return;
+    var markerCombustible = null;
+    var markersCombustible = [];
+    var combustibleMap = null;
+
+    function drawMe(map) {
+        if (markerCombustible != null){
+            markerCombustible.map = null;
         }
-        var me = {
-            lat: globalPosition.coords.latitude,
-            lng: globalPosition.coords.longitude
-        };
-        combustibleMap = new google.maps.Map(
-            document.getElementById('map'), {
-                zoom: 4,
-                center: me
-            });
-        var marker = new google.maps.Marker({
-            draggable: true,
-            raiseOnDrag: true,
-            position: me,
-            map: combustibleMap,
+        markerCombustible = new google.maps.Marker({
+            position: {
+                lat: globalPosition.coords.latitude,
+                lng: globalPosition.coords.longitude
+            },
+            map: map,
             icon: {
                 url: "//maps.google.com/mapfiles/ms/icons/green-dot.png"
             }
         });
-        google.maps.event.addListener(marker, "dragend", function (event) {
-            console.log('new position set');
-            var lat = event.latLng.lat();
-            var lng = event.latLng.lng();
-        });
-        loadMarkers();
     }
 
     function loadMarkers() {
+        setMapOnAll(markersCombustible, null);
         if (stations == null) {
             console.log('waiting for stations');
             setTimeout(loadMarkers, loopsWaitInterval);
@@ -47,7 +36,7 @@
                 lng: station.ubicacion.longitud
             };
             var url = "http://www.google.com/maps/place/" + pos.lat + "," + pos.lng;
-            addMarker(pos, station.distribuidor.nombre, combustibleMap, url);
+            markersCombustible.push(addMarker(pos, station.distribuidor.nombre, combustibleMap, url));
             //TODO add ranking, prices and other usefull information
             var loc = new google.maps.LatLng(pos.lat, pos.lng);
             bounds.extend(loc);
@@ -56,6 +45,25 @@
             combustibleMap.fitBounds(bounds); // auto-zoom
             //atmsMap.panToBounds(bounds); //auto-center
         }
+    }
+
+    function initMapCombustible() {
+        if (globalPosition == null) {
+            console.log('waiting for position');
+            setTimeout(initMapCombustible, loopsWaitInterval);
+            return;
+        }
+        combustibleMap = new google.maps.Map(
+            document.getElementById('map'), {
+                zoom: 4,
+                center: {
+                    lat: globalPosition.coords.latitude,
+                    lng: globalPosition.coords.longitude
+                }
+            });
+
+        drawMe(combustibleMap);
+        loadMarkers();
     }
     initMapCombustible();
 </script>

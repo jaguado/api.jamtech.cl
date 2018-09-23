@@ -5,7 +5,7 @@ var sessionCheckInterval = 60000 * 5; //5 minutes
 var loops = 5;
 var loginPath = "/login";
 var user = localStorage.getItem('user') != null ? JSON.parse(localStorage.getItem('user')) : null;
-var visibleDataRefreshInterval = 60000 * .5; //30 seconds
+var visibleDataRefreshInterval =  60000 * .5; //30 seconds
 var dashboardChartLimit = 30;
 var notifyTemplate = 'views/common/notify.html';
 var atmsDistanceKms = 5;
@@ -15,6 +15,32 @@ var combustibleMap = null;
 var atms = null;
 var stations = null;
 var loopsWaitInterval = 500;
+var showLocationWarning = false;
+
+//geolocalization events
+function updateLocation() {
+    //try to read geolocation from browser
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+                var changed = globalPosition == null || globalPosition.coords.latitude != position.coords.latitude || globalPosition.coords.longitude != position.coords.longitude;
+                if (changed) {
+                    globalPosition = position;
+                    showLocationWarning = false;
+                    //console.log('position', position);
+                    var event = new CustomEvent("positionChanged", position);
+                    document.dispatchEvent(event);
+                }
+            },
+            function (error) {
+                showLocationWarning = true;
+                console.log('position error', error);
+                var event = new CustomEvent("positionError", error);
+                document.dispatchEvent(event);
+            });
+    };
+}
+updateLocation();
+window.setTimeout(updateLocation, visibleDataRefreshInterval);
 
 function minimalize() {
     if (!$("body").hasClass("mini-navbar")) {
@@ -42,13 +68,12 @@ function AtmsCtrl($scope, $rootScope, $http, $interval, $location, notify, Analy
         Analytics.trackEvent('atms', 'template', template.name);
         $scope.gridTemplate = template;
     };
-    $scope.position = null;
     $scope.searchAtms = function () {
         var url = baseApiUrl + "Cajeros?distance=" + atmsDistanceKms;
         //add position
-        if ($scope.position != null) {
-            url += '&lat=' + $scope.position.coords.latitude;
-            url += '&lng=' + $scope.position.coords.longitude;
+        if (globalPosition != null) {
+            url += '&lat=' + globalPosition.coords.latitude;
+            url += '&lng=' + globalPosition.coords.longitude;
         }
         return $http.get(url).then(function (response) {
             //console.log('searchAtms', response.data);
@@ -61,23 +86,22 @@ function AtmsCtrl($scope, $rootScope, $http, $interval, $location, notify, Analy
             return false;
         });
     };
+    if(globalPosition!=null){
+        $scope.searchAtms();
+    }
+    // Events
+    document.addEventListener("positionChanged", function (newPos) {
+        $scope.showLocationWarning = false;
+        console.log('AtmsCtrl', 'position changed event', newPos);
+        Analytics.trackEvent('atms', 'geolocation', 'true');
+        $scope.searchAtms();
+    });
 
-    //try to read geolocation from browser
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function (position) {
-                $scope.$apply(function () {
-                    globalPosition = position;
-                    $scope.position = position;
-                    $scope.showLocationWarning = false;
-                    Analytics.trackEvent('atms', 'geolocation', 'true');
-                    $scope.searchAtms();
-                });
-            },
-            function (error) {
-                Analytics.trackEvent('atms', 'geolocation', 'false');
-                $scope.showLocationWarning = true;
-            });
-    };
+    document.addEventListener("positionError", function (error) {
+        $scope.showLocationWarning = true;
+        console.log('AtmsCtrl', 'error getting position', error);
+        Analytics.trackEvent('atms', 'geolocation', 'false');
+    });
 }
 
 function DashboardCtrl($scope, $rootScope, $http, $interval, $location, notify, Analytics, socialLoginService) {
@@ -325,9 +349,7 @@ function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, so
         if (user != null && (user.provider == "google" || user.provider == "facebook")) {
             console.log('checking session');
             var url = baseApiUrl + "User";
-            //get stations from api.jamtech.cl
             return $http.get(url).then(function (response) {
-                //console.log('status code', response.status);
                 return response.status == 201;
             }, function (response) {
                 $scope.logoff();
@@ -441,7 +463,6 @@ function ProductsCtrl($http, $scope, Analytics) {
     $scope.gridTemplate = $scope.availableProductTemplates[0];
     $scope.view = 'Search';
     $scope.textToSearch = null;
-    $scope.position = null;
     $scope.showLocationWarning = false;
     $scope.products = [];
     $scope.setTemplate = function (val) {
@@ -452,8 +473,6 @@ function ProductsCtrl($http, $scope, Analytics) {
         Analytics.trackEvent('product', 'search', product);
         $scope.textToSearch = product;
         var url = searchUrl + product;
-
-        //get stations from api.jamtech.cl
         return $http.get(url).then(function (response) {
             $scope.products = response.data;
             $scope.view = 'Search';
@@ -465,7 +484,6 @@ function ProductsCtrl($http, $scope, Analytics) {
     $scope.viewProduct = function (product) {
         Analytics.trackEvent('product', 'view', product);
         var url = compareUrl.replace('{productId}', product.product_id);
-        //get stations from api.jamtech.cl
         return $http.get(url).then(function (response) {
             $scope.products = response.data;
             $scope.view = 'Compare';
@@ -473,20 +491,16 @@ function ProductsCtrl($http, $scope, Analytics) {
         });
     };
 
-    //try to read geolocation from browser
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function (position) {
-                $scope.$apply(function () {
-                    $scope.position = position;
-                    $scope.showLocationWarning = false;
-                    Analytics.trackEvent('product', 'geolocation', 'true');
-                });
-            },
-            function (error) {
-                Analytics.trackEvent('product', 'geolocation', 'false');
-                $scope.showLocationWarning = true;
-            });
-    };
+    //Geolocalization Events
+    document.addEventListener("positionChanged", function (newPos) {
+        $scope.showLocationWarning = false;
+        Analytics.trackEvent('product', 'geolocation', 'true');
+    });
+
+    document.addEventListener("positionError", function (error) {
+        $scope.showLocationWarning = true;
+        Analytics.trackEvent('product', 'geolocation', 'false');
+    });
 }
 
 function StationsCtrl($http, $scope, Analytics) {
@@ -633,8 +647,8 @@ function StationsCtrl($http, $scope, Analytics) {
             tempStationsUrl += '&distributor=' + $scope.distributor;
 
         //add position
-        if ($scope.position != null) {
-            tempStationsUrl += '&lat=' + $scope.position.coords.latitude + '&lng=' + $scope.position.coords.longitude;
+        if (globalPosition != null) {
+            tempStationsUrl += '&lat=' + globalPosition.coords.latitude + '&lng=' + globalPosition.coords.longitude;
             tempStationsUrl += '&filters=ubicacion.distancia<' + $scope.maxDistance;
         }
 
@@ -647,24 +661,23 @@ function StationsCtrl($http, $scope, Analytics) {
         });
     };
 
-    //try to read geolocation from browser
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function (position) {
-                $scope.$apply(function () {
-                    $scope.position = position;
-                    globalPosition = position;
-                    $scope.showLocationWarning = false;
-                    Analytics.trackEvent('product', 'geolocation', 'true');
-                    $scope.searchStations();
-                });
-            },
-            function (error) {
-                //load stations without location
-                $scope.searchStations();
-                $scope.showLocationWarning = true;
-                Analytics.trackEvent('product', 'geolocation', 'false');
-            });
-    };
+    if(globalPosition!=null){
+        $scope.searchStations();
+    }
+
+    //Geolocalization Events
+    document.addEventListener("positionChanged", function (newPos) {
+        console.log('StationsCtrl', newPos);
+        $scope.showLocationWarning = false;
+        $scope.searchStations();
+        Analytics.trackEvent('combustible', 'geolocation', 'true');
+    });
+
+    document.addEventListener("positionError", function (error) {
+        $scope.showLocationWarning = true;
+        $scope.searchStations();
+        Analytics.trackEvent('combustible', 'geolocation', 'false');
+    });
 }
 
 function ToolsCtrl($scope, $rootScope, $http, Analytics) {
@@ -844,6 +857,13 @@ function addMarker(location, text, map, uri) {
         console.log('open route in new window');
         window.open(marker.url);
     });
+    return marker;
+}
+// Sets the map on all markers in the array.
+function setMapOnAll(markers, map) {
+    for (var i = 0; i < markers.length; i++) {
+        markers[i].setMap(map);
+    }
 }
 
 String.prototype.replaceAll = function (searchStr, replaceStr) {

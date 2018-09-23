@@ -1,41 +1,27 @@
 <div id="map"></div>
 <script>
     // Initialize and add the map
-    function initMap() {
-        if (globalPosition == null) {
-            console.log('waiting for position');
-            setTimeout(initMap, loopsWaitInterval);
-            return;
-        }
-        var me = {
-            lat: globalPosition.coords.latitude,
-            lng: globalPosition.coords.longitude
-        };
-        atmsMap = new google.maps.Map(
-            document.getElementById('map'), {
-                zoom: 4,
-                center: me
-            });
-        var marker = new google.maps.Marker({
-            draggable: true,
-            raiseOnDrag: true,
-            position: me,
-            map: atmsMap,
+    var marker = null;
+    var markers = [];
+    var atmsMap = null;
+    
+    function drawMe(map) {
+        if (marker != null)
+            marker.map = null;
+        marker = new google.maps.Marker({
+            position: {
+                lat: globalPosition.coords.latitude,
+                lng: globalPosition.coords.longitude
+            },
+            map: map,
             icon: {
                 url: "//maps.google.com/mapfiles/ms/icons/green-dot.png"
             }
         });
-        google.maps.event.addListener(marker, "dragend", function (event) {
-            console.log('new position set');
-            var lat = event.latLng.lat();
-            var lng = event.latLng.lng();
-            globalPosition.coords.latitude  = lat;
-            globalPosition.coords.longitude = lng;
-        });
-        loadMarkers();
     }
 
     function loadMarkers() {
+        setMapOnAll(markers, null);
         if (atms == null) {
             console.log('waiting for atms');
             setTimeout(loadMarkers, loopsWaitInterval);
@@ -48,7 +34,7 @@
                 lng: atm.longitude
             };
             var url = "http://www.google.com/maps/place/" + atm.latitude + "," + atm.longitude;
-            addMarker(pos, atm.location == null ? "Cajero" : atm.location, atmsMap, url);
+            markers.push(addMarker(pos, atm.location == null ? "Cajero" : atm.location, atmsMap, url));
             var loc = new google.maps.LatLng(pos.lat, pos.lng);
             bounds.extend(loc);
         });
@@ -58,5 +44,23 @@
         }
     }
 
+    function initMap() {
+        if (globalPosition == null) {
+            console.log('waiting for position');
+            setTimeout(initMap, loopsWaitInterval);
+            return;
+        }
+        atmsMap = new google.maps.Map(
+            document.getElementById('map'), {
+                zoom: 4,
+                center: {
+                    lat: globalPosition.coords.latitude,
+                    lng: globalPosition.coords.longitude
+                }
+            });
+
+        drawMe(atmsMap);
+        loadMarkers();
+    }
     initMap();
 </script>
