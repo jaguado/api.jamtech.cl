@@ -36,7 +36,9 @@
                 lng: station.ubicacion.longitud
             };
             var url = "http://www.google.com/maps/place/" + pos.lat + "," + pos.lng;
-            markersCombustible.push(addMarker(pos, station.distribuidor.nombre, combustibleMap, url));
+            var ranking = station.precios['ranking ' + fuelType.replaceAll('_', ' ')];
+            //console.log('rank',  station.precios, ranking);
+            markersCombustible.push(addMarker(pos, station.distribuidor.nombre, combustibleMap, url, ranking>0 && ranking<4 ? ranking + '' : ''));
             //TODO add ranking, prices and other usefull information
             var loc = new google.maps.LatLng(pos.lat, pos.lng);
             bounds.extend(loc);
@@ -63,7 +65,7 @@
             });
 
         drawMe(combustibleMap);
-        loadMarkers();
+        //loadMarkers();
     }
     initMapCombustible();
 </script>

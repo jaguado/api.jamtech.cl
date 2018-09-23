@@ -16,6 +16,7 @@ var atms = null;
 var stations = null;
 var loopsWaitInterval = 500;
 var showLocationWarning = false;
+var fuelType=null;
 
 //geolocalization events
 function updateLocation() {
@@ -79,6 +80,7 @@ function AtmsCtrl($scope, $rootScope, $http, $interval, $location, notify, Analy
             //console.log('searchAtms', response.data);
             $scope.atms = response.data;
             atms = response.data;
+            loadMarkers();
             return response.status == 200;
         }, function (response) {
             Alert('Error getting atms');
@@ -522,7 +524,7 @@ function StationsCtrl($http, $scope, Analytics) {
     $scope.maxDistance = 10000; //in meters
     $scope.distributor = null;
     $scope.region = null; //all is the default //TODO read from cookie or calculate by location
-    $scope.fuel = 'gasolina_95';
+    $scope.fuel = fuelType = 'gasolina_95';
     $scope.fuelTypes = ["gasolina 93", "gasolina 95", "gasolina 97", "petroleo diesel", "kerosene", "glp vehicular"];
     $scope.distances = [1000, 5000, 10000, 15000, 20000, 50000, 100000];
     $scope.combustible = 'Vehicular';
@@ -592,6 +594,7 @@ function StationsCtrl($http, $scope, Analytics) {
     }
     $scope.setFuel = function (val) {
         $scope.fuel = val;
+        fuelType=val;
         localStorage.setItem('fuel', val != null ? val : '');
         $scope.searchStations();
     }
@@ -665,6 +668,7 @@ function StationsCtrl($http, $scope, Analytics) {
             $scope.stations = response.data;
             $scope.searchText = $scope.searchTextTemp;
             stations = response.data;
+            loadMarkers();  
             return true;
         });
     };
@@ -858,10 +862,11 @@ function GetPrice() {
     }
 };
 
-function addMarker(location, text, map, uri) {
+function addMarker(location, text, map, uri, label) {
     var marker = new google.maps.Marker({
         position: location,
         title: text,
+        label: label,
         map: map,
         url: uri
     });
