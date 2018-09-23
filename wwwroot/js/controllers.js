@@ -5,7 +5,7 @@ var sessionCheckInterval = 60000 * 5; //5 minutes
 var loops = 5;
 var loginPath = "/login";
 var user = localStorage.getItem('user') != null ? JSON.parse(localStorage.getItem('user')) : null;
-var visibleDataRefreshInterval =  60000 * .5; //30 seconds
+var visibleDataRefreshInterval = 60000 * .5; //30 seconds
 var dashboardChartLimit = 30;
 var notifyTemplate = 'views/common/notify.html';
 var atmsDistanceKms = 5;
@@ -16,7 +16,8 @@ var atms = null;
 var stations = null;
 var loopsWaitInterval = 500;
 var showLocationWarning = false;
-var fuelType=null;
+var fuelType = null;
+var mapObjectLimit = 15;
 
 //geolocalization events
 function updateLocation() {
@@ -76,6 +77,8 @@ function AtmsCtrl($scope, $rootScope, $http, $interval, $location, notify, Analy
             url += '&lat=' + globalPosition.coords.latitude;
             url += '&lng=' + globalPosition.coords.longitude;
         }
+        url += '&limit=' + mapObjectLimit;
+
         return $http.get(url).then(function (response) {
             //console.log('searchAtms', response.data);
             $scope.atms = response.data;
@@ -88,7 +91,7 @@ function AtmsCtrl($scope, $rootScope, $http, $interval, $location, notify, Analy
             return false;
         });
     };
-    if(globalPosition!=null){
+    if (globalPosition != null) {
         $scope.searchAtms();
     }
     // Events
@@ -105,7 +108,7 @@ function AtmsCtrl($scope, $rootScope, $http, $interval, $location, notify, Analy
         Analytics.trackEvent('atms', 'geolocation', 'false');
     });
 
-    $scope.refresh = function(){
+    $scope.refresh = function () {
         updateLocation();
     }
 }
@@ -308,7 +311,7 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, notify, 
         });
     };
 
-    $scope.refresh = function(){
+    $scope.refresh = function () {
         $scope.refreshSensors();
     }
 
@@ -594,7 +597,7 @@ function StationsCtrl($http, $scope, Analytics) {
     }
     $scope.setFuel = function (val) {
         $scope.fuel = val;
-        fuelType=val;
+        fuelType = val;
         localStorage.setItem('fuel', val != null ? val : '');
         $scope.searchStations();
     }
@@ -663,17 +666,19 @@ function StationsCtrl($http, $scope, Analytics) {
             tempStationsUrl += '&filters=ubicacion.distancia<' + $scope.maxDistance;
         }
 
+        tempStationsUrl += '&limit=' + mapObjectLimit;
+
         //get stations from api.jamtech.cl
         return $http.get(tempStationsUrl).then(function (response) {
             $scope.stations = response.data;
             $scope.searchText = $scope.searchTextTemp;
             stations = response.data;
-            loadMarkers();  
+            loadMarkers();
             return true;
         });
     };
 
-    if(globalPosition!=null){
+    if (globalPosition != null) {
         $scope.searchStations();
     }
 
@@ -691,7 +696,7 @@ function StationsCtrl($http, $scope, Analytics) {
         Analytics.trackEvent('combustible', 'geolocation', 'false');
     });
 
-    $scope.refresh = function(){
+    $scope.refresh = function () {
         updateLocation();
     }
 }
@@ -862,14 +867,26 @@ function GetPrice() {
     }
 };
 
-function addMarker(location, text, map, uri, label) {
-    var marker = new google.maps.Marker({
-        position: location,
-        title: text,
-        label: label,
-        map: map,
-        url: uri
-    });
+function addMarker(location, text, map, uri, label, icon) {
+    if (icon != null) {
+        var marker = new google.maps.Marker({
+            position: location,
+            title: text,
+            label: label,
+            map: map,
+            url: uri,
+            icon: icon
+        });
+    } else {
+        var marker = new google.maps.Marker({
+            position: location,
+            title: text,
+            label: label,
+            map: map,
+            url: uri
+        });
+    }
+
     google.maps.event.addListener(marker, "click", function (e) {
         console.log('open route in new window');
         window.open(marker.url);

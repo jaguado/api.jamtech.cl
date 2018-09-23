@@ -34,7 +34,7 @@
                 lng: atm.longitude
             };
             var url = "http://www.google.com/maps/place/" + atm.latitude + "," + atm.longitude;
-            markers.push(addMarker(pos, atm.location == null ? "Cajero" : atm.location, atmsMap, url,''));
+            markers.push(addMarker(pos, atm.location == null ? "Cajero" : atm.location, atmsMap, url,'', null));
             var loc = new google.maps.LatLng(pos.lat, pos.lng);
             bounds.extend(loc);
         });
