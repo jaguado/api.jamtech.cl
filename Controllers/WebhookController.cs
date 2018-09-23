@@ -19,6 +19,7 @@ namespace JAMTech.Controllers
     [Route("v1/[controller]")]
     public class WebhookController : BaseController
     {
+        [AllowAnonymous]
         [HttpPost()]
         public async Task<IActionResult> WebHookAsync()
         {

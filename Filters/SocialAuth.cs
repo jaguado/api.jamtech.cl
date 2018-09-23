@@ -11,6 +11,7 @@ using System.Linq;
 using System.Collections;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Authorization;
 
 namespace JAMTech.Filters
 {
@@ -224,11 +225,15 @@ namespace JAMTech.Filters
                 if (string.IsNullOrEmpty(accessToken))
                 {
                     //throw new SecurityTokenException("Access token missing");
-                    context.Result = new ContentResult()
+                    // Check for authorization
+                    if (!context.Filters.Any(a=> a is AllowAnonymousFilter))
                     {
-                        StatusCode = StatusCodes.Status401Unauthorized,
-                        Content = "Access token missing"
-                    };
+                        context.Result = new ContentResult()
+                        {
+                            StatusCode = StatusCodes.Status401Unauthorized,
+                            Content = "Access token missing"
+                        };
+                    }
                 }
                 else
                 {
