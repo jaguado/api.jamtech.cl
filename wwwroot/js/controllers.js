@@ -306,6 +306,10 @@ function DashboardCtrl($scope, $rootScope, $http, $interval, $location, notify, 
         });
     };
 
+    $scope.refresh = function(){
+        $scope.refreshSensors();
+    }
+
     /**
      * Options for Line chart
      */
