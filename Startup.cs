@@ -117,6 +117,7 @@ namespace JAMTech
 
             services.AddMvc(options =>
             {
+                options.Filters.Add(typeof(SocialAuth)); // by type
                 options.Filters.Add(typeof(BaseResultFilter)); // by type
             })
             .AddJsonOptions(options =>

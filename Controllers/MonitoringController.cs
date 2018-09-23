@@ -15,7 +15,6 @@ using JAMTech.Models;
 
 namespace JAMTech.Controllers
 {
-    [SocialAuth]
     [Route("v1/[controller]")]
     public class MonitoringController : BaseController
     {

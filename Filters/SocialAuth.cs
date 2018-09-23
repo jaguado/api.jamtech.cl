@@ -19,7 +19,7 @@ namespace JAMTech.Filters
     /// If it does contains the header it then will check if the body and query string of the request to find
     /// a rut, finally, it will try to find the rut in the payload of the 
     /// </summary>
-    public class SocialAuth : ActionFilterAttribute
+    public class SocialAuth : IAsyncActionFilter
     {
         JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
         const string googlePublicKey = "";
@@ -238,8 +238,8 @@ namespace JAMTech.Filters
                 }
             }
 
-            var resultContext = await next();
-            // do something after the action executes; resultContext.Result will be set
+            if (context.Result == null)
+                await next();
         }
     }
 }
