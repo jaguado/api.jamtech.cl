@@ -4,7 +4,7 @@
     var marker = null;
     var markers = [];
     var atmsMap = null;
-    
+
     function drawMe(map) {
         if (marker != null)
             marker.map = null;
@@ -34,7 +34,24 @@
                 lng: atm.longitude
             };
             var url = "http://www.google.com/maps/place/" + atm.latitude + "," + atm.longitude;
-            markers.push(addMarker(pos, atm.location == null ? "Cajero" : atm.location, atmsMap, url,'', null));
+            var clickCallback = function (marker, map) {
+                var title = atm.location != null && atm.location != 'null' ? atm.location : atm.street;
+                var atmDetail = '<center><b>' + title + '</b><br /><br />';
+                atmDetail += "<br />";
+                atmDetail += "<div>" + atm.distance.toFixed(0) + "&nbsp;kms<br />";
+                atmDetail +=
+                    "<a target=\"_blank\" href=\"" + url + "\">";
+                atmDetail += "¿C&oacute;mo llegar?&nbsp;<i class=\"fas fa-map-marked-alt\"></i>";
+                atmDetail += "</a>";
+                atmDetail += "</div></center>";
+
+                var infowindow = new google.maps.InfoWindow({
+                    content: atmDetail
+                });
+                infowindow.open(map, marker);
+            };
+            markers.push(addMarker(pos, atm.location == null ? "Cajero" : atm.location, atmsMap, url, '', null,
+                clickCallback));
             var loc = new google.maps.LatLng(pos.lat, pos.lng);
             bounds.extend(loc);
         });
@@ -60,7 +77,7 @@
             });
 
         drawMe(atmsMap);
-        //loadMarkers();
+        loadMarkers();
     }
     initMap();
 </script>

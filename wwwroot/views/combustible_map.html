@@ -67,7 +67,7 @@
                 stationDetail += "<br />";
                 stationDetail += "<div>" + station.ubicacion.distancia.toFixed(0) + "&nbsp;metros<br />";
                 stationDetail +=
-                    "<a target=\"_blank\" href=\"http://www.google.com/maps/place/" + station.ubicacion.latitud + "," + station.ubicacion.longitud + "\">";
+                    "<a target=\"_blank\" href=\"" + url + "\">";
                 stationDetail += "¿C&oacute;mo llegar?&nbsp;<i class=\"fas fa-map-marked-alt\"></i>";
                 stationDetail += "</a>";
                 stationDetail += "</div></center>";
@@ -107,7 +107,7 @@
             });
 
         drawMe(combustibleMap);
-        //loadMarkers();
+        loadMarkers();
     }
     initMapCombustible();
 </script>

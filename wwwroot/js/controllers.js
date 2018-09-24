@@ -880,10 +880,12 @@ function addMarker(location, text, map, uri, label, icon, clickCallback) {
         icon: icon
     });
 
-    
-    google.maps.event.addListener(marker, "click", function (e) {
-        clickCallback(marker, map);
-    });
+
+    if (clickCallback != null) {
+        google.maps.event.addListener(marker, "click", function (e) {
+            clickCallback(marker, map);
+        });
+    }
     return marker;
 }
 // Sets the map on all markers in the array.
