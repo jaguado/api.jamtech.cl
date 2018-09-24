@@ -829,6 +829,9 @@ function Capitalize() {
     }
 };
 
+function capitalize(input) {
+    return (!!input) ? input.charAt(0).toUpperCase() + input.substr(1).toLowerCase() : '';
+}
 
 function toArray() {
     'use strict';
@@ -867,29 +870,19 @@ function GetPrice() {
     }
 };
 
-function addMarker(location, text, map, uri, label, icon) {
-    if (icon != null) {
-        var marker = new google.maps.Marker({
-            position: location,
-            title: text,
-            label: label,
-            map: map,
-            url: uri,
-            icon: icon
-        });
-    } else {
-        var marker = new google.maps.Marker({
-            position: location,
-            title: text,
-            label: label,
-            map: map,
-            url: uri
-        });
-    }
+function addMarker(location, text, map, uri, label, icon, clickCallback) {
+    var marker = new google.maps.Marker({
+        position: location,
+        title: text,
+        label: label,
+        map: map,
+        url: uri,
+        icon: icon
+    });
 
+    
     google.maps.event.addListener(marker, "click", function (e) {
-        console.log('open route in new window');
-        window.open(marker.url);
+        clickCallback(marker, map);
     });
     return marker;
 }

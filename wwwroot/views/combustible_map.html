@@ -53,14 +53,41 @@
                     break;
             }
             //console.log('rank', ranking, icon);
-            markersCombustible.push(addMarker(pos, station.distribuidor.nombre, combustibleMap, url, '', icon));
+            var clickCallback = function (marker, map) {
+                var stationDetail = '<center><b>' + station.distribuidor.nombre + '</b><br /><br />';
+                for (var element in station.precios) {
+                    if (!element.startsWith('ranking')) {
+                        var precio = station.precios[element];
+                        stationDetail += "<div>";
+                        stationDetail += "<small>" + capitalize(element) + "</small><br />";
+                        stationDetail += "<strong>" + precio + "</strong>";
+                        stationDetail += "</div>";
+                    }
+                }
+                stationDetail += "<br />";
+                stationDetail += "<div>" + station.ubicacion.distancia.toFixed(0) + "&nbsp;metros<br />";
+                stationDetail +=
+                    "<a target=\"_blank\" href=\"http://www.google.com/maps/place/" + station.ubicacion.latitud + "," + station.ubicacion.longitud + "\">";
+                stationDetail += "¿C&oacute;mo llegar?&nbsp;<i class=\"fas fa-map-marked-alt\"></i>";
+                stationDetail += "</a>";
+                stationDetail += "</div></center>";
+
+                var infowindow = new google.maps.InfoWindow({
+                    content: stationDetail
+                });
+                infowindow.open(map, marker);
+                console.log('open route in new window', marker);
+                //window.open(marker.url)
+            };
+            markersCombustible.push(addMarker(pos, station.distribuidor.nombre, combustibleMap, url, '', icon,
+                clickCallback));
             //TODO add ranking, prices and other usefull information
             var loc = new google.maps.LatLng(pos.lat, pos.lng);
             bounds.extend(loc);
         });
         if (combustibleMap != null) {
             combustibleMap.fitBounds(bounds); // auto-zoom
-            //atmsMap.panToBounds(bounds); //auto-center
+            combustibleMap.panToBounds(bounds); //auto-center
         }
     }
 
