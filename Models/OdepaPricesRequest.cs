@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace JAMTech.Models
@@ -67,9 +68,9 @@ namespace JAMTech.Models
     public class OdepaPricesRequest
     {
         public TipoSerie tipoSerie { get; set; } = new TipoSerie { code = "WEEK" };
-        public Agno agno { get; set; } = new Agno { code = 2018 };
-        public SemanaInicio semanaInicio { get; set; } = new SemanaInicio { code = 38 };
-        public SemanaTermino semanaTermino { get; set; } = new SemanaTermino { code = 38 };
+        public Agno agno { get; set; } = new Agno { code = DateTime.Now.Year };
+        public SemanaInicio semanaInicio { get; set; } = new SemanaInicio { code = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(DateTime.Now, CalendarWeekRule.FirstFullWeek, DayOfWeek.Sunday) };
+        public SemanaTermino semanaTermino { get; set; } = new SemanaTermino { code = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(DateTime.Now, CalendarWeekRule.FirstFullWeek, DayOfWeek.Sunday) };
         public Region region { get; set; } = new Region { id = 13 };
         public Sector sector { get; set; } = new Sector { value = -1 };
         public Producto tipoProducto { get; set; }

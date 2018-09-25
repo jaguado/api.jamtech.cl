@@ -30,7 +30,7 @@ namespace JAMTech.Controllers
             if (_productsPrices == null)
                 await LoadAllPrices();
             if(!string.IsNullOrEmpty(productName))
-                return new OkObjectResult(_productsPrices.Where(p=>p["producto"].Value.ToString().ToLower().Contains(productName.Trim().ToLower())));
+                return new OkObjectResult(_productsPrices.Where(p=>p.producto.ToLower().Contains(productName.Trim().ToLower())));
             return new OkObjectResult(_productsPrices);
         }
         
@@ -70,7 +70,7 @@ namespace JAMTech.Controllers
                     if (result.IsSuccessStatusCode)
                     {
                         var prices = await result.Content.ReadAsStringAsync();
-                        return JsonConvert.DeserializeObject<dynamic>(prices);
+                        return JsonConvert.DeserializeObject<List<Models.OdepaProductPrice>>(prices);
                     }
                     else
                     {
