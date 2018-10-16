@@ -39,6 +39,28 @@ namespace JAMTech.Controllers
         }
 
         /// <summary>
+        /// Get customer and account information
+        /// </summary>
+        /// <param name="rut"></param>
+        /// <param name="pwd"></param>
+        /// <returns></returns>
+        [HttpGet("BBVA/Accounts")]
+        public async Task<IActionResult> GetBBVAAccountsAsync(string rut, string pwd)
+        {
+            using (var bank = new Plugins.Banks.BBVA(rut.ToCleanRut(), pwd))
+            {
+                if (await bank.Login())
+                    return new OkObjectResult(new
+                    {
+                        Customer = bank.Customer,
+                        Accounts = bank.Accounts
+                    });
+                else
+                    return new UnauthorizedResult();
+            }
+        }
+
+        /// <summary>
         /// Get all movements for a specified customer
         /// </summary>
         /// <param name="rut"></param>

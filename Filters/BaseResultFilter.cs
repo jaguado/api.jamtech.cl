@@ -9,26 +9,15 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace JAMTech.Filters
 {
-    public class BaseResultFilter : IActionFilter
+    public class BaseResultFilter : IAsyncActionFilter
     {
         const int defaultLimit = 50;
         public static string[] Operators = new[] { "==", "!=", "<", ">", "<>", "<=", ">=" };
         private static readonly bool _minifyResponse = Environment.GetEnvironmentVariable("minifyResponse") =="false" ? false : true;
-        public void OnActionExecuting(ActionExecutingContext context)
-        {
-            // do something before the action executes
-        }
-
-        public void OnActionExecuted(ActionExecutedContext context)
-        {
-            // do something after the action executes
-            var request = context.HttpContext.Request;
-            var resultResponse = context.Result as OkObjectResult;
-            FilterOrderLimitResult<dynamic>(context, request, resultResponse);
-        }
 
         private static WebMarkupMin.Core.CrockfordJsMinifier minifyJs = new WebMarkupMin.Core.CrockfordJsMinifier();
         private void FilterOrderLimitResult<T>(ActionExecutedContext context, HttpRequest request, OkObjectResult resultResponse)
@@ -119,6 +108,15 @@ namespace JAMTech.Filters
                 }
             }
             return query;
-        } 
+        }
+
+        public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+        {
+            var resultContext = await next();
+            // do something after the action executes
+            var request = resultContext.HttpContext.Request;
+            var resultResponse = resultContext.Result as OkObjectResult;
+            FilterOrderLimitResult<dynamic>(resultContext, request, resultResponse);
+        }
     }
 }

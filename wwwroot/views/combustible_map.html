@@ -1,32 +1,28 @@
 <div id="map"></div>
 <script>
     // Initialize and add the map
-    function initMapCombustible() {
-        if (globalPosition == null) {
-            console.log('waiting for position');
-            setTimeout(initMapCombustible, loopsWaitInterval);
-            return;
+    var markerCombustible = null;
+    var markersCombustible = [];
+    var combustibleMap = null;
+
+    function drawMe(map) {
+        if (markerCombustible != null) {
+            markerCombustible.map = null;
         }
-        var me = {
-            lat: globalPosition.coords.latitude,
-            lng: globalPosition.coords.longitude
-        };
-        combustibleMap = new google.maps.Map(
-            document.getElementById('map'), {
-                zoom: 4,
-                center: me
-            });
-        var marker = new google.maps.Marker({
-            position: me,
-            map: combustibleMap,
+        markerCombustible = new google.maps.Marker({
+            position: {
+                lat: globalPosition.coords.latitude,
+                lng: globalPosition.coords.longitude
+            },
+            map: map,
             icon: {
                 url: "//maps.google.com/mapfiles/ms/icons/green-dot.png"
             }
         });
-        loadMarkers();
     }
 
     function loadMarkers() {
+        setMapOnAll(markersCombustible, null);
         if (stations == null) {
             console.log('waiting for stations');
             setTimeout(loadMarkers, loopsWaitInterval);
@@ -40,15 +36,78 @@
                 lng: station.ubicacion.longitud
             };
             var url = "http://www.google.com/maps/place/" + pos.lat + "," + pos.lng;
-            addMarker(pos, station.distribuidor.nombre, combustibleMap, url);
+            var ranking = station.precios['ranking ' + fuelType.replaceAll('_', ' ')];
+            var icon = "img/marker_";
+            switch (ranking) {
+                case 1:
+                    icon = icon + 'green1.png';
+                    break;
+                case 2:
+                    icon = icon + 'blue2.png';
+                    break;
+                case 3:
+                    icon = icon + 'red3.png';
+                    break;
+                default:
+                    icon = null;
+                    break;
+            }
+            //console.log('rank', ranking, icon);
+            var clickCallback = function (marker, map) {
+                var stationDetail = '<center><b>' + station.distribuidor.nombre + '</b><br /><br />';
+                for (var element in station.precios) {
+                    if (!element.startsWith('ranking')) {
+                        var precio = station.precios[element];
+                        stationDetail += "<div>";
+                        stationDetail += "<small>" + capitalize(element) + "</small><br />";
+                        stationDetail += "<strong>" + precio + "</strong>";
+                        stationDetail += "</div>";
+                    }
+                }
+                stationDetail += "<br />";
+                stationDetail += "<div>" + station.ubicacion.distancia.toFixed(0) + "&nbsp;metros<br />";
+                stationDetail +=
+                    "<a target=\"_blank\" href=\"" + url + "\">";
+                stationDetail += "¿C&oacute;mo llegar?&nbsp;<i class=\"fas fa-map-marked-alt\"></i>";
+                stationDetail += "</a>";
+                stationDetail += "</div></center>";
+
+                var infowindow = new google.maps.InfoWindow({
+                    content: stationDetail
+                });
+                infowindow.open(map, marker);
+                console.log('open route in new window', marker);
+                //window.open(marker.url)
+            };
+            markersCombustible.push(addMarker(pos, station.distribuidor.nombre, combustibleMap, url, '', icon,
+                clickCallback));
             //TODO add ranking, prices and other usefull information
             var loc = new google.maps.LatLng(pos.lat, pos.lng);
             bounds.extend(loc);
         });
         if (combustibleMap != null) {
             combustibleMap.fitBounds(bounds); // auto-zoom
-            //atmsMap.panToBounds(bounds); //auto-center
+            combustibleMap.panToBounds(bounds); //auto-center
         }
+    }
+
+    function initMapCombustible() {
+        if (globalPosition == null) {
+            console.log('waiting for position');
+            setTimeout(initMapCombustible, loopsWaitInterval);
+            return;
+        }
+        combustibleMap = new google.maps.Map(
+            document.getElementById('map'), {
+                zoom: 4,
+                center: {
+                    lat: globalPosition.coords.latitude,
+                    lng: globalPosition.coords.longitude
+                }
+            });
+
+        drawMe(combustibleMap);
+        loadMarkers();
     }
     initMapCombustible();
 </script>

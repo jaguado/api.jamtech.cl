@@ -5,7 +5,8 @@
                 <h1>
                     Monitoring Dashboard
                 </h1>
-                <small>{{sensors == null ? '0' : sensors.length}} sensors found</small>
+                <small>{{sensors == null ? '0' : sensors.length}} sensors found</small> 
+                <a><i class="fas fa-sync-alt" ng-click="refresh()"></i></a>
             </div>
             <br />
         </div>

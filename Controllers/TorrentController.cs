@@ -68,6 +68,31 @@ namespace JAMTech.Controllers
             return new OkObjectResult(flattenResult);
         }
 
+        // GET: api/Torrent/movie
+        /// <summary>
+        /// Allow to search torrents on ZTorrents, TPB and other torrents
+        /// </summary>
+        /// <param name="search">word to search</param>
+        /// <param name="pages">max pages count</param>
+        /// <returns>List of torrent files</returns>
+        [HttpGet("/v3/[controller]/")]
+        [Produces(typeof(List<TorrentResult>))]
+        public async Task<IActionResult> GetTriple(string search, int pages = 1, bool skipLinks = false)
+        {
+            var torrentPagesTasks = new List<Task<List<TorrentResult>>>();
+            torrentPagesTasks.AddRange(Enumerable.Range(1, pages).Select(page => FindOtherTorrentsAsync(search, page, skipLinks)));
+            torrentPagesTasks.AddRange(Enumerable.Range(1, pages).Select(page => FindZTorrentsAsync(search, page, skipLinks)));
+            torrentPagesTasks.AddRange(Enumerable.Range(1, pages).Select(page => FindTPBTorrentsAsync(search, page, skipLinks)));
+
+            await Task.WhenAll(torrentPagesTasks);
+            var flattenResult = torrentPagesTasks.Where(t => t.IsCompletedSuccessfully && t.Result != null)
+                               .Select(s => s.Result)
+                               .SelectMany(s => s, (list, value) => value)
+                               .OrderBy(o => o.Page)
+                               .ToList();
+            return new OkObjectResult(flattenResult);
+        }
+
         private const string tpbSearchUrl = @"https://thepiratebay.org/search/{0}/{1}/7/0";
         private const string searchResultDivName = "searchResult";
         private const string detailDivName = "detName";
@@ -88,7 +113,8 @@ namespace JAMTech.Controllers
             }
             catch (Exception ex)
             {
-                throw new TimeoutException(ex.Message, ex.InnerException);
+                return null;
+                //throw new TimeoutException(ex.Message, ex.InnerException);
             }
             return null;
         }

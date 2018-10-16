@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace JAMTech.Controllers
 {
-    [SocialAuth]
     [Route("v1/[controller]")]
     public class UserController : BaseController
     {
