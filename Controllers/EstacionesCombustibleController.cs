@@ -43,7 +43,7 @@ namespace JAMTech.Controllers
         /// <returns></returns>
         [HttpGet]
         [Produces(typeof(List<Models.CombustibleStation>))]
-        public async Task<IActionResult> GetStations(CombustibleType type, int region = 0, int comuna = 0, string distributor = "")
+        public async Task<IActionResult> GetStations(CombustibleType type, int region = 0, int comuna = 0, string lat = "", string lng="", string distributor = "")
         {
             try
             {
@@ -56,8 +56,6 @@ namespace JAMTech.Controllers
                                                   );
 
                 //add distance
-                var lat = Request.Query["lat"].ToString();
-                var lng = Request.Query["lng"].ToString();
                 if (lat != string.Empty && lng != string.Empty)
                     AddDistance(filteredResult, double.Parse(lat), double.Parse(lng));
 
