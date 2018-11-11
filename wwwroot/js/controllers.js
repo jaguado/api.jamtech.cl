@@ -455,6 +455,11 @@ function TorrentsCtrl($http, $scope, $window, Analytics) {
         if (url.length > 0)
             $window.open(url[0].Item2, '_self');
     };
+    $scope.open = function (val) {
+        console.log('opening', val);
+        Analytics.trackEvent('torrent', 'open', val.Name);
+        $window.open(val.Link, '_blank');
+    };
 };
 
 function ProductsCtrl($http, $scope, Analytics) {
