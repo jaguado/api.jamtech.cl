@@ -361,7 +361,7 @@ function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, so
     $scope.checkSession = function () {
         if (user != null && (user.provider == "google" || user.provider == "facebook")) {
             console.log('checking session');
-            var url = baseApiUrl + "User";
+            var url = baseApiUrl + "User/me";
             return $http.get(url).then(function (response) {
                 return response.status == 201;
             }, function (response) {

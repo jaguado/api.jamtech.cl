@@ -32,7 +32,7 @@ namespace JAMTech.Filters
         public async Task InvokeAsync(HttpContext context)
         {
             //custom static files middleware with cache
-            if (context.Request.Method == "GET" && Path.GetExtension(context.Request.Path) != string.Empty)
+            if (context.Request.Method == "GET")
             {
                 //get file from cache and put into response
                 var originalStream = context.Response.Body;
