@@ -26,6 +26,7 @@ namespace JAMTech.Controllers
         /// </summary>
         /// <param name="search">word to search</param>
         /// <param name="pages">max pages count</param>
+        /// <param name="skipLinks">disable links completion</param>
         /// <returns>List of torrent files</returns>
         [HttpGet]
         [Produces(typeof(List<TorrentResult>))]
@@ -50,6 +51,7 @@ namespace JAMTech.Controllers
         /// </summary>
         /// <param name="search">word to search</param>
         /// <param name="pages">max pages count</param>
+        /// <param name="skipLinks">disable links completion</param>
         /// <returns>List of torrent files</returns>
         [HttpGet("/v2/[controller]/")]
         [Produces(typeof(List<TorrentResult>))]
@@ -74,6 +76,7 @@ namespace JAMTech.Controllers
         /// </summary>
         /// <param name="search">word to search</param>
         /// <param name="pages">max pages count</param>
+        /// <param name="skipLinks">disable links completion</param>
         /// <returns>List of torrent files</returns>
         [HttpGet("/v3/[controller]/")]
         [Produces(typeof(List<TorrentResult>))]
