@@ -246,17 +246,17 @@ namespace JAMTech.Controllers
                         Seeds = int.Parse(columnValues[1]),
                         Leeds = int.Parse(columnValues[2]),
                         Description = new List<string>() { "Date: " + columnValues[3], "Size: " + columnValues[4], "Uploader:" + columnValues[5] },
-                        Link = links.Skip(1).First(),
+                        Link = otherBaseUrl + links.Skip(1).First(), //add other torrents baseUrl
                         Vip = columnClasses.Any(c => c.Contains("vip"))
                     });
                 });
-            });
+            }); 
             return torrentResults;
         }
         private static async Task<string> GetOtherDownloadLink(string url)
         {
             var source = string.Empty;
-            using (var response = await Net.GetResponse(otherBaseUrl + url, null, defaultTimeout))
+            using (var response = await Net.GetResponse(url, null, defaultTimeout))
             {
                 if(response.IsSuccessStatusCode)
                     source = await response.Content.ReadAsStringAsync();
@@ -331,7 +331,7 @@ namespace JAMTech.Controllers
                         Seeds = int.Parse(row.ChildNodes[1].ChildNodes[3].InnerText),
                         Leeds = int.Parse(row.ChildNodes[1].ChildNodes[4].InnerText),
                         Description = new List<string>() { "Date: " + row.ChildNodes[1].ChildNodes[1].InnerText, "Size: " + row.ChildNodes[1].ChildNodes[2].InnerText},
-                        Link = row.ChildNodes[0].FirstChild.Attributes[0].Value,
+                     Link = rarbgReferrer.AbsoluteUri + row.ChildNodes[0].FirstChild.Attributes[0].Value //TODO add other torrents baseUrl
                     });
                 });
             });
