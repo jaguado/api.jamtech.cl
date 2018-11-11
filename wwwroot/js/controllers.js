@@ -361,7 +361,7 @@ function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, so
     $scope.checkSession = function () {
         if (user != null && (user.provider == "google" || user.provider == "facebook")) {
             console.log('checking session');
-            var url = baseApiUrl + "User";
+            var url = baseApiUrl + "User/me";
             return $http.get(url).then(function (response) {
                 return response.status == 201;
             }, function (response) {
@@ -454,6 +454,11 @@ function TorrentsCtrl($http, $scope, $window, Analytics) {
         var url = val.Links.filter(link => link.Item2.startsWith('magnet:'));
         if (url.length > 0)
             $window.open(url[0].Item2, '_self');
+    };
+    $scope.open = function (val) {
+        console.log('opening', val);
+        Analytics.trackEvent('torrent', 'open', val.Name);
+        $window.open(val.Link, '_blank');
     };
 };
 

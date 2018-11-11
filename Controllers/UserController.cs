@@ -27,7 +27,26 @@ namespace JAMTech.Controllers
         [HttpGet("me")]
         public IActionResult GetInfo(string userInfo = null)
         {
-            return new JsonResult(JsonConvert.DeserializeObject(userInfo));
+            if(userInfo!=null){
+                var result = new Models.LoggedUser{
+                    Date=DateTime.Now,
+                    UserInfo=JsonConvert.DeserializeObject(userInfo),
+                    AppInfo  = new {
+                        Origin = Request.Headers["Origin"],
+                        Referer = Request.Headers["Referer"],
+                        UserAgent = Request.Headers["User-Agent"],
+                        Languague = Request.Headers["Accept-Language"]
+                    }
+                };
+                //log user
+                ThreadPool.QueueUserWorkItem(
+                    new WaitCallback(async delegate (object state)
+                    { 
+                        await state.ToMongoDB<Models.LoggedUser>(); 
+                    }), result);
+                return new JsonResult(result);
+            }
+            return new NotFoundResult();
         }        
     }
 }
