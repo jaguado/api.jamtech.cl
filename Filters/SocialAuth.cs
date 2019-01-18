@@ -212,16 +212,16 @@ namespace JAMTech.Filters
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            //remove auth when method is OPTIONS
-            if (checkAuth && context.HttpContext.Request.Method != "OPTIONS")
-            {
-                //Get access token and check state
-                var accessToken = GetFromHeader(context, authHeader) ?? string.Empty;
-                if (accessToken == string.Empty)
-                    accessToken = GetFromRequest(context, tokenName);
-                else
-                    accessToken = accessToken.Replace("Bearer ", "");
+            //Get access token and check state
+            var accessToken = GetFromHeader(context, authHeader) ?? string.Empty;
+            if (accessToken == string.Empty)
+                accessToken = GetFromRequest(context, tokenName);
+            else
+                accessToken = accessToken.Replace("Bearer ", "");
 
+            //remove auth when method is OPTIONS
+            if ((checkAuth || !string.IsNullOrEmpty(accessToken)) && context.HttpContext.Request.Method != "OPTIONS")
+            {
                 if (string.IsNullOrEmpty(accessToken))
                 {
                     //throw new SecurityTokenException("Access token missing");
@@ -237,6 +237,7 @@ namespace JAMTech.Filters
                 }
                 else
                 {
+                    //check access token state
                     var uid = GetFromRequest(context, uidFieldName);
                     await CheckGoogleAsync(context, accessToken, uid);
                     await CheckFacebookAsync(context, accessToken, uid);
