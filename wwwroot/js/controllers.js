@@ -1,5 +1,6 @@
 var mocksBaseApiUrl = '//aio.jamtech.cl/mocks/torrents.json'
-var baseApiUrl = '//jamtechapi.herokuapp.com/v1/';
+//var baseApiUrl = '//jamtechapi.herokuapp.com/v1/';
+var baseApiUrl = '/v1/';
 var defaultPages = 2;
 var sessionCheckInterval = 60000 * 5; //5 minutes
 var loops = 5;
