@@ -1,5 +1,4 @@
 ﻿using JAMTech.Filters;
-using JAMTech.Providers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
@@ -84,28 +83,28 @@ namespace JAMTech
             .AddHttpCompression(options =>
             {
 
-                options.CompressorFactories = new List<ICompressorFactory>
-                {
-                    new BrotliCompressorFactory(new BrotliCompressionSettings
-                    {
-                        Level = CompressionLevel.Fastest
-                    }),
-                    new DeflateCompressorFactory(new DeflateCompressionSettings
-                    {
-                        Level = CompressionLevel.Fastest
-                    }),
-                    new GZipCompressorFactory(new GZipCompressionSettings
-                    {
-                        Level = CompressionLevel.Fastest
-                    })
-                };
+                //options.CompressorFactories = new List<ICompressorFactory>
+                //{
+                //    new BrotliCompressorFactory(new BrotliCompressionSettings
+                //    {
+                //        Level = CompressionLevel.Fastest
+                //    }),
+                //    new DeflateCompressorFactory(new DeflateCompressionSettings
+                //    {
+                //        Level = CompressionLevel.Fastest
+                //    }),
+                //    new GZipCompressorFactory(new GZipCompressionSettings
+                //    {
+                //        Level = CompressionLevel.Fastest
+                //    })
+                //};
             });
 
             //compress dynamic json content using brotli
             services.AddResponseCompression(options =>
             {
                 options.EnableForHttps = true;
-                options.Providers.Add<BrotliCompressionProvider>();
+                options.Providers.Add<Providers.BrotliCompressionProvider>();
                 options.MimeTypes = new[] { "application/json" };
             });
 
@@ -144,6 +143,8 @@ namespace JAMTech
                     In = "query",
                     Type = "apiKey"
                 });
+                // UseFullTypeNameInSchemaIds replacement for .NET Core
+                c.CustomSchemaIds(x => x.FullName);
             });
         }
 
