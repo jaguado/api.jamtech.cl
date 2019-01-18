@@ -1,0 +1,65 @@
+{
+  "addons": [
+    "logentries",
+    "mongolab",
+    "newrelic"
+  ],
+  "buildpacks": [
+    {
+      "url": "https://github.com/jaguado/dotnetcore2.git"
+    }
+  ],
+  "env": {
+    "cne_token": {
+      "required": true
+    },
+    "CORECLR_NEWRELIC_HOME": {
+      "required": true
+    },
+    "CORS": {
+      "required": true
+    },
+    "DOTNET_CLI_TELEMETRY_OPTOUT": {
+      "required": true
+    },
+    "minifyResponse": {
+      "required": true
+    },
+    "MONGODB_URI": {
+      "required": true
+    },
+    "monitoring_interval": {
+      "required": true
+    },
+    "monitoring_url": {
+      "required": true
+    },
+    "monitoring_worker": {
+      "required": true
+    },
+    "monitoring_worker_url": {
+      "required": true
+    },
+    "NEW_RELIC_APP_NAME": {
+      "required": true
+    },
+    "NEW_RELIC_LICENSE_KEY": {
+      "required": true
+    },
+    "useCache": {
+      "required": true
+    },
+    "zTorrentsCookie": {
+      "required": true
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1
+    }
+  },
+  "name": "api.jamtech.cl",
+  "scripts": {
+  },
+  "stack": "heroku-18"
+}
