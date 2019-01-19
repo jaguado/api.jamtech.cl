@@ -48,15 +48,15 @@ namespace JAMTech.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePassword(string id, string forUser = null)
         {
-            var obj = new UserSavedPassword()
-            {
-                uid = forUser,
-                _id = new UserSavedPassword.id { oid = id}
-            };
             //check if sensor id correspond to the authenticated user (forUser)
             var userResults = await MongoDB.FromMongoDB<UserSavedPassword, SavedPassword>(forUser);
             if (userResults == null || !userResults.Any(t => t.Id == id))
                 return new ForbidResult();
+            var obj = new Models.UserSavedPassword()
+            {
+                uid = forUser,
+                _id = new Models.UserSavedPassword.id { oid = id }
+            };
             await obj.DeleteFromMongoDB();
             return new OkResult();
         }
