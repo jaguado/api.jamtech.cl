@@ -299,6 +299,10 @@ namespace JAMTech.Controllers
                         var source = await response.Content.ReadAsStringAsync();
                         return GetRarbgTorrents(source, page);
                     }
+                    else
+                    {
+                        //TODO Save log with error
+                    }
                 }
             }
             catch (Exception ex)

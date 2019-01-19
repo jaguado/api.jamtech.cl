@@ -78,10 +78,10 @@ namespace JAMTech.Extensions
         }
         public static async Task DeleteFromMongoDB<T>(this T obj)
         {
-            if (typeof(UserMonitorConfig) != typeof(T))
-                throw new NotImplementedException("DELETE only works for UserMonitorConfig objects");
+            //if (typeof(UserMonitorConfig) != typeof(T))
+            //    throw new NotImplementedException("DELETE only works for UserMonitorConfig objects");
             var collectionName = typeof(T).Name.ToLower();
-            var objectId = (obj as UserMonitorConfig)._id.oid;
+            var objectId = (obj as dynamic)._id.oid;
             var collectionUrl = $"{baseUrl}databases/{defaultDatabase}/collections/{collectionName}/{objectId}?apiKey={apiKey}";
             using (var response = await Helpers.Net.DeleteResponse(collectionUrl))
             {
@@ -114,6 +114,14 @@ namespace JAMTech.Extensions
                         data.ForEach(d =>
                         {
                             var t = d as MonitorConfig;
+                            t.Id = obj["_id"]["$oid"].ToString();
+                        });
+                    }
+                    if (typeof(T) == typeof(UserSavedPassword) && typeof(Y) == typeof(SavedPassword))
+                    {
+                        data.ForEach(d =>
+                        {
+                            var t = d as SavedPassword;
                             t.Id = obj["_id"]["$oid"].ToString();
                         });
                     }
