@@ -19,7 +19,7 @@ namespace JAMTech.Models
 
         public SavedPassword()
         {
-            Id = new Guid().ToString();
+            Id = Guid.NewGuid().ToString();
         }
     }
     

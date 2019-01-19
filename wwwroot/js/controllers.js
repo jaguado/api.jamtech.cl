@@ -1,5 +1,6 @@
 var mocksBaseApiUrl = '//aio.jamtech.cl/mocks/torrents.json'
-var baseApiUrl = '//jamtechapi.herokuapp.com/v1/';
+//var baseApiUrl = '//jamtechapi.herokuapp.com/v1/';
+var baseApiUrl = '/v1/';
 var defaultPages = 2;
 var sessionCheckInterval = 60000 * 5; //5 minutes
 var loops = 5;
@@ -805,53 +806,115 @@ function ToolsCtrl($scope, $rootScope, $http, Analytics) {
     };
 }
 
+function PasswordsCtrl($scope, $rootScope, $http, $interval, $location, notify, Analytics, socialLoginService) {
+    var url = baseApiUrl + "SavedPassword";
+    Warning = function (msg) {
+        if (notify != null) {
+            notify({
+                message: msg,
+                classes: 'alert-warning',
+                templateUrl: notifyTemplate
+            });
+        }
+    };
+
+    Alert = function (msg) {
+        if (notify != null) {
+            notify({
+                message: msg,
+                classes: 'alert-danger',
+                templateUrl: notifyTemplate
+            });
+        }
+    };
+
+    Success = function (msg) {
+        if (notify != null) {
+            notify({
+                message: msg,
+                classes: 'alert-success',
+                templateUrl: notifyTemplate
+            });
+        }
+    }
+
+    $scope.passwords = [];
+    $scope.newPassword = {
+        "Id": null
+    };
+
+    $scope.addPassword = function () {
+        console.log('add new password', $scope.newPassword);
+        Analytics.trackEvent('SavedPasswords', 'addPassword', $scope.newPassword.Source);
+        var arr = [];
+        arr.push($scope.newPassword);
+        var data = JSON.stringify(arr);
+        return $http.post(url, data).then(function (response) {
+            Success('Contraseña guardada');
+            $scope.newPassword = {
+                "Id": null,
+                "CreationDate": new Date(),
+                "LastUpdateDate": new Date()
+            };
+            $scope.refreshPasswords();
+            return response.status == 200;
+        }, function (response) {
+            Alert('Error guardando nueva contraseña');
+            console.log('Error saving  new password', response);
+            return false;
+        });
+    };
+
+    $scope.refreshPasswords = function () {
+        if (user != null) {
+            return $http.get(url).then(function (response) {
+                //console.log('status code', response.status);
+                $scope.passwords = response.data;
+                console.log('passwords', $scope.passwords);
+                return response.status == 200;
+            }, function (response) {
+                Alert('Error obteniendo claves ' + response.statusText);
+                // console.log('err', response);
+                return false;
+            });
+        } else {
+            console.log('refresh skipped to avoid auth errors');
+        }
+    };
+    $scope.refreshPasswords();
+
+    $scope.deletePassword = function (password) {
+        console.log('deleting password', password.Source);
+        Analytics.trackEvent('SavedPasswords', 'deletePassword', password.Source);
+        return $http.delete(url + "/" + password.Id).then(function (response) {
+            Success("Contraseña borrada");
+            $scope.refreshPasswords();
+            return response.status == 200;
+        }, function (response) {
+            Alert('Error deleting password. ' + response.statusText);
+            console.log('err', response);
+            return false;
+        });
+    };
+
+    $scope.copyPassword = function (password){
+        Analytics.trackEvent('SavedPasswords', 'copyPassword', password.Source);
+        var $body = document.getElementsByTagName('body')[0];
+        var $tempInput = document.createElement('INPUT');
+        $body.appendChild($tempInput);
+        $tempInput.setAttribute('value', password.Password)
+        $tempInput.select();
+        document.execCommand('copy');
+        $body.removeChild($tempInput);
+        Success("Contraseña copiada");
+    };
+    $scope.showPassword = function (password){
+        Success("La contraseña es " + password.Password);
+    };
+}
 // End of controllers
 
 
-
-//math operations used to calculate distnace between two points
-function deg2rad(deg) {
-    return deg * (Math.PI / 180)
-}
-
-function getDistanceBetweenTwoPointsInMeters(lat1, lon1, lat2, lon2) {
-    //console.log(lat1,lon1, lat2, lon2);
-    var R = 6378100; // Radius of the earth in meters
-    var dLat = deg2rad(lat2 - lat1); // deg2rad below
-    var dLon = deg2rad(lon2 - lon1);
-    var a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-        Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    var d = R * c; // Distance in meters
-    return d;
-};
-
-function Capitalize() {
-    return function (input) {
-        return (!!input) ? input.charAt(0).toUpperCase() + input.substr(1).toLowerCase() : '';
-    }
-};
-
-function capitalize(input) {
-    return (!!input) ? input.charAt(0).toUpperCase() + input.substr(1).toLowerCase() : '';
-}
-
-function toArray() {
-    'use strict';
-    return function (obj) {
-        if (!(obj instanceof Object)) {
-            return obj;
-        }
-        return Object.keys(obj).map(function (key) {
-            return Object.defineProperty(obj[key], '$key', {
-                __proto__: null,
-                value: key
-            });
-        });
-    }
-};
 
 function getProductBrandType() {
     return function (product) {
@@ -859,15 +922,6 @@ function getProductBrandType() {
     }
 }
 
-function onlyUnique(value, index, self) {
-    return self.indexOf(value) === index;
-}
-
-function GetPrice() {
-    return function (input) {
-
-    }
-}
 
 function GetPrice() {
     return function (input) {
@@ -893,22 +947,13 @@ function addMarker(location, text, map, uri, label, icon, clickCallback) {
     }
     return marker;
 }
+
 // Sets the map on all markers in the array.
 function setMapOnAll(markers, map) {
     for (var i = 0; i < markers.length; i++) {
         markers[i].setMap(map);
     }
 }
-
-String.prototype.replaceAll = function (searchStr, replaceStr) {
-    var str = this;
-
-    // escape regexp special characters in search string
-    searchStr = searchStr.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-
-    return str.replace(new RegExp(searchStr, 'gi'), replaceStr);
-};
-
 
 //angular js - load controllers, filters and other stuff
 angular
@@ -920,6 +965,7 @@ angular
     .controller('ToolsCtrl', ToolsCtrl)
     .controller('DashboardCtrl', DashboardCtrl)
     .controller('AtmsCtrl', AtmsCtrl)
+    .controller('PasswordsCtrl', PasswordsCtrl)
     .filter('capitalize', Capitalize)
     .filter('toArray', toArray)
     .filter('getBrand', getProductBrandType)
