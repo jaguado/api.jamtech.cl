@@ -845,11 +845,12 @@ function PasswordsCtrl($scope, $rootScope, $http, $interval, $location, notify, 
 
     $scope.addPassword = function () {
         console.log('add new password', $scope.newPassword);
+        Analytics.trackEvent('SavedPasswords', 'addPassword', $scope.newPassword.Source);
         var arr = [];
         arr.push($scope.newPassword);
         var data = JSON.stringify(arr);
         return $http.post(url, data).then(function (response) {
-            Success('Password saved');
+            Success('Contraseña guardada');
             $scope.newPassword = {
                 "Id": null,
                 "CreationDate": new Date(),
@@ -858,7 +859,7 @@ function PasswordsCtrl($scope, $rootScope, $http, $interval, $location, notify, 
             $scope.refreshPasswords();
             return response.status == 200;
         }, function (response) {
-            Alert('Error saving  new password');
+            Alert('Error guardando nueva contraseña');
             console.log('Error saving  new password', response);
             return false;
         });
@@ -872,7 +873,7 @@ function PasswordsCtrl($scope, $rootScope, $http, $interval, $location, notify, 
                 console.log('passwords', $scope.passwords);
                 return response.status == 200;
             }, function (response) {
-                Alert('Error getting passwords ' + response.statusText);
+                Alert('Error obteniendo claves ' + response.statusText);
                 // console.log('err', response);
                 return false;
             });
@@ -886,7 +887,7 @@ function PasswordsCtrl($scope, $rootScope, $http, $interval, $location, notify, 
         console.log('deleting password', password.Source);
         Analytics.trackEvent('SavedPasswords', 'deletePassword', password.Source);
         return $http.delete(url + "/" + password.Id).then(function (response) {
-            Success("Password deleted");
+            Success("Contraseña borrada");
             $scope.refreshPasswords();
             return response.status == 200;
         }, function (response) {
@@ -897,6 +898,7 @@ function PasswordsCtrl($scope, $rootScope, $http, $interval, $location, notify, 
     };
 
     $scope.copyPassword = function (password){
+        Analytics.trackEvent('SavedPasswords', 'copyPassword', password.Source);
         var $body = document.getElementsByTagName('body')[0];
         var $tempInput = document.createElement('INPUT');
         $body.appendChild($tempInput);
@@ -904,10 +906,10 @@ function PasswordsCtrl($scope, $rootScope, $http, $interval, $location, notify, 
         $tempInput.select();
         document.execCommand('copy');
         $body.removeChild($tempInput);
-        Success("Password copied");
+        Success("Contraseña copiada");
     };
     $scope.showPassword = function (password){
-        Success("The password is " + password.Password);
+        Success("La contraseña es " + password.Password);
     };
 }
 // End of controllers
