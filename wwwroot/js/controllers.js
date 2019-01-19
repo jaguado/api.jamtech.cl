@@ -851,7 +851,9 @@ function PasswordsCtrl($scope, $rootScope, $http, $interval, $location, notify, 
         return $http.post(url, data).then(function (response) {
             Success('Password saved');
             $scope.newPassword = {
-                "Id": null
+                "Id": null,
+                "CreationDate": new Date(),
+                "LastUpdateDate": new Date()
             };
             $scope.refreshPasswords();
             return response.status == 200;
@@ -879,6 +881,34 @@ function PasswordsCtrl($scope, $rootScope, $http, $interval, $location, notify, 
         }
     };
     $scope.refreshPasswords();
+
+    $scope.deletePassword = function (password) {
+        console.log('deleting password', password.Source);
+        Analytics.trackEvent('SavedPasswords', 'deletePassword', password.Source);
+        return $http.delete(url + "/" + password.Id).then(function (response) {
+            Success("Password deleted");
+            $scope.refreshPasswords();
+            return response.status == 200;
+        }, function (response) {
+            Alert('Error deleting password. ' + response.statusText);
+            console.log('err', response);
+            return false;
+        });
+    };
+
+    $scope.copyPassword = function (password){
+        var $body = document.getElementsByTagName('body')[0];
+        var $tempInput = document.createElement('INPUT');
+        $body.appendChild($tempInput);
+        $tempInput.setAttribute('value', password.Password)
+        $tempInput.select();
+        document.execCommand('copy');
+        $body.removeChild($tempInput);
+        Success("Password copied");
+    };
+    $scope.showPassword = function (password){
+        Success("The password is " + password.Password);
+    };
 }
 // End of controllers
 
