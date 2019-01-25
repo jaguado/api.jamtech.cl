@@ -41,6 +41,8 @@
     <link id="loadBefore" href="css/custom.css" rel="stylesheet">
     <!-- Ladda loading -->
     <link href="css/plugins/ladda/ladda-themeless.min.css" rel="stylesheet">
+    <!-- freshchat -->
+    <script src="js/plugins/chatWidget.js"></script>
 </head>
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase-app.js"></script>
@@ -89,6 +91,12 @@
     <script src="js/config.js"></script>
     <script src="js/directives.js"></script>
     <script src="js/controllers.js"></script>
+    <script>
+        window.fcWidget.init({
+            token: "13144813-2839-47b7-8716-00a7216ad35c",
+            host: "https://wchat.freshchat.com"
+        });
+    </script>
 </body>
 
 </html>
