@@ -341,6 +341,14 @@ function MainCtrl($scope, $rootScope, $http, $interval, $location, Analytics, so
     $scope.checkUser = function () {
         if (user != null) {
             console.log('user logged in', user.name, user);
+            // freshchat
+            window.fcWidget.setExternalId(user.provider + "-" + user.uid);  
+            window.fcWidget.user.setFirstName(user.name);
+            window.fcWidget.user.setEmail(user.email);
+            window.fcWidget.user.setProperties({
+                plan: "Estate", // meta property 1
+                status: "Active" // meta property 2
+            });
             if ($location.path() == loginPath) {
                 $location.path("/");
             }
@@ -897,23 +905,45 @@ function PasswordsCtrl($scope, $rootScope, $http, $interval, $location, notify, 
         });
     };
 
-    $scope.copyPassword = function (password){
+    getPassword = function (password) {
+        return $http.get(url + "/password/" + password.Id).then(function (response) {
+            return response.data;
+        }, function (response) {
+            Alert('Error obteniendo clave ' + response.statusText);
+            // console.log('err', response);
+            return false;
+        });
+    }
+
+
+    $scope.copyPassword = function (password) {
         Analytics.trackEvent('SavedPasswords', 'copyPassword', password.Source);
-        var $body = document.getElementsByTagName('body')[0];
-        var $tempInput = document.createElement('INPUT');
-        $body.appendChild($tempInput);
-        $tempInput.setAttribute('value', password.Password)
-        $tempInput.select();
-        document.execCommand('copy');
-        $body.removeChild($tempInput);
-        Success("Contraseña copiada");
+        getPassword(password).then(pwd => {
+            var doc = document;
+            var $body = doc.getElementsByTagName('body')[0];
+            var $tempInput = doc.createElement('INPUT');
+            $body.appendChild($tempInput);
+            $tempInput.setAttribute('value', 'test2');
+            $tempInput.select();
+            doc.execCommand('copy');
+            $body.removeChild($tempInput);
+            Success("Contraseña copiada");
+        });
+
+
     };
-    $scope.showPassword = function (password){
-        Success("La contraseña es " + password.Password);
+    $scope.showPassword = function (password) {
+        Analytics.trackEvent('SavedPasswords', 'showPassword', password.Source);
+        getPassword(password).then(pwd => {
+            Success("La contraseña es " + pwd);
+        });
     };
 }
 // End of controllers
 
+function copyToClipboard(text) {
+
+}
 
 
 function getProductBrandType() {
