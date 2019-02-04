@@ -15,6 +15,7 @@ namespace JAMTech.Extensions
     {
         const string baseUrl = "https://api.mlab.com/api/1/";
         const string apiKey = "Y_-KGvDKUDqEMDgUp0so9kNQ8kMNkwoA";
+        private const string DefaultContentType = "application/json";
         private static readonly string mongodbUri = Environment.GetEnvironmentVariable("MONGODB_URI") ?? throw new ApplicationException("'MONGODB_URI' variable is missing");
         private static readonly string defaultDatabase = mongodbUri.Substring(mongodbUri.LastIndexOf("/") + 1);
 
@@ -36,7 +37,7 @@ namespace JAMTech.Extensions
                 if (minified.Errors.Count == 0)
                     stringPayload = minified.MinifiedContent;
             }
-            var httpContent = new StringContent(stringPayload, Encoding.UTF8, "application/json");
+            var httpContent = new StringContent(stringPayload, Encoding.UTF8, DefaultContentType);
 
             using (var response = update ? await Helpers.Net.PutResponse(collectionUrl, httpContent) : await Helpers.Net.PostResponse(collectionUrl, httpContent))
             {
@@ -56,7 +57,7 @@ namespace JAMTech.Extensions
                 if (minified.Errors.Count == 0)
                     stringPayload = minified.MinifiedContent;
             }
-            var httpContent = new StringContent(stringPayload, Encoding.UTF8, "application/json");
+            var httpContent = new StringContent(stringPayload, Encoding.UTF8, DefaultContentType);
 
             using (var response = update ? await Helpers.Net.PutResponse(collectionUrl, httpContent) : await Helpers.Net.PostResponse(collectionUrl, httpContent))
             {

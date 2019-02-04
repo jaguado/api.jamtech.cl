@@ -74,5 +74,20 @@ namespace JAMTech.Controllers
             var result = await MongoDB.FromMongoDB<UserSavedPassword, SavedPassword> (forUser);
             return new OkObjectResult(result as IEnumerable<SavedPassword>);
         }
+
+        /// <summary>
+        /// Get saved password
+        /// </summary>
+        /// <param name="forUser">This paramemeter is optional and will be completed or validated against access_token</param>
+        /// <returns></returns>
+        [HttpGet("password/{id}")]
+        [Produces(typeof(String))]
+        public async Task<IActionResult> GetSavedPassword(string id, string forUser = null)
+        {
+            var result = await MongoDB.FromMongoDB<UserSavedPassword, SavedPassword>(forUser);
+            if (result == null || !result.Any(r => r.Id == id))
+                return new NotFoundResult();
+            return new OkObjectResult(result.First(r=>r.Id == id).GetPassword());
+        }
     }
 }
