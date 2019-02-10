@@ -28,6 +28,7 @@ namespace JAMTech
             BuildWebHost(args, url).Run();
         }
 
+        #region "Monitoring"
         internal static List<Monitor> Monitors = null;
         public static async Task StartMonitoringAsync()
         {
@@ -53,9 +54,9 @@ namespace JAMTech
                 });
             }
         }
-        private static async Task RefreshWorkers(string querystring)
+        private static async Task RefreshMonitoringWorkers(string querystring)
         {
-            var workersUrl = Environment.GetEnvironmentVariable("monitoring_worker_url") != null ? Environment.GetEnvironmentVariable("monitoring_worker_url").Split(",") : null;
+            var workersUrl = Environment.GetEnvironmentVariable("monitoring_worker_url")?.Split(",");
             if (workersUrl != null)
             {
                 var workers = workersUrl.Select(async workerUrl =>
@@ -73,7 +74,7 @@ namespace JAMTech
         public static async Task RefreshMonitoringForUserAsync(string user, string querystring)
         {
             //if workers exists, call refresh endpoint
-            await RefreshWorkers(querystring);
+            await RefreshMonitoringWorkers(querystring);
 
             //remove all active monitors of the user
             if (Monitors == null) return;
@@ -89,6 +90,7 @@ namespace JAMTech
                 Monitors.ForEach(m => m.Start());
             }
         }
+        #endregion
 
         public static IWebHost BuildWebHost(string[] args, string url) =>
             WebHost.CreateDefaultBuilder(args)
