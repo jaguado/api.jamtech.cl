@@ -32,11 +32,11 @@ namespace JAMTech.Helpers
                 msg.AddAttachment(attachmentName, attachmentBase64String);
             return await Send(msg);
         }
-        public static async Task<Response> SendTemplate(EmailAddress from, EmailAddress to, string subject, string templateId, object templateData, string attachmentName = "", string attachmentBase64String = "")
+        public static async Task<Response> SendTemplate(EmailAddress from, List<EmailAddress> to, string subject, string templateId, object templateData, string attachmentName = "", string attachmentBase64String = "")
         {
             var msg = new SendGridMessage();
             msg.SetFrom(from);
-            msg.AddTo(to);
+            msg.AddTos(to);
             msg.SetSubject(subject);
             msg.SetTemplateId(templateId);
             msg.SetTemplateData(templateData);
@@ -44,11 +44,11 @@ namespace JAMTech.Helpers
                 msg.AddAttachment(attachmentName, attachmentBase64String);
             return await Send(msg);
         }
-        public static async Task<Response> SendTransactional(EmailAddress from, EmailAddress to, string subject, string templateId, object templateData, string attachmentName = "", string attachmentBase64String = "")
+        public static async Task<Response> SendTransactional(EmailAddress from, List<EmailAddress> to, string subject, string templateId, object templateData, string attachmentName = "", string attachmentBase64String = "")
         {
             var msg = new SendGridMessage();
             msg.SetFrom(from);
-            msg.AddTo(to);
+            msg.AddTos(to);
             msg.SetSubject(subject);
             msg.SetTemplateId(templateId);
             msg.SetTemplateData(templateData);
@@ -56,11 +56,11 @@ namespace JAMTech.Helpers
                 msg.AddAttachment(attachmentName, attachmentBase64String);
             return await Send(msg);
         }
-        public static async Task<Response> SendLegacy(EmailAddress from, EmailAddress to, string subject, string templateId, List<Tuple<string,string>> substitutions, string attachmentName = "", string attachmentBase64String = "")
+        public static async Task<Response> SendLegacy(EmailAddress from, List<EmailAddress> to, string subject, string templateId, List<Tuple<string,string>> substitutions, string attachmentName = "", string attachmentBase64String = "")
         {
             var msg = new SendGridMessage();
             msg.SetFrom(from);
-            msg.AddTo(to);
+            msg.AddTos(to);
             msg.SetSubject(subject);
             msg.SetTemplateId(templateId);
             if (attachmentName != string.Empty && attachmentBase64String != string.Empty)
