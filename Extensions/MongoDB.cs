@@ -126,6 +126,14 @@ namespace JAMTech.Extensions
                             t.Id = obj["_id"]["$oid"].ToString();
                         });
                     }
+                    if (typeof(T) == typeof(UserRememberConfig) && typeof(Y) == typeof(RememberConfig))
+                    {
+                        data.ForEach(d =>
+                        {
+                            var t = d as RememberConfig;
+                            t.Id = obj["_id"]["$oid"].ToString();
+                        });
+                    }
                     result.Add(data);
                 }
                 return result.SelectMany(c => c);
