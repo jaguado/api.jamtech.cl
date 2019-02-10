@@ -29,13 +29,13 @@ namespace JAMTech.Helpers
         public static async Task<Response> Send(EmailAddress from, EmailAddress to, string subject, string plainTextContent, string htmlContent)
         {            
             var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
-            return await _client.SendEmailAsync(msg);
+            return await Send(msg);
         }
         public static async Task<Response> SendWithAttachment(EmailAddress from, EmailAddress to, string subject, string plainTextContent, string htmlContent, string attachmentName, string attachmentBase64String)
         {
             var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
             msg.AddAttachment(attachmentName, attachmentBase64String);
-            return await _client.SendEmailAsync(msg);
+            return await Send(msg);
         }
         public static async Task<Response> SendTemplate(EmailAddress from, EmailAddress to, string subject, string templateId, object templateData, string attachmentName = "", string attachmentBase64String = "")
         {
@@ -47,7 +47,7 @@ namespace JAMTech.Helpers
             msg.SetTemplateData(templateData);
             if(attachmentName!=string.Empty && attachmentBase64String != string.Empty)
                 msg.AddAttachment(attachmentName, attachmentBase64String);
-            return await _client.SendEmailAsync(msg);
+            return await Send(msg);
         }
         public static async Task<Response> SendTransactional(EmailAddress from, EmailAddress to, string subject, string templateId, object templateData, string attachmentName = "", string attachmentBase64String = "")
         {
@@ -59,7 +59,7 @@ namespace JAMTech.Helpers
             msg.SetTemplateData(templateData);
             if (attachmentName != string.Empty && attachmentBase64String != string.Empty)
                 msg.AddAttachment(attachmentName, attachmentBase64String);
-            return await _client.SendEmailAsync(msg);
+            return await Send(msg);
         }
         public static async Task<Response> SendLegacy(EmailAddress from, EmailAddress to, string subject, string templateId, List<Tuple<string,string>> substitutions, string attachmentName = "", string attachmentBase64String = "")
         {
@@ -71,7 +71,7 @@ namespace JAMTech.Helpers
             if (attachmentName != string.Empty && attachmentBase64String != string.Empty)
                 msg.AddAttachment(attachmentName, attachmentBase64String);
             substitutions.ForEach(sub => msg.AddSubstitution(sub.Item1, sub.Item2));
-            return await _client.SendEmailAsync(msg);
+            return await Send(msg);
         }
     }
 }
