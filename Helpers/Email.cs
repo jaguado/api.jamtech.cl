@@ -10,7 +10,7 @@ namespace JAMTech.Helpers
 {
     public static class Email
     {
-        private static readonly string _apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
+        private static readonly string _apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY") ?? throw new ApplicationException("SENDGRID_API_KEY variable not found");
         private static readonly SendGridClient _client = new SendGridClient(_apiKey);
 
         public static void Test()
