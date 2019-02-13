@@ -11,7 +11,7 @@ namespace JAMTech.Models
     public class UserRememberConfig
     {
         public string uid { get; set; }
-        public IEnumerable<Models.RememberConfig> Data { get; set; }
+        public IEnumerable<RememberConfig> Data { get; set; }
 
         public id _id { get; set; }
         public class id

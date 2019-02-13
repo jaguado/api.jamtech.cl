@@ -110,7 +110,7 @@ namespace JAMTech
                 usersConfigs.ToList().ForEach(user =>
                 {
                     Console.WriteLine($"Loading '{user.Data.Count()}' remembers of user '{user.uid}'");
-                    Remembers.AddRange(user.Data.Select(config => new Remember(config, user.uid)).ToList());
+                    Remembers.AddRange(user.Data.Select(config => new Remember(config, user)).ToList());
                     Remembers.ForEach(m => m.Config.Id = user._id.oid); //add mongodb id
                     Remembers.ForEach(m => m.Start());
                 });
@@ -148,8 +148,7 @@ namespace JAMTech
             if (userConfigs != null)
             {
                 Console.WriteLine($"Refreshing '{userConfigs.Count()}' remembers of user '{user}'");
-                Remembers.AddRange(userConfigs.Select(config => new Remember(config, user)).ToList());
-                Remembers.ForEach(m => m.Start());
+                //TODO fix refresh
             }
         }
         #endregion
