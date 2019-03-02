@@ -22,20 +22,23 @@
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "PORT" : "5000",
+        "PORT": "5000",
         "cne_token": "OMooZxxRzq",
-        "monitoring_url" : "",
-        "monitoring_interval" : "30000",
+        "monitoring_url": "",
+        "monitoring_interval": "30000",
         "useCache": "false",
-        "MONGODB_URI":"mongodb://heroku_rq3dg792:6l30qn9fvvon30dsj26ovm02pi@ds133622.mlab.com:33622/heroku_rq3dg792",
-        "zTorrentsCookie":"__cfduid=dff2b2cac201912a8bca9545fc8416a301541911362; cf_clearance=14999a1d5f1d7f6d28df1beada502b256b0c8d05-1541911366-86400-150",
+        "MONGODB_URI": "mongodb://heroku_rq3dg792:6l30qn9fvvon30dsj26ovm02pi@ds133622.mlab.com:33622/heroku_rq3dg792",
+        "zTorrentsCookie": "__cfduid=dff2b2cac201912a8bca9545fc8416a301541911362; cf_clearance=14999a1d5f1d7f6d28df1beada502b256b0c8d05-1541911366-86400-150",
         "disableAuth": true,
+        "disableSendEmail": true,
         "minifyResponse": false,
         "CORS": "localhost,aio.jamtech.cl,localhost:5000",
         "monitoring_worker_url": "https://jamtechmonitor.herokuapp.com",
         "monitoring_worker": false,
-        "NEW_RELIC_LICENSE_KEY":"c84d5bf8df0a796a1d7e173668c5720f884a24fa",
-        "NEW_RELIC_APP_NAME":"api.jamtech.cl localhost"
+        "remember_worker": true,
+        "NEW_RELIC_LICENSE_KEY": "c84d5bf8df0a796a1d7e173668c5720f884a24fa",
+        "NEW_RELIC_APP_NAME": "api.jamtech.cl localhost",
+        "SENDGRID_API_KEY": "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"
       },
       "applicationUrl": "http://localhost:60209/"
     }
