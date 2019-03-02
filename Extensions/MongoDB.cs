@@ -29,7 +29,9 @@ namespace JAMTech.Extensions
         public static async Task<IActionResult> ToMongoDB<T>(this object collection, bool update = false, bool storeMinified = false)
         {
             var collectionName = typeof(T).Name.ToLower();
-            var collectionUrl = $"{baseUrl}databases/{defaultDatabase}/collections/{collectionName}?apiKey={apiKey}&m=true&u=true";
+            var objectId = (collection as dynamic) != null ? (collection as dynamic)._id != null ? (collection as dynamic)._id.oid : "" : "";
+            var updateInfo = update ? $"/{objectId}" : "";
+            var collectionUrl = $"{baseUrl}databases/{defaultDatabase}/collections/{collectionName}{updateInfo}?apiKey={apiKey}&m=true&u=true";
             var stringPayload = JsonConvert.SerializeObject(collection, Startup.jsonSettings);
             if (storeMinified)
             {

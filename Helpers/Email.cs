@@ -13,12 +13,12 @@ namespace JAMTech.Helpers
         private static readonly string _apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY") ?? throw new ApplicationException("SENDGRID_API_KEY variable not found");
         private static readonly SendGridClient _client = new SendGridClient(_apiKey);
 
+        public static readonly EmailAddress defaultFrom = new EmailAddress("api@jamtech.cl", "JAMTech API");
+        public static readonly EmailAddress defaultTo = new EmailAddress("jorge@jamtech.cl", "Jorge");
         public static void Test()
         {
-            var from = new EmailAddress("api@jamtech.cl", "JAMTech API");
-            var to = new EmailAddress("jorge@jamtech.cl", "Jorge");
             var subject = "Sending with SendGrid is Fun";
-            var response = Send(from, to, subject, "Test html content", "<b>Test html content</b>");
+            var response = Send(defaultFrom, defaultTo, subject, "Test html content", "<b>Test html content</b>");
         }
         
         public static async Task<Response> Send(SendGridMessage msg)
@@ -56,7 +56,7 @@ namespace JAMTech.Helpers
                 msg.AddAttachment(attachmentName, attachmentBase64String);
             return await Send(msg);
         }
-        public static async Task<Response> SendLegacy(EmailAddress from, List<EmailAddress> to, string subject, string templateId, List<Tuple<string,string>> substitutions, string attachmentName = "", string attachmentBase64String = "")
+        public static async Task<Response> SendLegacy(EmailAddress from, List<EmailAddress> to, string subject, string templateId, IDictionary<string,string> substitutions, string attachmentName = "", string attachmentBase64String = "")
         {
             var msg = new SendGridMessage();
             msg.SetFrom(from);
@@ -65,7 +65,7 @@ namespace JAMTech.Helpers
             msg.SetTemplateId(templateId);
             if (attachmentName != string.Empty && attachmentBase64String != string.Empty)
                 msg.AddAttachment(attachmentName, attachmentBase64String);
-            substitutions.ForEach(sub => msg.AddSubstitution(sub.Item1, sub.Item2));
+            substitutions.ToList().ForEach(sub => msg.AddSubstitution(sub.Key, sub.Value));
             return await Send(msg);
         }
     }
