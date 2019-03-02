@@ -9,7 +9,9 @@ namespace JAMTech.Models
     {
         public string Id { get; set; }
         public string Name { get; set; }
+        public string Description { get; set; }
         public List<string> RememberTo { get; set; }
+        public List<Tuple<RecurrenceTypes, int>> RememberEarlier { get; set; }
         public RememberType Type { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime? EndDate { get; set; }
