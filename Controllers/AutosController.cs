@@ -18,6 +18,7 @@ namespace JAMTech.Controllers
     [Route("v1/[controller]")]
     public class AutoController : BaseController
     {
+        [AllowAnonymous]
         [HttpGet("models")]
         public async Task<IActionResult> GetModels(string brand)
         {
@@ -37,6 +38,7 @@ namespace JAMTech.Controllers
             return new NotFoundResult();
         }
 
+        [AllowAnonymous]
         [HttpGet("prices")]
         public async Task<IActionResult> GetPrices(string brand, string model)
         {
