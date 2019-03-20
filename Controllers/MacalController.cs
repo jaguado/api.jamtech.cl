@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.IO;
 using System.Net.Http.Formatting;
 using System.Text;
+using System.Reflection;
 
 namespace JAMTech.Controllers
 {
@@ -22,21 +23,25 @@ namespace JAMTech.Controllers
     public class MacalController : BaseController
     {
         private static Models.Macal _macal = null;
+        const int _defaultRemate = 422;
 
         [AllowAnonymous]
         [HttpGet()]
-        public async Task<IActionResult> GetVehicles(int idRemate = 422)
+        [Produces(typeof(Models.Macal))]
+        public async Task<IActionResult> GetVehicles(int idRemate = _defaultRemate)
         {
             if (_macal == null)
             {
                 const string url = @"https://www.macal.cl/Vehiculos/VehiculosBienesGet";
                 var macalBody = await new HttpClient().PostAsync(url, new StringContent("{'carrusel':'NO','id_remate':'" + idRemate + "'}",  Encoding.UTF8, "application/json"));
                 _macal = await macalBody.Content.ReadAsAsync<Models.Macal>();
+                _macal.IdRemate = idRemate;
             }
             return new OkObjectResult(_macal);
         }
         [AllowAnonymous]
         [HttpGet("{id}")]
+        [Produces(typeof(Models.Biene))]
         public async Task<IActionResult> GetVehicle(int id)
         {
             if (_macal == null)
@@ -58,5 +63,28 @@ namespace JAMTech.Controllers
             return new OkObjectResult(vehicle);
         }
 
+        [AllowAnonymous]
+        [HttpGet("search/{text}")]
+        [Produces(typeof(Models.Biene[]))]
+        public async Task<IActionResult> SearchVehicle(string text, bool completeDetails=false, int idRemate = _defaultRemate)
+        {
+            if (_macal == null)
+            {
+                await GetVehicles(idRemate);
+            }
+            var vehicles = _macal.Bienes.Where(b => Search(b, text)).ToList();
+            if (completeDetails)
+            {
+                var loadDetails = vehicles.Select(async v => await GetVehicle(v.Bienid)).ToArray();
+                Task.WaitAll(loadDetails);
+                vehicles = _macal.Bienes.Where(b => Search(b, text)).ToList();
+            }
+            return new OkObjectResult(vehicles);
+        }
+
+        private static bool Search(Models.Biene bien, string text)
+        {
+            return JsonConvert.SerializeObject(bien).ToLower().Contains(text);
+        }
     }
 }
