@@ -30,6 +30,25 @@ namespace JAMTech.Controllers
             var body = await new StreamReader(request.Body).ReadToEndAsync();
             Console.WriteLine("Webhook body: " + body);
             return new OkResult();
-        }    
+        }
+
+        private static int counter;
+
+        [AllowAnonymous]
+        [HttpGet()]
+        public bool TestAsyncTask()
+        {
+            //GC.Collect();
+            //GC.WaitForFullGCComplete();
+
+            ThreadPool.QueueUserWorkItem(tempCounter =>
+            {
+                Console.WriteLine("Init " + tempCounter);
+                Thread.Sleep(10000);
+                Console.WriteLine("End " + tempCounter);
+            }, ++counter);
+            
+            return true;
+        }
     }
 }
