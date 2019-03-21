@@ -39,36 +39,36 @@ namespace JAMTech.Models
         public string Marca { get; set; }
         public string Modelo { get; set; }
         public string __invalid_name__Año { get; set; }
-        public object Docbienurl { get; set; }
-        public object Url_img { get; set; }
+        public string Docbienurl { get; set; }
+        public string Url_img { get; set; }
         public double Precio { get; set; }
-        public object CajaTransmision { get; set; }
-        public object Traccion { get; set; }
-        public object Combustible { get; set; }
-        public object Kilometraje { get; set; }
-        public object PlacaUnica { get; set; }
-        public object Exhibicion { get; set; }
+        public string CajaTransmision { get; set; }
+        public string Traccion { get; set; }
+        public string Combustible { get; set; }
+        public string Kilometraje { get; set; }
+        public string PlacaUnica { get; set; }
+        public string Exhibicion { get; set; }
         public bool Destacado { get; set; }
-        public object Certificado_anotaciones { get; set; }
-        public object Garantia_mecanica { get; set; }
+        public string Certificado_anotaciones { get; set; }
+        public string Garantia_mecanica { get; set; }
         public double Garantia { get; set; }
-        public CuotaTanner CuotaTanner { get; set; }
-        public object IdRemate { get; set; }
+        //public CuotaTanner CuotaTanner { get; set; }
+        public string IdRemate { get; set; }
         public int Bienid { get; set; }
-        public object Nombre { get; set; }
-        public object Descripcion { get; set; }
+        public string Nombre { get; set; }
+        public string Descripcion { get; set; }
         public List<string> Imagenes { get; set; }
         public int Tipremid { get; set; }
         public int Remid { get; set; }
-        public object Biendescripcionweb { get; set; }
+        public string Biendescripcionweb { get; set; }
         public int Docbienid { get; set; }
         public object Esdestacado { get; set; }
         public string Loteid { get; set; }
         public int LOTECODIGOCONTADOR { get; set; }
         public int RemCodigoContador { get; set; }
         public int Monid { get; set; }
-        public object Detloteminimo { get; set; }
-        public object Categoria { get; set; }
+        public string Detloteminimo { get; set; }
+        public string Categoria { get; set; }
         public int LoteoDefinitivo { get; set; }
         public int NumeroLote { get; set; }
         public dynamic Detalle { get; set; }
