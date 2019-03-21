@@ -16,6 +16,7 @@ using System.IO;
 using System.Net.Http.Formatting;
 using System.Text;
 using System.Reflection;
+using System.Diagnostics;
 
 namespace JAMTech.Controllers
 {
@@ -23,6 +24,7 @@ namespace JAMTech.Controllers
     public class MacalController : BaseController
     {
         private static Models.Macal _macal = null;
+        private static bool _detailLoaded = false;
         const int _defaultRemate = 422;
 
         [AllowAnonymous]
@@ -36,29 +38,33 @@ namespace JAMTech.Controllers
                 var macalBody = await new HttpClient().PostAsync(url, new StringContent("{'carrusel':'NO','id_remate':'" + idRemate + "'}",  Encoding.UTF8, "application/json"));
                 _macal = await macalBody.Content.ReadAsAsync<Models.Macal>();
                 _macal.IdRemate = idRemate;
+                if (!_detailLoaded)
+                    ThreadPool.QueueUserWorkItem(state => LoadDetailsAsync());
             }
             return new OkObjectResult(_macal);
         }
         [AllowAnonymous]
-        [HttpGet("{id}")]
+        [HttpGet("{numLote}")]
         [Produces(typeof(Models.Biene))]
-        public async Task<IActionResult> GetVehicle(int id)
+        public async Task<IActionResult> GetVehicle(int numLote)
         {
             if (_macal == null)
             {
                 await GetVehicles();
             }
-            var vehicle = _macal.Bienes.First(b => b.Bienid == id);
+            var vehicle = _macal.Bienes.First(b => b.NumeroLote == numLote);
             if(vehicle.Detalle == null)
             {
                 //TODO complete detail
                 const string url = @"https://www.macal.cl/Detalle/Vehiculo/";
-                var detailBody = await new HttpClient().GetStringAsync(url + id.ToString());
+                var detailBody = await new HttpClient().GetStringAsync(url + numLote.ToString());
                 const string tag = "dataLayer =";
                 var startIndex = detailBody.IndexOf(tag) + 1;
                 var endIndex = detailBody.IndexOf("}];", startIndex);
                 var data = detailBody.Substring(startIndex + tag.Length, endIndex - (startIndex + tag.Length) + 2);
-                vehicle.Detalle = JsonConvert.DeserializeObject<object[]>(data)[0];
+                vehicle.Detalle = JsonConvert.DeserializeObject<dynamic[]>(data)[0];
+
+                //TODO add custom logic
             }
             return new OkObjectResult(vehicle);
         }
@@ -75,7 +81,7 @@ namespace JAMTech.Controllers
             var vehicles = _macal.Bienes.Where(b => Search(b, text)).ToList();
             if (completeDetails)
             {
-                var loadDetails = vehicles.Select(async v => await GetVehicle(v.Bienid)).ToArray();
+                var loadDetails = vehicles.Select(async v => await GetVehicle(v.NumeroLote)).ToArray();
                 Task.WaitAll(loadDetails);
                 vehicles = _macal.Bienes.Where(b => Search(b, text)).ToList();
             }
@@ -85,6 +91,24 @@ namespace JAMTech.Controllers
         private static bool Search(Models.Biene bien, string text)
         {
             return JsonConvert.SerializeObject(bien).ToLower().Contains(text);
+        }
+
+        private void LoadDetailsAsync()
+        {
+            _detailLoaded = true;
+            var timer = Stopwatch.StartNew();
+            var loadTasks = _macal.Bienes.Select(async bien => await GetVehicle(bien.NumeroLote)).ToArray();
+            try
+            {
+                Task.WaitAll(loadTasks);
+                Console.WriteLine($"The detail was loading in {timer.ElapsedMilliseconds / 1000} seconds.");
+            }
+            catch (AggregateException exs)
+            {
+                Console.Error.WriteLine($"{exs.InnerExceptions.Count} {exs.Message}");
+                exs.InnerExceptions.ToList().ForEach(ex => Console.Error.WriteLine(ex.ToString()));
+                _detailLoaded = false;
+            }
         }
     }
 }
