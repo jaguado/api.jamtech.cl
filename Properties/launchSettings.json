@@ -35,7 +35,7 @@
         "CORS": "localhost,aio.jamtech.cl,localhost:5000",
         "monitoring_worker_url": "https://jamtechmonitor.herokuapp.com",
         "monitoring_worker": false,
-        "remember_worker": true,
+        "remember_worker": false,
         "NEW_RELIC_LICENSE_KEY": "",
         "NEW_RELIC_APP_NAME": "api.jamtech.cl localhost",
         "SENDGRID_API_KEY": ""
