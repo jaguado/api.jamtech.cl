@@ -79,10 +79,10 @@ namespace JAMTech.Controllers
                         {
                             Console.WriteLine($"Precio fiscal lote {vehicle.NumeroLote} {vehicle.Marca}-{vehicle.Modelo}: {vehicle.ValorFiscal.Value:C0}");
                             const double ingresoMinimo = 1000000;
-                            vehicle.PrecioIdeal = GetPrice(vehicle.ValorFiscal.Value - (ingresoMinimo * 2), vehicle.ValorFiscal.Value);
-                            vehicle.PrecioIdealFinal = GetRealPrice(vehicle.PrecioIdeal, vehicle.ValorFiscal.Value);
-                            vehicle.PrecioMaximo = GetPrice(vehicle.ValorFiscal.Value - ingresoMinimo , vehicle.ValorFiscal.Value);
-                            vehicle.PrecioMaximoFinal = GetRealPrice(vehicle.PrecioMaximo, vehicle.ValorFiscal.Value);
+                            vehicle.PrecioIdeal = MacalCalculations.GetPrice(vehicle.ValorFiscal.Value - (ingresoMinimo * 2), vehicle.ValorFiscal.Value);
+                            vehicle.PrecioIdealFinal = MacalCalculations.GetRealPrice(vehicle.PrecioIdeal, vehicle.ValorFiscal.Value);
+                            vehicle.PrecioMaximo = MacalCalculations.GetPrice(vehicle.ValorFiscal.Value - ingresoMinimo , vehicle.ValorFiscal.Value);
+                            vehicle.PrecioMaximoFinal = MacalCalculations.GetRealPrice(vehicle.PrecioMaximo, vehicle.ValorFiscal.Value);
                         }
                     }
                 }
@@ -140,31 +140,6 @@ namespace JAMTech.Controllers
                 exs.InnerExceptions.ToList().ForEach(ex => Console.Error.WriteLine(ex.ToString()));
                 _detailLoaded = false;
             }
-        }
-
-        public double GetRealPrice(double price, double fiscalValue = 0)
-        {
-            if (fiscalValue < price)
-                return price + GetComission(price) + (price * 0.015) + 75000;
-            else
-            {
-                return price + GetComission(price) + (fiscalValue * 0.015) + 75000;
-            }
-        }
-
-        public double GetPrice(double realPrice, double fiscalValue = 0)
-        {
-            if (fiscalValue < realPrice)
-                return realPrice - GetComission(realPrice) - (realPrice * 0.015) - 75000;
-            else
-            {
-                return realPrice - GetComission(realPrice) - (fiscalValue * 0.015) - 75000;
-            }
-        }
-
-        public double GetComission(double price)
-        {
-            return price * 0.125;
         }
     }
 }
