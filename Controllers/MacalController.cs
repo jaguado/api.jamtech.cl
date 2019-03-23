@@ -58,15 +58,34 @@ namespace JAMTech.Controllers
                 //complete detail
                 vehicle.Detalle = await GetVehicleDetail(vehicle);
                 //add custom logic
-                if (vehicle.Detalle != null)
+                if (vehicle.Detalle != null && vehicle.Detalle.caracteristicas!=null)
                 {
-
+                    string rawDetail = vehicle.Detalle.caracteristicas.ToString();
+                    if (rawDetail!=null)
+                    {
+                        //"caracteristicas": 
+                        // "Año 2018 / Caja Transmisión AUTOMATICA / N° Chasis VF70B9HPGJE500046 / Combustible DIESEL / Kilometraje 21464 / Marca CITROËN / Modelo CAV C4 CACTUS HDI 1.6 / Motor(c c) 1.6 / N° Motor 10JBFN0090313 / Placa Única JYPZ62-K / Tracción 4x2 / Color BLANCO NACAR / Comitente COMERCIAL RAR SPA / N° VIN NO REGISTRA / Rut Comitente 762708329 / Tipo AUTOMOVIL / Modelo NSR C4 CACTUS",
+                        var arrDetail = rawDetail.ToLowerInvariant().Split('/');
+                        vehicle.Kilometraje = arrDetail.FirstOrDefault(d => d.ToString().Contains("kilometraje")).OnlyNumbers();
+                        vehicle.Combustible = arrDetail.FirstOrDefault(d => d.ToString().Contains("combustible")).OnlyLastWord();
+                        vehicle.CajaTransmision = arrDetail.FirstOrDefault(d => d.ToString().Contains("transmisión")).OnlyLastWord();
+                        vehicle.Traccion = arrDetail.FirstOrDefault(d => d.ToString().Contains("tracción")).OnlyLastWord();
+                        vehicle.Color = arrDetail.FirstOrDefault(d => d.ToString().Contains("color")).OnlyLastWord();
+                        vehicle.ValorFiscal = arrDetail.FirstOrDefault(d => d.ToString().Contains("fiscal")).OnlyNumbers();
+                        vehicle.NumChasis = arrDetail.FirstOrDefault(d => d.ToString().Contains("chasis")).OnlyLastWord();
+                        vehicle.Motor = arrDetail.FirstOrDefault(d => d.ToString().Contains("motor(c c)")).OnlyLastWord();
+                        vehicle.NumMotor = arrDetail.FirstOrDefault(d => d.ToString().Contains("n° motor")).OnlyLastWord();
+                        vehicle.Vendedor = arrDetail.FirstOrDefault(d => d.ToString().Contains("comitente")).OnlyLastWord();
+                        vehicle.RutVendedor = arrDetail.FirstOrDefault(d => d.ToString().Contains("rut comitente")).OnlyLastWord();
+                        if (vehicle.ValorFiscal.HasValue)
+                            Console.WriteLine($"Precio fiscal lote {vehicle.NumeroLote} {vehicle.Marca}-{vehicle.Modelo}: {vehicle.ValorFiscal.Value:C0}");
+                    }
                 }
             }
             return new OkObjectResult(vehicle);
         }
 
-        private static async Task<dynamic[]> GetVehicleDetail(Models.Biene vehicle)
+        private static async Task<dynamic> GetVehicleDetail(Models.Biene vehicle)
         {
             const string url = @"https://www.macal.cl/Detalle/Vehiculo/";
             var detailBody = await new HttpClient().GetStringAsync(url + vehicle.Bienid.ToString());
@@ -105,7 +124,7 @@ namespace JAMTech.Controllers
         {
             _detailLoaded = true;
             var timer = Stopwatch.StartNew();
-            var loadTasks = _macal.Bienes.Select(async bien => await GetVehicle(bien.NumeroLote)).ToArray();
+            var loadTasks = _macal.Bienes.Select(bien => GetVehicle(bien.NumeroLote)).ToArray();
             try
             {
                 Task.WaitAll(loadTasks);

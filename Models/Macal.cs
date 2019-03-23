@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -38,14 +39,10 @@ namespace JAMTech.Models
     {
         public string Marca { get; set; }
         public string Modelo { get; set; }
-        public string __invalid_name__Año { get; set; }
+        public string Año { get; set; }
         public string Docbienurl { get; set; }
         public string Url_img { get; set; }
         public double Precio { get; set; }
-        public string CajaTransmision { get; set; }
-        public string Traccion { get; set; }
-        public string Combustible { get; set; }
-        public string Kilometraje { get; set; }
         public string PlacaUnica { get; set; }
         public string Exhibicion { get; set; }
         public bool Destacado { get; set; }
@@ -71,13 +68,25 @@ namespace JAMTech.Models
         public string Categoria { get; set; }
         public int LoteoDefinitivo { get; set; }
         public int NumeroLote { get; set; }
+        public int? ValorFiscal { get; set; }
+        public int? Kilometraje { get; set; }
+        public string CajaTransmision { get; set; }
+        public string Traccion { get; set; }
+        public string Combustible { get; set; }
+        public string Color { get; set; }
+        public string NumChasis { get; set; }
+        public string Motor { get; set; }
+        public string NumMotor { get; set; }
+        public string Vendedor { get; set; }
+        public string RutVendedor { get; set; }
+        [JsonIgnore]
         public dynamic Detalle { get; set; }
     }
 
     public class Macal
     {
         public DateTime FechaRemate { get; set; }
-        public object IdRemate { get; set; }
+        public int? IdRemate { get; set; }
         public List<Biene> Bienes { get; set; }
     }
 }
