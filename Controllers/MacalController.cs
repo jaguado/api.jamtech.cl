@@ -25,7 +25,7 @@ namespace JAMTech.Controllers
     {
         private static Models.Macal _macal = null;
         private static bool _detailLoaded = false;
-        const int _defaultRemate = 422;
+        const int _defaultRemate = 424;
 
         [AllowAnonymous]
         [HttpGet()]
@@ -55,18 +55,49 @@ namespace JAMTech.Controllers
             var vehicle = _macal.Bienes.First(b => b.NumeroLote == numLote);
             if(vehicle.Detalle == null)
             {
-                //TODO complete detail
-                const string url = @"https://www.macal.cl/Detalle/Vehiculo/";
-                var detailBody = await new HttpClient().GetStringAsync(url + numLote.ToString());
-                const string tag = "dataLayer =";
-                var startIndex = detailBody.IndexOf(tag) + 1;
-                var endIndex = detailBody.IndexOf("}];", startIndex);
-                var data = detailBody.Substring(startIndex + tag.Length, endIndex - (startIndex + tag.Length) + 2);
-                vehicle.Detalle = JsonConvert.DeserializeObject<dynamic[]>(data)[0];
-
-                //TODO add custom logic
+                //complete detail
+                vehicle.Detalle = await GetVehicleDetail(vehicle);
+                //add custom logic
+                if (vehicle.Detalle != null && vehicle.Detalle.caracteristicas!=null)
+                {
+                    string rawDetail = vehicle.Detalle.caracteristicas.ToString();
+                    if (rawDetail!=null)
+                    {
+                        var arrDetail = rawDetail.ToLowerInvariant().Split('/');
+                        vehicle.Kilometraje = arrDetail.FirstOrDefault(d => d.ToString().Contains("kilometraje")).OnlyNumbers();
+                        vehicle.Combustible = arrDetail.FirstOrDefault(d => d.ToString().Contains("combustible")).FromSecondWord();
+                        vehicle.CajaTransmision = arrDetail.FirstOrDefault(d => d.ToString().Contains("transmisión")).FromSecondWord();
+                        vehicle.Traccion = arrDetail.FirstOrDefault(d => d.ToString().Contains("tracción")).FromSecondWord();
+                        vehicle.Color = arrDetail.FirstOrDefault(d => d.ToString().Contains("color")).FromSecondWord();
+                        vehicle.ValorFiscal = arrDetail.FirstOrDefault(d => d.ToString().Contains("fiscal")).OnlyNumbers();
+                        vehicle.NumChasis = arrDetail.FirstOrDefault(d => d.ToString().Contains("chasis")).OnlyLastWord();
+                        vehicle.Motor = arrDetail.FirstOrDefault(d => d.ToString().Contains("motor(c c)")).OnlyLastWord();
+                        vehicle.NumMotor = arrDetail.FirstOrDefault(d => d.ToString().Contains("n° motor")).FromSecondWord();
+                        vehicle.Vendedor = arrDetail.FirstOrDefault(d => d.ToString().Contains("comitente")).FromSecondWord();
+                        vehicle.RutVendedor = arrDetail.FirstOrDefault(d => d.ToString().Contains("rut comitente")).OnlyLastWord();
+                        if (vehicle.ValorFiscal.HasValue)
+                        {
+                            Console.WriteLine($"Precio fiscal lote {vehicle.NumeroLote} {vehicle.Marca}-{vehicle.Modelo}: {vehicle.ValorFiscal.Value:C0}");
+                            const double ingresoMinimo = 1000000;
+                            vehicle.PrecioIdeal = GetPrice(vehicle.ValorFiscal.Value - (ingresoMinimo * 2), vehicle.ValorFiscal.Value);
+                            vehicle.PrecioIdealFinal = GetRealPrice(vehicle.PrecioIdeal, vehicle.ValorFiscal.Value);
+                            vehicle.PrecioMaximo = GetPrice(vehicle.ValorFiscal.Value - ingresoMinimo , vehicle.ValorFiscal.Value);
+                            vehicle.PrecioMaximoFinal = GetRealPrice(vehicle.PrecioMaximo, vehicle.ValorFiscal.Value);
+                        }
+                    }
+                }
             }
             return new OkObjectResult(vehicle);
+        }
+
+        private static async Task<dynamic> GetVehicleDetail(Models.Biene vehicle)
+        {
+            var detailBody = await new HttpClient().GetStringAsync(vehicle.Link);
+            const string tag = "dataLayer =";
+            var startIndex = detailBody.IndexOf(tag) + 1;
+            var endIndex = detailBody.IndexOf("}];", startIndex);
+            var data = detailBody.Substring(startIndex + tag.Length, endIndex - (startIndex + tag.Length) + 2);
+            return JsonConvert.DeserializeObject<dynamic[]>(data)[0];
         }
 
         [AllowAnonymous]
@@ -97,11 +128,11 @@ namespace JAMTech.Controllers
         {
             _detailLoaded = true;
             var timer = Stopwatch.StartNew();
-            var loadTasks = _macal.Bienes.Select(async bien => await GetVehicle(bien.NumeroLote)).ToArray();
+            var loadTasks = _macal.Bienes.Select(bien => GetVehicle(bien.NumeroLote)).ToArray();
             try
             {
                 Task.WaitAll(loadTasks);
-                Console.WriteLine($"The detail was loading in {timer.ElapsedMilliseconds / 1000} seconds.");
+                Console.WriteLine($"The detail was loaded in {timer.ElapsedMilliseconds / 1000} seconds.");
             }
             catch (AggregateException exs)
             {
@@ -109,6 +140,31 @@ namespace JAMTech.Controllers
                 exs.InnerExceptions.ToList().ForEach(ex => Console.Error.WriteLine(ex.ToString()));
                 _detailLoaded = false;
             }
+        }
+
+        public double GetRealPrice(double price, double fiscalValue = 0)
+        {
+            if (fiscalValue < price)
+                return price + GetComission(price) + (price * 0.015) + 75000;
+            else
+            {
+                return price + GetComission(price) + (fiscalValue * 0.015) + 75000;
+            }
+        }
+
+        public double GetPrice(double realPrice, double fiscalValue = 0)
+        {
+            if (fiscalValue < realPrice)
+                return realPrice - GetComission(realPrice) - (realPrice * 0.015) - 75000;
+            else
+            {
+                return realPrice - GetComission(realPrice) - (fiscalValue * 0.015) - 75000;
+            }
+        }
+
+        public double GetComission(double price)
+        {
+            return price * 0.125;
         }
     }
 }
