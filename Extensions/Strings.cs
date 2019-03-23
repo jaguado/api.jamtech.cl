@@ -20,5 +20,9 @@ namespace JAMTech.Extensions
         {
             return value.Trim().Split(' ').Last().Trim();
         }
+        public static string FromSecondWord(this string value)
+        {
+            return string.Join(' ',value.Trim().Split(' ').Skip(1));
+        }
     }
 }

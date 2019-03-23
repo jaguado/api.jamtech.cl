@@ -63,22 +63,27 @@ namespace JAMTech.Controllers
                     string rawDetail = vehicle.Detalle.caracteristicas.ToString();
                     if (rawDetail!=null)
                     {
-                        //"caracteristicas": 
-                        // "Año 2018 / Caja Transmisión AUTOMATICA / N° Chasis VF70B9HPGJE500046 / Combustible DIESEL / Kilometraje 21464 / Marca CITROËN / Modelo CAV C4 CACTUS HDI 1.6 / Motor(c c) 1.6 / N° Motor 10JBFN0090313 / Placa Única JYPZ62-K / Tracción 4x2 / Color BLANCO NACAR / Comitente COMERCIAL RAR SPA / N° VIN NO REGISTRA / Rut Comitente 762708329 / Tipo AUTOMOVIL / Modelo NSR C4 CACTUS",
                         var arrDetail = rawDetail.ToLowerInvariant().Split('/');
                         vehicle.Kilometraje = arrDetail.FirstOrDefault(d => d.ToString().Contains("kilometraje")).OnlyNumbers();
-                        vehicle.Combustible = arrDetail.FirstOrDefault(d => d.ToString().Contains("combustible")).OnlyLastWord();
-                        vehicle.CajaTransmision = arrDetail.FirstOrDefault(d => d.ToString().Contains("transmisión")).OnlyLastWord();
-                        vehicle.Traccion = arrDetail.FirstOrDefault(d => d.ToString().Contains("tracción")).OnlyLastWord();
-                        vehicle.Color = arrDetail.FirstOrDefault(d => d.ToString().Contains("color")).OnlyLastWord();
+                        vehicle.Combustible = arrDetail.FirstOrDefault(d => d.ToString().Contains("combustible")).FromSecondWord();
+                        vehicle.CajaTransmision = arrDetail.FirstOrDefault(d => d.ToString().Contains("transmisión")).FromSecondWord();
+                        vehicle.Traccion = arrDetail.FirstOrDefault(d => d.ToString().Contains("tracción")).FromSecondWord();
+                        vehicle.Color = arrDetail.FirstOrDefault(d => d.ToString().Contains("color")).FromSecondWord();
                         vehicle.ValorFiscal = arrDetail.FirstOrDefault(d => d.ToString().Contains("fiscal")).OnlyNumbers();
                         vehicle.NumChasis = arrDetail.FirstOrDefault(d => d.ToString().Contains("chasis")).OnlyLastWord();
                         vehicle.Motor = arrDetail.FirstOrDefault(d => d.ToString().Contains("motor(c c)")).OnlyLastWord();
-                        vehicle.NumMotor = arrDetail.FirstOrDefault(d => d.ToString().Contains("n° motor")).OnlyLastWord();
-                        vehicle.Vendedor = arrDetail.FirstOrDefault(d => d.ToString().Contains("comitente")).OnlyLastWord();
+                        vehicle.NumMotor = arrDetail.FirstOrDefault(d => d.ToString().Contains("n° motor")).FromSecondWord();
+                        vehicle.Vendedor = arrDetail.FirstOrDefault(d => d.ToString().Contains("comitente")).FromSecondWord();
                         vehicle.RutVendedor = arrDetail.FirstOrDefault(d => d.ToString().Contains("rut comitente")).OnlyLastWord();
                         if (vehicle.ValorFiscal.HasValue)
+                        {
                             Console.WriteLine($"Precio fiscal lote {vehicle.NumeroLote} {vehicle.Marca}-{vehicle.Modelo}: {vehicle.ValorFiscal.Value:C0}");
+                            const double ingresoMinimo = 1000000;
+                            vehicle.PrecioIdeal = GetPrice(vehicle.ValorFiscal.Value - (ingresoMinimo * 2), vehicle.ValorFiscal.Value);
+                            vehicle.PrecioIdealFinal = GetRealPrice(vehicle.PrecioIdeal, vehicle.ValorFiscal.Value);
+                            vehicle.PrecioMaximo = GetPrice(vehicle.ValorFiscal.Value - ingresoMinimo , vehicle.ValorFiscal.Value);
+                            vehicle.PrecioMaximoFinal = GetRealPrice(vehicle.PrecioMaximo, vehicle.ValorFiscal.Value);
+                        }
                     }
                 }
             }
@@ -87,8 +92,7 @@ namespace JAMTech.Controllers
 
         private static async Task<dynamic> GetVehicleDetail(Models.Biene vehicle)
         {
-            const string url = @"https://www.macal.cl/Detalle/Vehiculo/";
-            var detailBody = await new HttpClient().GetStringAsync(url + vehicle.Bienid.ToString());
+            var detailBody = await new HttpClient().GetStringAsync(vehicle.Link);
             const string tag = "dataLayer =";
             var startIndex = detailBody.IndexOf(tag) + 1;
             var endIndex = detailBody.IndexOf("}];", startIndex);
@@ -136,6 +140,31 @@ namespace JAMTech.Controllers
                 exs.InnerExceptions.ToList().ForEach(ex => Console.Error.WriteLine(ex.ToString()));
                 _detailLoaded = false;
             }
+        }
+
+        public double GetRealPrice(double price, double fiscalValue = 0)
+        {
+            if (fiscalValue < price)
+                return price + GetComission(price) + (price * 0.015) + 75000;
+            else
+            {
+                return price + GetComission(price) + (fiscalValue * 0.015) + 75000;
+            }
+        }
+
+        public double GetPrice(double realPrice, double fiscalValue = 0)
+        {
+            if (fiscalValue < realPrice)
+                return realPrice - GetComission(realPrice) - (realPrice * 0.015) - 75000;
+            else
+            {
+                return realPrice - GetComission(realPrice) - (fiscalValue * 0.015) - 75000;
+            }
+        }
+
+        public double GetComission(double price)
+        {
+            return price * 0.125;
         }
     }
 }

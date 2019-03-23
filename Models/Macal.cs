@@ -79,6 +79,14 @@ namespace JAMTech.Models
         public string NumMotor { get; set; }
         public string Vendedor { get; set; }
         public string RutVendedor { get; set; }
+
+        public double PrecioIdeal { get; set; }
+        public double PrecioIdealFinal { get; set; }
+
+        public double PrecioMaximo { get; set; }
+        public double PrecioMaximoFinal { get; set; }
+
+        public string Link => @"https://www.macal.cl/Detalle/Vehiculo/" + Bienid.ToString();
         [JsonIgnore]
         public dynamic Detalle { get; set; }
     }
