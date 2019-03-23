@@ -25,7 +25,7 @@ namespace JAMTech.Controllers
     {
         private static Models.Macal _macal = null;
         private static bool _detailLoaded = false;
-        const int _defaultRemate = 422;
+        const int _defaultRemate = 424;
 
         [AllowAnonymous]
         [HttpGet()]
@@ -57,7 +57,7 @@ namespace JAMTech.Controllers
             {
                 //TODO complete detail
                 const string url = @"https://www.macal.cl/Detalle/Vehiculo/";
-                var detailBody = await new HttpClient().GetStringAsync(url + numLote.ToString());
+                var detailBody = await new HttpClient().GetStringAsync(url + vehicle.Bienid.ToString());
                 const string tag = "dataLayer =";
                 var startIndex = detailBody.IndexOf(tag) + 1;
                 var endIndex = detailBody.IndexOf("}];", startIndex);
@@ -101,7 +101,7 @@ namespace JAMTech.Controllers
             try
             {
                 Task.WaitAll(loadTasks);
-                Console.WriteLine($"The detail was loading in {timer.ElapsedMilliseconds / 1000} seconds.");
+                Console.WriteLine($"The detail was loaded in {timer.ElapsedMilliseconds / 1000} seconds.");
             }
             catch (AggregateException exs)
             {
