@@ -55,18 +55,26 @@ namespace JAMTech.Controllers
             var vehicle = _macal.Bienes.First(b => b.NumeroLote == numLote);
             if(vehicle.Detalle == null)
             {
-                //TODO complete detail
-                const string url = @"https://www.macal.cl/Detalle/Vehiculo/";
-                var detailBody = await new HttpClient().GetStringAsync(url + vehicle.Bienid.ToString());
-                const string tag = "dataLayer =";
-                var startIndex = detailBody.IndexOf(tag) + 1;
-                var endIndex = detailBody.IndexOf("}];", startIndex);
-                var data = detailBody.Substring(startIndex + tag.Length, endIndex - (startIndex + tag.Length) + 2);
-                vehicle.Detalle = JsonConvert.DeserializeObject<dynamic[]>(data)[0];
+                //complete detail
+                vehicle.Detalle = await GetVehicleDetail(vehicle);
+                //add custom logic
+                if (vehicle.Detalle != null)
+                {
 
-                //TODO add custom logic
+                }
             }
             return new OkObjectResult(vehicle);
+        }
+
+        private static async Task<dynamic[]> GetVehicleDetail(Models.Biene vehicle)
+        {
+            const string url = @"https://www.macal.cl/Detalle/Vehiculo/";
+            var detailBody = await new HttpClient().GetStringAsync(url + vehicle.Bienid.ToString());
+            const string tag = "dataLayer =";
+            var startIndex = detailBody.IndexOf(tag) + 1;
+            var endIndex = detailBody.IndexOf("}];", startIndex);
+            var data = detailBody.Substring(startIndex + tag.Length, endIndex - (startIndex + tag.Length) + 2);
+            return JsonConvert.DeserializeObject<dynamic[]>(data)[0];
         }
 
         [AllowAnonymous]
