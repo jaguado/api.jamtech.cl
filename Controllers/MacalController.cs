@@ -78,7 +78,7 @@ namespace JAMTech.Controllers
                         if (vehicle.ValorFiscal.HasValue)
                         {
                             Console.WriteLine($"Precio fiscal lote {vehicle.NumeroLote} {vehicle.Marca}-{vehicle.Modelo}: {vehicle.ValorFiscal.Value:C0}");
-                            const double ingresoMinimo = 1000000;
+                            const double ingresoMinimo = 2000000;
                             vehicle.PrecioIdeal = MacalCalculations.GetPrice(vehicle.ValorFiscal.Value - (ingresoMinimo * 2), vehicle.ValorFiscal.Value);
                             vehicle.PrecioIdealFinal = MacalCalculations.GetRealPrice(vehicle.PrecioIdeal, vehicle.ValorFiscal.Value);
                             vehicle.PrecioMaximo = MacalCalculations.GetPrice(vehicle.ValorFiscal.Value - ingresoMinimo , vehicle.ValorFiscal.Value);
