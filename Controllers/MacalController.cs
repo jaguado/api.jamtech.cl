@@ -46,13 +46,13 @@ namespace JAMTech.Controllers
         [AllowAnonymous]
         [HttpGet("{numLote}")]
         [Produces(typeof(Models.Biene))]
-        public async Task<IActionResult> GetVehicle(int numLote)
+        public async Task<IActionResult> GetVehicle(int numLote, int idBien=0)
         {
             if (_macal == null)
             {
                 await GetVehicles();
             }
-            var vehicle = _macal.Bienes.First(b => b.NumeroLote == numLote);
+            var vehicle = _macal.Bienes.First(b => b.NumeroLote == numLote || (idBien>0 && b.Bienid == idBien));
             if(vehicle.Detalle == null)
             {
                 //complete detail
