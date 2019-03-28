@@ -70,5 +70,12 @@ namespace JAMTech.Controllers
             }
             return new NotFoundResult();
         }
+
+        [AllowAnonymous]
+        [HttpGet("sii")]
+        public IActionResult GetVehicleFromSII(Models.Vehicle vehicle)
+        {
+            return new OkObjectResult(Sii.GetVehicleInfoFromSII(vehicle));
+        }
     }
 }

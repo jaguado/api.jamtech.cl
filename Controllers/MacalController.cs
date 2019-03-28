@@ -35,7 +35,7 @@ namespace JAMTech.Controllers
             if (_macal == null)
             {
                 const string url = @"https://www.macal.cl/Vehiculos/VehiculosBienesGet";
-                var macalBody = await new HttpClient().PostAsync(url, new StringContent("{'carrusel':'NO','id_remate':'" + idRemate + "'}",  Encoding.UTF8, "application/json"));
+                var macalBody = await new HttpClient().PostAsync(url, new StringContent("{'carrusel':'NO','id_remate':'" + idRemate + "'}", Encoding.UTF8, "application/json"));
                 _macal = await macalBody.Content.ReadAsAsync<Models.Macal>();
                 _macal.IdRemate = idRemate;
                 if (!_detailLoaded)
@@ -46,22 +46,22 @@ namespace JAMTech.Controllers
         [AllowAnonymous]
         [HttpGet("{numLote}")]
         [Produces(typeof(Models.Biene))]
-        public async Task<IActionResult> GetVehicle(int numLote, int idBien=0)
+        public async Task<IActionResult> GetVehicle(int numLote, int idBien = 0)
         {
             if (_macal == null)
             {
                 await GetVehicles();
             }
-            var vehicle = _macal.Bienes.First(b => b.NumeroLote == numLote || (idBien>0 && b.Bienid == idBien));
-            if(vehicle.Detalle == null)
+            var vehicle = _macal.Bienes.First(b => b.NumeroLote == numLote || (idBien > 0 && b.Bienid == idBien));
+            if (vehicle.Detalle == null)
             {
                 //complete detail
                 vehicle.Detalle = await GetVehicleDetail(vehicle);
                 //add custom logic
-                if (vehicle.Detalle != null && vehicle.Detalle.caracteristicas!=null)
+                if (vehicle.Detalle != null && vehicle.Detalle.caracteristicas != null)
                 {
                     string rawDetail = vehicle.Detalle.caracteristicas.ToString();
-                    if (rawDetail!=null)
+                    if (rawDetail != null)
                     {
                         var arrDetail = rawDetail.ToLowerInvariant().Split('/');
                         vehicle.Kilometraje = arrDetail.FirstOrDefault(d => d.ToString().Contains("kilometraje")).OnlyNumbers();
@@ -75,13 +75,25 @@ namespace JAMTech.Controllers
                         vehicle.NumMotor = arrDetail.FirstOrDefault(d => d.ToString().Contains("n° motor")).FromSecondWord();
                         vehicle.Vendedor = arrDetail.FirstOrDefault(d => d.ToString().Contains("comitente")).FromSecondWord();
                         vehicle.RutVendedor = arrDetail.FirstOrDefault(d => d.ToString().Contains("rut comitente")).OnlyLastWord();
+                        if (!vehicle.ValorFiscal.HasValue)
+                        {
+                            //get value from SII info
+                            var vehicles = Helpers.Sii.GetVehicleInfoFromSII(new Models.Vehicle
+                            {
+                                Marca = vehicle.Marca,
+                                Modelo = vehicle.Modelo,
+                                Año = double.Parse(vehicle.Año)
+                            });
+                            if (vehicles.Any())
+                                vehicle.ValorFiscal = vehicles.First().Tasacion;
+                        }
                         if (vehicle.ValorFiscal.HasValue)
                         {
                             Console.WriteLine($"Precio fiscal lote {vehicle.NumeroLote} {vehicle.Marca}-{vehicle.Modelo}: {vehicle.ValorFiscal.Value:C0}");
                             const double ingresoMinimo = 2000000;
                             vehicle.PrecioIdeal = MacalCalculations.GetPrice(vehicle.ValorFiscal.Value - (ingresoMinimo * 2), vehicle.ValorFiscal.Value);
                             vehicle.PrecioIdealFinal = MacalCalculations.GetRealPrice(vehicle.PrecioIdeal, vehicle.ValorFiscal.Value);
-                            vehicle.PrecioMaximo = MacalCalculations.GetPrice(vehicle.ValorFiscal.Value - ingresoMinimo , vehicle.ValorFiscal.Value);
+                            vehicle.PrecioMaximo = MacalCalculations.GetPrice(vehicle.ValorFiscal.Value - ingresoMinimo, vehicle.ValorFiscal.Value);
                             vehicle.PrecioMaximoFinal = MacalCalculations.GetRealPrice(vehicle.PrecioMaximo, vehicle.ValorFiscal.Value);
                         }
                     }
@@ -103,7 +115,7 @@ namespace JAMTech.Controllers
         [AllowAnonymous]
         [HttpGet("search/{text}")]
         [Produces(typeof(Models.Biene[]))]
-        public async Task<IActionResult> SearchVehicle(string text, bool completeDetails=false, int idRemate = _defaultRemate)
+        public async Task<IActionResult> SearchVehicle(string text, bool completeDetails = false, int idRemate = _defaultRemate)
         {
             if (_macal == null)
             {
@@ -124,9 +136,11 @@ namespace JAMTech.Controllers
             return JsonConvert.SerializeObject(bien).ToLower().Contains(text);
         }
 
+       
         private void LoadDetailsAsync()
         {
             _detailLoaded = true;
+
             var timer = Stopwatch.StartNew();
             var loadTasks = _macal.Bienes.Select(bien => GetVehicle(bien.NumeroLote)).ToArray();
             try
@@ -141,5 +155,7 @@ namespace JAMTech.Controllers
                 _detailLoaded = false;
             }
         }
+
+      
     }
 }

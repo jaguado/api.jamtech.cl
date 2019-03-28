@@ -68,7 +68,7 @@ namespace JAMTech.Models
         public string Categoria { get; set; }
         public int LoteoDefinitivo { get; set; }
         public int NumeroLote { get; set; }
-        public int? ValorFiscal { get; set; }
+        public double? ValorFiscal { get; set; }
         public int? Kilometraje { get; set; }
         public string CajaTransmision { get; set; }
         public string Traccion { get; set; }
