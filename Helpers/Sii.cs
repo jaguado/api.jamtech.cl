@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -12,7 +13,7 @@ namespace JAMTech.Helpers
         private static void LoadSiiVehiclesDB()
         {
             //load xls
-            var book = Excel.ReadXls(@"App_Data\liv2019xls.xlsx");
+            var book = Excel.ReadXls(Path.Combine("App_Data", "liv2019xls.xlsx"));
             if (book.Tables.Count > 0)
             {
                 _siiDb = book.Tables[0].Select().Select(row => new Models.Vehicle
