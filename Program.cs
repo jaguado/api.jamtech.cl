@@ -21,6 +21,13 @@ namespace JAMTech
 
         public static void Main(string[] args)
         {
+            var results = Sii.GetVehicleInfoFromSII(new Models.Vehicle
+            {
+                Año = 2018,
+                Marca = "Audi",
+                Modelo= "A3"
+            }).ToList();
+
             isMonitoringWorker = Environment.GetEnvironmentVariable("monitoring_worker") == null || Environment.GetEnvironmentVariable("monitoring_worker") != "false";
             if (isMonitoringWorker)
                 System.Threading.ThreadPool.QueueUserWorkItem(async state => await StartMonitoringAsync());
