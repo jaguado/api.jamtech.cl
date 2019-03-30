@@ -32,6 +32,7 @@ namespace JAMTech.Controllers
         /// Find products in a jumbo local
         /// </summary>
         /// <param name="product"></param>
+        /// <param name="pages"></param>
         /// <param name="local"></param>
         /// <returns></returns>
         [HttpGet]

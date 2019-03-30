@@ -94,6 +94,7 @@ namespace JAMTech.Controllers
         /// </summary>
         /// <param name="hostname"></param>
         /// <param name="port"></param>
+        /// <param name="loops"></param>
         /// <param name="timeout"></param>
         /// <returns></returns>
         [HttpPost("telnet/{loops}")]

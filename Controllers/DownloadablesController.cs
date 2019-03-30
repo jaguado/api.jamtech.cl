@@ -42,9 +42,9 @@ namespace JAMTech.Controllers
             var tasks = new List<Task>();
             urls.AsParallel().ForAll(url =>
             {
-                var t = new Task(async () =>
+                var t = new Task(() =>
                 {
-                    downloadResults.AddRange(await GetDownloadables(url, extension, levels));
+                    downloadResults.AddRange(GetDownloadables(url, extension, levels));
                 });
                 t.Start();
                 tasks.Add(t);
@@ -55,7 +55,7 @@ namespace JAMTech.Controllers
         }
 
         //TODO Fix Me
-        private static async Task<IEnumerable<DownloadResult>> GetDownloadables(string url, string extension, int levels)
+        private static IEnumerable<DownloadResult> GetDownloadables(string url, string extension, int levels)
         {
             var downloadResults = new ConcurrentBag<DownloadResult>();
             var results = GetDownloadables(url, extension).Result.ToList();

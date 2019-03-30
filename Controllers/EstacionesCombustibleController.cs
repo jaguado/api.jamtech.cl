@@ -39,6 +39,8 @@ namespace JAMTech.Controllers
         /// <param name="type">Kind of Combustible</param>
         /// <param name="region">Region Id. Ex: RM = 13</param>
         /// <param name="comuna">Comune Id</param>
+        /// <param name="lat"></param>
+        /// <param name="lng"></param>
         /// <param name="distributor">Distributor Id</param>
         /// <returns></returns>
         [HttpGet]

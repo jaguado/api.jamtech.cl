@@ -114,7 +114,7 @@ namespace JAMTech.Controllers
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
                 //throw new TimeoutException(ex.Message, ex.InnerException);
