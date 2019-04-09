@@ -77,6 +77,8 @@ namespace JAMTech.Filters
                         //add user info to request
                         context.ActionArguments[uidFieldName] = result.id.ToString();
                         context.ActionArguments["userInfo"] = googleResult;
+                        NewRelic.Api.Agent.NewRelic.AddCustomParameter("AuthProvider", "Google");
+                        NewRelic.Api.Agent.NewRelic.AddCustomParameter("AuthBody", googleResult);
                     }
                 }
             }
@@ -130,6 +132,8 @@ namespace JAMTech.Filters
                         //add user info to request
                         context.ActionArguments[uidFieldName] = result.id.ToString();
                         context.ActionArguments["userInfo"] = facebookResult;
+                        NewRelic.Api.Agent.NewRelic.AddCustomParameter("AuthProvider", "Facebook");
+                        NewRelic.Api.Agent.NewRelic.AddCustomParameter("AuthBody", facebookResult);
                     }
                 }
             }

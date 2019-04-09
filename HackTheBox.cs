@@ -15,7 +15,6 @@ namespace JAMTech
         {
             var unexpectedBody = System.IO.File.ReadAllText(@"C:\Users\a159609\response2.txt");
             var originalJwt = "eyJVc2VyIjoiZWZiZmFjZmVmYWJmZGVlc3NzIiwiQWRtaW4iOiJGYWxzZSIsIk1BQyI6IjA0OGEyOGU4MGNiOTczNjZlODI0MTNkMTU0MWVkYTBkIn0";
-            var cookie = "ses=";
             var siteUrl = "http://docker.hackthebox.eu:32928/index.php";
                        
 
@@ -79,8 +78,6 @@ namespace JAMTech
         public static void Solved1()
         {
             //hacking
-            var count = 0;
-            var errCount = 0;
             var siteUrl = "http://docker.hackthebox.eu:32817";
             var responseBodyWrong = System.IO.File.ReadAllText(@"C:\Users\a159609\response.txt");
             var passwords = System.IO.File.ReadAllLines(@"C:\Users\a159609\rockyou.txt");

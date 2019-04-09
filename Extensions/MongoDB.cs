@@ -96,6 +96,7 @@ namespace JAMTech.Extensions
         /// Only returns data of specified user
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        /// <typeparam name="Y"></typeparam>
         /// <param name="uid"></param>
         /// <returns></returns>
         public static async Task<IEnumerable<Y>> FromMongoDB<T, Y>(string uid)

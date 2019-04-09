@@ -25,7 +25,7 @@ namespace JAMTech.Controllers
     {
         private static Models.Macal _macal = null;
         private static bool _detailLoaded = false;
-        const int _defaultRemate = 424;
+        const int _defaultRemate = 426;
 
         [AllowAnonymous]
         [HttpGet()]

@@ -94,6 +94,8 @@ namespace JAMTech.Controllers
         /// Get monitors results with configuration of an authenticated user
         /// </summary>
         /// <param name="forUser">This paramemeter is optional and will be completed or validated against access_token</param>
+        /// <param name="onlyErrors"></param>
+        /// <param name="resultsCount"></param>
         /// <returns></returns>
         [HttpGet("results")]
         [Produces(typeof(IEnumerable<MonitorResultGroup>))]

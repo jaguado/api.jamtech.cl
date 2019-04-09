@@ -1,0 +1,24 @@
+version: '2'
+
+services:
+  jamtech-api:
+    image: jamtech/aio
+    build:
+      context: .
+    environment:
+       - "NEW_RELIC_APP_NAME=JAMTech.AIO.Docker"
+       - "NEW_RELIC_LICENSE_KEY=195cb6e62921d83376172a83bb2389a5c9bedaac"
+       - "ASPNETCORE_ENVIRONMENT=Development"
+       - "PORT=5000"
+       - "MONGODB_URI="
+       - "disableAuth=true"
+       - "disableSendEmail=true"
+       - "minifyResponse=false"
+       - "CORS=localhost,aio.jamtech.cl,localhost:5000"
+       - "monitoring_worker=false"
+       - "remember_worker=false"
+       - "SENDGRID_API_KEY="
+    ports:
+       - "8080:5000"
+    mem_limit: 256m
+    mem_reservation: 128m

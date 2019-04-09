@@ -35,6 +35,7 @@ namespace JAMTech.Controllers
 
         internal void Log(Exception ex)
         {
+            NewRelic.Api.Agent.NewRelic.NoticeError(ex);
             var msg = $"{DateTime.Now.ToString()}|ERROR|{ex.Source}|{ex.Message}|{ex.StackTrace}";
             Console.Error.WriteLineAsync(msg);
         }

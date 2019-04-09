@@ -118,6 +118,7 @@ namespace JAMTech
             {
                 options.Filters.Add(typeof(SocialAuth)); // by type
                 options.Filters.Add(typeof(BaseResultFilter)); // by type
+                options.Filters.Add(typeof(CustomExceptionFilter));
             })
             .AddJsonOptions(options =>
             {

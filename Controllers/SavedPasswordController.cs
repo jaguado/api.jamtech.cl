@@ -78,6 +78,7 @@ namespace JAMTech.Controllers
         /// <summary>
         /// Get saved password
         /// </summary>
+        /// <param name="id"></param>
         /// <param name="forUser">This paramemeter is optional and will be completed or validated against access_token</param>
         /// <returns></returns>
         [HttpGet("password/{id}")]
