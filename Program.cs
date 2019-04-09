@@ -46,11 +46,11 @@ namespace JAMTech
                 monitor.Start();
             }
 
-            Monitors = new List<Monitor>();
             //search for all users monitoring tasks
             var usersConfigs = await Extensions.MongoDB.FromMongoDB<Models.UserMonitorConfig>();
             if (usersConfigs != null)
             {
+                Monitors = new List<Monitor>();
                 usersConfigs.ToList().ForEach(user =>
                 {
                     Console.WriteLine($"Loading '{user.Data.Count()}' monitors of user '{user.uid}'");
@@ -102,11 +102,11 @@ namespace JAMTech
         internal static List<Remember> Remembers = null;
         public static async Task StartRememberAsync()
         {
-            Remembers = new List<Remember>();
             //search for all users remember tasks
             var usersConfigs = await Extensions.MongoDB.FromMongoDB<Models.UserRememberConfig>();
             if (usersConfigs != null)
             {
+                Remembers = new List<Remember>();
                 usersConfigs.ToList().ForEach(user =>
                 {
                     Console.WriteLine($"Loading '{user.Data.Count()}' remembers of user '{user.uid}'");
