@@ -25,11 +25,11 @@ namespace JAMTech.Controllers
         /// <param name="rut"></param>
         /// <param name="pwd"></param>
         /// <returns></returns>
-        [HttpGet("Santander/Accounts")]
+        [HttpPost("Santander/Accounts")]
         [Produces(typeof(List<Models.Santander.E1>))]
-        public async Task<IActionResult> GetSantanderAccountsAsync(string rut, int pwd)
+        public async Task<IActionResult> GetSantanderAccountsAsync([FromBody] Models.BankCredentials credentials)
         {
-            using (var bank = new Plugins.Banks.Santander(rut.ToCleanRut(), pwd.ToString()))
+            using (var bank = new Plugins.Banks.Santander(credentials.Rut.ToCleanRut(), credentials.Password.ToString()))
             {
                 if (await bank.Login())
                     return new OkObjectResult(bank.Accounts);
@@ -44,10 +44,10 @@ namespace JAMTech.Controllers
         /// <param name="rut"></param>
         /// <param name="pwd"></param>
         /// <returns></returns>
-        [HttpGet("BBVA/Accounts")]
-        public async Task<IActionResult> GetBBVAAccountsAsync(string rut, string pwd)
+        [HttpPost("BBVA/Accounts")]
+        public async Task<IActionResult> GetBBVAAccountsAsync([FromBody] Models.BankCredentials credentials)
         {
-            using (var bank = new Plugins.Banks.BBVA(rut.ToCleanRut(), pwd))
+            using (var bank = new Plugins.Banks.BBVA(credentials.Rut.ToCleanRut(), credentials.Password))
             {
                 if (await bank.Login())
                     return new OkObjectResult(new
@@ -66,14 +66,17 @@ namespace JAMTech.Controllers
         /// <param name="rut"></param>
         /// <param name="pwd"></param>
         /// <returns></returns>
-        [HttpGet("Santander/Movements")]
+        [HttpPost("Santander/Movements")]
         [Produces(typeof(IList<MovimientosDeposito>))]
-        public async Task<IActionResult> GetSantanderMovementsAsync(string rut, int pwd)
+        public async Task<IActionResult> GetSantanderMovementsAsync([FromBody] Models.BankCredentials credentials)
         {
-            using (var bank = new Plugins.Banks.Santander(rut.ToCleanRut(), pwd.ToString()))
+            using (var bank = new Plugins.Banks.Santander(credentials.Rut.ToCleanRut(), credentials.Password.ToString()))
             {
                 if (await bank.Login())
-                    return new OkObjectResult(bank.GetAllMovements());
+                {
+                    var movements = await bank.GetAllMovements();
+                    return new OkObjectResult(movements);
+                }
                 else
                     return new UnauthorizedResult();
             }
@@ -86,11 +89,11 @@ namespace JAMTech.Controllers
         /// <param name="pwd"></param>
         /// <param name="amount"></param>
         /// <returns></returns>
-        [HttpGet("Santander/Movements/{amount}")]
+        [HttpPost("Santander/Movements/{amount}")]
         [Produces(typeof(IList<MovimientosDeposito>))]
-        public async Task<IActionResult> GetSantanderMovementsAsync(string rut, int pwd, int amount)
+        public async Task<IActionResult> GetSantanderMovementsAsync([FromBody] Models.BankCredentials credentials, int amount)
         {
-            using (var bank = new Plugins.Banks.Santander(rut.ToCleanRut(), pwd.ToString()))
+            using (var bank = new Plugins.Banks.Santander(credentials.Rut.ToCleanRut(), credentials.Password.ToString()))
             {
                 if (await bank.Login())
                 {

@@ -72,9 +72,10 @@ namespace JAMTech.Plugins.Banks
 
         public async Task<IList<MovimientosDeposito>> GetAllMovements()
         {
-            return await Task.Run(() => Accounts.Select(async account => await GetMovements(account.NUMEROCONTRATO))
+            var result = Accounts.Select(async account => await GetMovements(account.NUMEROCONTRATO))
                             .SelectMany(t => t.Result.MovimientosDepositos)
-                            .ToList());
+                            .ToList();
+            return result;
         }
 
         public async Task WaitForMovementAsync(int amount, int waitBetweenRequests = 5000)
