@@ -26,20 +26,20 @@ namespace JAMTech.Models.Santander
 
         internal void SaveLocalCopy()
         {
-            File.WriteAllText(Path.Combine(_localPath, Cuenta + ".keys"), ToString());
+            File.WriteAllText(Path.Combine(System.AppContext.BaseDirectory, _localPath, Cuenta + ".keys"), ToString());
         }
         protected void Open()
         {
             //find keys on environment variable, folder, etc...
-            var path = Path.Combine(_localPath, Cuenta + ".keys");
+            var path = Path.Combine(System.AppContext.BaseDirectory, _localPath, Cuenta + ".keys");
             if(File.Exists(path))
-                FromBase64String(Cuenta, Id, File.ReadAllText(path));
+                Keys = FromBase64String(Cuenta, Id, File.ReadAllText(path)).Keys;
             else
             {
                 //environment variables
                 var keys = Environment.GetEnvironmentVariable("keys_santander_" + Cuenta);
                 if (!string.IsNullOrEmpty(keys))
-                    FromBase64String(Cuenta, Id, keys);
+                    Keys = FromBase64String(Cuenta, Id, keys).Keys;
                 else
                     throw new ApplicationException($"Keys of account '{Cuenta}' not found");
             }
