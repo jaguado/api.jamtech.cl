@@ -1,4 +1,5 @@
 ﻿using JAMTech.Models;
+using JAMTech.Models.Servicios;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -84,7 +85,7 @@ namespace JAMTech.Extensions
             //if (typeof(UserMonitorConfig) != typeof(T))
             //    throw new NotImplementedException("DELETE only works for UserMonitorConfig objects");
             var collectionName = typeof(T).Name.ToLower();
-            var objectId = (obj as dynamic)._id.oid;
+            var objectId = (obj as dynamic)._id?.oid ?? (obj as dynamic).Id;
             var collectionUrl = $"{baseUrl}databases/{defaultDatabase}/collections/{collectionName}/{objectId}?apiKey={apiKey}";
             using (var response = await Helpers.Net.DeleteResponse(collectionUrl))
             {
@@ -134,6 +135,14 @@ namespace JAMTech.Extensions
                         data.ForEach(d =>
                         {
                             var t = d as RememberConfig;
+                            t.Id = obj["_id"]["$oid"].ToString();
+                        });
+                    }
+                    if (typeof(T) == typeof(UserCita) && typeof(Y) == typeof(Cita))
+                    {
+                        data.ForEach(d =>
+                        {
+                            var t = d as Cita;
                             t.Id = obj["_id"]["$oid"].ToString();
                         });
                     }

@@ -56,13 +56,9 @@ namespace JAMTech.Controllers
                 return Unauthorized();
 
             var forUser = AuthenticatedToken.Payload["uid"].ToString();
-            var userResults = await MongoDB.FromMongoDB<UserCita, Cita>(forUser);
-            if (userResults == null || !userResults.Any(t => t.Id == id))
-                return NotFound();
-
-            var results = userResults.Select(async result => await result.DeleteFromMongoDB()).ToArray();
-            await Task.WhenAll(results);
-            return results.All(r => r.IsCompletedSuccessfully) ? new OkObjectResult(results.Count()) : StatusCode(500, results.Count());
+            var forDeletion = new UserCita { uid = forUser, _id = new UserCita.id { oid = id } };
+            await forDeletion.DeleteFromMongoDB();
+            return Ok();
         }
 
         
