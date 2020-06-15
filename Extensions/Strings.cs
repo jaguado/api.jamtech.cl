@@ -24,5 +24,9 @@ namespace JAMTech.Extensions
         {
             return string.Join(' ',value.Trim().Split(' ').Skip(1));
         }
+        public static string JoinString<T>(this IEnumerable<T> source, string seperator = "")
+        {
+            return string.Join(seperator, source);
+        }
     }
 }

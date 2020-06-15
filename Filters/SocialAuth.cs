@@ -60,7 +60,7 @@ namespace JAMTech.Filters
                     };
                 else
                 {
-                    var googleResult = response.Content.ReadAsStringAsync().Result;
+                    var googleResult = await response.Content.ReadAsStringAsync();
                     var result = JsonConvert.DeserializeObject<dynamic>(googleResult, Startup.jsonSettings);
                     // validate parameter uid against google uid
                     if (!string.IsNullOrEmpty(uid))
@@ -114,7 +114,7 @@ namespace JAMTech.Filters
                     };
                 else
                 {
-                    var facebookResult = response.Content.ReadAsStringAsync().Result;
+                    var facebookResult = await response.Content.ReadAsStringAsync();
                     var result = JsonConvert.DeserializeObject<dynamic>(facebookResult, Startup.jsonSettings);
 
                     // validate parameter uid against google uid
@@ -170,7 +170,7 @@ namespace JAMTech.Filters
             }
         }
 
-        public static JwtSecurityToken ValidateAndDecode(string jwt, X509Certificate2 cert)
+        public static JwtSecurityToken ValidateAndDecode(string jwt, X509Certificate2 cert = null)
         {
             if (cert == null) return new JwtSecurityToken(jwt);
 
@@ -242,9 +242,19 @@ namespace JAMTech.Filters
                 else
                 {
                     //check access token state
-                    var uid = GetFromRequest(context, uidFieldName);
-                    await CheckGoogleAsync(context, accessToken, uid);
-                    await CheckFacebookAsync(context, accessToken, uid);
+                    if(string.IsNullOrEmpty(GetFromRequest(context, "provider")))
+                    {
+                        // decode jwt
+                        var baseController = context.Controller as Controllers.BaseController;
+                        if (baseController != null)
+                            baseController.AuthenticatedToken = ValidateAndDecode(accessToken);
+                    }
+                    else
+                    {
+                        var uid = GetFromRequest(context, uidFieldName);
+                        await CheckGoogleAsync(context, accessToken, uid);
+                        await CheckFacebookAsync(context, accessToken, uid);
+                    }
                 }
             }
 

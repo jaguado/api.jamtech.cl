@@ -20,7 +20,8 @@ namespace JAMTech.Models
         public double distancia { get; set; }
     }
 
-    public class Servicios
+
+    public class Servicio
     {
         public bool tienda { get; set; }
         public bool farmacia { get; set; }
@@ -44,7 +45,8 @@ namespace JAMTech.Models
         public Precios precios { get; set; }
         public MetodosDePago metodos_de_pago { get; set; }
         public Ubicacion ubicacion { get; set; }
-        public Servicios servicios { get; set; }
+        [JsonProperty("Servicios")]
+        public Servicio servicios { get; set; }
     }
 
     public class Precios
