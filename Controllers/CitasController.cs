@@ -16,27 +16,30 @@ using JAMTech.Models.Servicios;
 
 namespace JAMTech.Controllers
 {
-    [Route("v1/[controller]")]
+    [Route("v2/[controller]")]
     public class CitasController : BaseController
     {
         /// <summary>
         /// Add Cita to user storage
         /// </summary>
         /// <param name="citas">Collection of citas</param>
-        /// <param name="forUser">This paramemeter is optional and will be completed or validated against access_token</param>
         /// <returns></returns>
         [HttpPost()]
         [Produces(typeof(IEnumerable<UserCita>))]
-        public async Task<IActionResult> AddCitas([FromBody] List<Cita> citas, string forUser=null)
+        public async Task<IActionResult> AddCitas([FromBody] List<Cita> citas)
         {
-            if (citas == null || forUser == null || !citas.Any())
+            if (AuthenticatedToken == null)
+                return Unauthorized();
+
+            if (citas == null || !citas.Any())
                 return new BadRequestResult();
 
+            var forUser = AuthenticatedToken.Payload["uid"].ToString();
             // TODO security check of user against data and permissions
             var obj = new UserCita
             {
-                uid=forUser,
-                Data= citas
+                uid = forUser,
+                Data = citas
             };
 
              var result = await obj.ToMongoDB<UserCita>();
@@ -48,8 +51,12 @@ namespace JAMTech.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCitas(string id, string forUser = null)
+        public async Task<IActionResult> DeleteCitas(string id)
         {
+            if (AuthenticatedToken == null)
+                return Unauthorized();
+
+            var forUser = AuthenticatedToken.Payload["uid"].ToString();
             //check if sensor id correspond to the authenticated user (forUser)
             var userResults = await MongoDB.FromMongoDB<UserCita, Cita>(forUser);
             if (userResults == null || !userResults.Any(t => t.Id == id))
@@ -67,12 +74,14 @@ namespace JAMTech.Controllers
         /// <summary>
         /// Get cita of an authenticated user
         /// </summary>
-        /// <param name="forUser">This paramemeter is optional and will be completed or validated against access_token</param>
         /// <returns></returns>
         [HttpGet()]
         [Produces(typeof(IEnumerable<Cita>))]
-        public async Task<IActionResult> GetCitas(string forUser=null)
+        public async Task<IActionResult> GetCitas()
         {
+            if (AuthenticatedToken == null)
+                return Unauthorized();
+            var forUser = AuthenticatedToken.Payload["uid"].ToString();
             var result = await MongoDB.FromMongoDB<UserCita, Cita> (forUser);
             return new OkObjectResult(result as IEnumerable<Cita>);
         }

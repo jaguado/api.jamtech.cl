@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net;
@@ -11,6 +12,7 @@ namespace JAMTech.Controllers
 {
     public abstract class BaseController : Controller
     {
+        public JwtSecurityToken AuthenticatedToken { get; set; }
         /// <summary>
         /// Allows cors support
         /// </summary>
