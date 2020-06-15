@@ -34,7 +34,7 @@ namespace JAMTech
         /// </summary>
         internal static bool useMemCache = Environment.GetEnvironmentVariable("useCache") != null && Environment.GetEnvironmentVariable("useCache") == "false" ? false : true; //default true
 
-        internal static string[] corsWhitelist = Environment.GetEnvironmentVariable("CORS") != null ? Environment.GetEnvironmentVariable("CORS").Split(",") : null;
+        internal static string[] corsWhitelist = Environment.GetEnvironmentVariable("CORS")?.Split(",");
 
         public Startup(IConfiguration configuration)
         {

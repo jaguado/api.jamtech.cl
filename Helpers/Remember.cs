@@ -100,7 +100,7 @@ namespace JAMTech.Helpers
             }
         }
 
-        static bool disableSendEmail = Environment.GetEnvironmentVariable("disableSendEmail", EnvironmentVariableTarget.Process).Trim().ToLower().Equals("true");
+        static readonly bool disableSendEmail = Environment.GetEnvironmentVariable("disableSendEmail", EnvironmentVariableTarget.Process).Trim().ToLower().Equals("true");
         private static async Task<bool> RememberByEmail(Models.RememberConfig config, bool isNow)
         {
             var subject = $"Hi, this mail is a remembering for '{config.Name}'";

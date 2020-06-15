@@ -19,9 +19,9 @@ namespace JAMTech.Plugins.Banks
         const string _tplLoginPayload = "AID=LoginPerformance-000&CustPermID=0000000&IdPers=1&CustLoginID={0}&SignonPswd={1}";
         const string _tplAccounts = "MID=04&AID=MyAccounts-000";
         const string baseUrl = "https://www.bbvanet.cl/bbvaIphone/IphoneServlet";
-        private string loginPayload;
+        private readonly string loginPayload;
         private string JSESSIONID;
-        private string customerId;
+        private readonly string customerId;
         public dynamic Accounts;
         public dynamic Customer;
         public BBVA(string rut, string pwd)

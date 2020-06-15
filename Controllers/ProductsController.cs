@@ -15,7 +15,7 @@ namespace JAMTech.Controllers
     [Route("v1/[controller]")]
     public class ProductsController : BaseController
     {
-        private static JumboProductsController jumboController = new JumboProductsController();
+        private static readonly JumboProductsController jumboController = new JumboProductsController();
 
         [HttpGet]
         public async Task<IActionResult> FindProductsAsync(string product, int pages=1)
@@ -42,7 +42,7 @@ namespace JAMTech.Controllers
 
 
         //TODO move this to knasta controller
-        private static Uri referrer = new Uri("https://knasta.cl");
+        private static readonly Uri referrer = new Uri("https://knasta.cl");
         const string url = "https://knasta.cl/api/products?p=all&page={1}&q={0}&app_version=2.8.12";
         private static async Task<IActionResult> FindProductsKnastaAsync(string product, int page = 1)
         {

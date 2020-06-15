@@ -26,7 +26,7 @@ namespace JAMTech.Extensions
             return new OkObjectResult(await Helpers.Http.GetStringAsync<string>(url));
         }
 
-        private static WebMarkupMin.Core.CrockfordJsMinifier minifyJs = new WebMarkupMin.Core.CrockfordJsMinifier();
+        private static readonly WebMarkupMin.Core.CrockfordJsMinifier minifyJs = new WebMarkupMin.Core.CrockfordJsMinifier();
         public static async Task<IActionResult> ToMongoDB<T>(this object collection, bool update = false, bool storeMinified = false)
         {
             var collectionName = typeof(T).Name.ToLower();

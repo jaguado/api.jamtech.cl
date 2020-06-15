@@ -117,38 +117,5 @@ namespace JAMTech.Controllers
                 return HandleException(ex);
             }
         }
-
-
-
-        /// <summary>
-        /// Check only the connection to endpoint and return status code
-        /// </summary>
-        /// <returns></returns>
-        private async Task<Tuple<bool, object>> CheckOnlyConnectionAsync(string url, bool internet = false)
-        {
-            try
-            {
-                using (var result = Http.GetStringAsync(url, 5000, internet ? "" : "-"))
-                {
-                    if (await result is HttpWebResponse response)
-                    {
-                        return new Tuple<bool, object>(true, (int)response.StatusCode);
-                    }
-
-                    return new Tuple<bool, object>(true, result);
-                }
-            }
-            catch (WebException wex)
-            {
-                if (wex.Response is HttpWebResponse response)
-                    return new Tuple<bool, object>(true, (int)response.StatusCode);
-                return new Tuple<bool, object>(false, wex);
-            }
-            catch (Exception ex)
-            {
-                HandleException(ex);
-                return new Tuple<bool, object>(false, -1);
-            }
-        }
     }
 }

@@ -22,7 +22,7 @@ namespace JAMTech.Filters
     /// </summary>
     public class SocialAuth : IAsyncActionFilter
     {
-        JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+        readonly JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
         const string googlePublicKey = "";
         const string uidFieldName = "forUser";
         const string authHeader = "Authorization";
@@ -141,7 +141,7 @@ namespace JAMTech.Filters
 
         private T GetFromBody<T>(ActionExecutingContext context, string key)
         {
-            return context.ActionArguments.ContainsKey(key) ? (T)context.ActionArguments[key] : default(T);
+            return context.ActionArguments.ContainsKey(key) ? (T)context.ActionArguments[key] : default;
         }
 
         private string GetFromRequest(ActionExecutingContext context, string key)
@@ -245,8 +245,7 @@ namespace JAMTech.Filters
                     if(string.IsNullOrEmpty(GetFromRequest(context, "provider")))
                     {
                         // decode jwt
-                        var baseController = context.Controller as Controllers.BaseController;
-                        if (baseController != null)
+                        if (context.Controller is Controllers.BaseController baseController)
                             baseController.AuthenticatedToken = ValidateAndDecode(accessToken);
                     }
                     else

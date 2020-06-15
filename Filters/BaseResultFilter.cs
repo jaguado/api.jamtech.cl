@@ -19,7 +19,7 @@ namespace JAMTech.Filters
         public static string[] Operators = new[] { "==", "!=", "<", ">", "<>", "<=", ">=" };
         private static readonly bool _minifyResponse = Environment.GetEnvironmentVariable("minifyResponse") =="false" ? false : true;
 
-        private static WebMarkupMin.Core.CrockfordJsMinifier minifyJs = new WebMarkupMin.Core.CrockfordJsMinifier();
+        private static readonly WebMarkupMin.Core.CrockfordJsMinifier minifyJs = new WebMarkupMin.Core.CrockfordJsMinifier();
         private void FilterOrderLimitResult<T>(ActionExecutedContext context, HttpRequest request, OkObjectResult resultResponse)
         {
             if (resultResponse != null)

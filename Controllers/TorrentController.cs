@@ -284,9 +284,9 @@ namespace JAMTech.Controllers
 
 
         private const string rarbgBaseUrl = "https://torrentz2.eu/search?f={0}&p={1}";
-        private static Uri rarbgReferrer = new Uri("https://torrentz2.eu");
-        private static string userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36";
-        private static string zTorrentsCookie = Environment.GetEnvironmentVariable("zTorrentsCookie") ?? throw new ApplicationException("zTorrentsCookie variable missing");
+        private static readonly Uri rarbgReferrer = new Uri("https://torrentz2.eu");
+        private static readonly string userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36";
+        private static readonly string zTorrentsCookie = Environment.GetEnvironmentVariable("zTorrentsCookie") ?? throw new ApplicationException("zTorrentsCookie variable missing");
         private static async Task<List<TorrentResult>> FindZTorrentsAsync(string movie, int page, bool skipLinks)
         {
             try

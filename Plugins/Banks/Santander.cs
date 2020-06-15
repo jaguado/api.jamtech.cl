@@ -20,9 +20,9 @@ namespace JAMTech.Plugins.Banks
         const string _tplMovements = "{{  \"Cabecera\": {{    \"HOST\": {{      \"USUARIO-ALT\": \"GAPPS2P\",      \"TERMINAL-ALT\": \"\",      \"CANAL-ID\": \"078\"    }},    \"CanalFisico\": \"78\",    \"CanalLogico\": \"74\",   \"RutCliente\": \"{0}\",    \"RutUsuario\": \"{0}\",    \"IpCliente\": \"\",    \"InfoDispositivo\": \"xx\"  }},  \"Entrada\": {{    \"NumeroCuenta\": \"{1}\"   }}}}";
         const string urlLogin = "https://apiper.santander.cl/appper/login";
         const string urlMovements = "https://apiper.santander.cl/appper/facade/Consultas/MvtosYDeposiDocCtas";
-        private string loginPayload;
+        private readonly string loginPayload;
         private string token;
-        private string customerId;
+        private readonly string customerId;
         public List<Models.Santander.E1> Accounts;
         public Santander(string rut, string pwd)
         {
@@ -76,9 +76,10 @@ namespace JAMTech.Plugins.Banks
         public async Task<IList<MovimientosDeposito>> GetAllMovements()
         {
             var result = Accounts.Select(async account => await GetMovements(account.NUMEROCONTRATO))
-                            .SelectMany(t => t.Result.MovimientosDepositos)
-                            .ToList();
-            return result;
+                                 .Select(async t => (await t).MovimientosDepositos)
+                                 .ToArray();
+            await Task.WhenAll(result);
+            return result.SelectMany(r => r.Result).ToList();
         }
 
         public async Task WaitForMovementAsync(int amount, int waitBetweenRequests = 5000)
@@ -105,7 +106,7 @@ namespace JAMTech.Plugins.Banks
 
         public async Task<IActionResult> TransferResponse(Models.Santander.Transfer transfer)
         {
-            initHttpClient();
+            InitHttpClient();
             var loginResponse = await PostJsonWithToken<LoginResponse>(_login, transfer.Credentials, false);
             if (loginResponse == null || loginResponse.ErrorCode != "00") return new BadRequestObjectResult(loginResponse);
             token = loginResponse.Result.KEY;
@@ -167,8 +168,8 @@ namespace JAMTech.Plugins.Banks
         private CookieContainer cookies;
         private HttpClientHandler handler;
         private HttpClient client;
-        string[] _userAgents = new [] { "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36" };
-        private void initHttpClient()
+        readonly string[] _userAgents = new [] { "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36" };
+        private void InitHttpClient()
         {
             if (client == null) {
                 cookies = new CookieContainer();

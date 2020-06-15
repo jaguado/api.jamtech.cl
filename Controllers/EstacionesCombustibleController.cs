@@ -30,8 +30,8 @@ namespace JAMTech.Controllers
         const int skipDataBeforeInMonths = 1; //in months
 
         //mem store to cache external apis data
-        private static Dictionary<string, Tuple<DateTime, List<Models.CombustibleStation>>> memStore = new Dictionary<string, Tuple<DateTime, List<Models.CombustibleStation>>>();
-        private static Dictionary<string, dynamic> memStoreFilters = new Dictionary<string, dynamic>();
+        private static readonly Dictionary<string, Tuple<DateTime, List<Models.CombustibleStation>>> memStore = new Dictionary<string, Tuple<DateTime, List<Models.CombustibleStation>>>();
+        private static readonly Dictionary<string, dynamic> memStoreFilters = new Dictionary<string, dynamic>();
 
         /// <summary>
         /// GET Stations with prices and other useful information
