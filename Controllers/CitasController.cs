@@ -35,7 +35,6 @@ namespace JAMTech.Controllers
                 return new BadRequestResult();
 
             var forUser = AuthenticatedToken.Payload["uid"].ToString();
-            // TODO security check of user against data and permissions
             var obj = new UserCita
             {
                 uid = forUser,
@@ -57,17 +56,13 @@ namespace JAMTech.Controllers
                 return Unauthorized();
 
             var forUser = AuthenticatedToken.Payload["uid"].ToString();
-            //check if sensor id correspond to the authenticated user (forUser)
             var userResults = await MongoDB.FromMongoDB<UserCita, Cita>(forUser);
             if (userResults == null || !userResults.Any(t => t.Id == id))
-                return new ForbidResult();
-            var obj = new UserCita()
-            {
-                uid = forUser,
-                _id = new UserCita.id { oid = id }
-            };
-            await obj.DeleteFromMongoDB();
-            return new OkResult();
+                return NotFound();
+
+            var results = userResults.Select(async result => await result.DeleteFromMongoDB()).ToArray();
+            await Task.WhenAll(results);
+            return results.All(r => r.IsCompletedSuccessfully) ? new OkObjectResult(results.Count()) : StatusCode(500, results.Count());
         }
 
         
