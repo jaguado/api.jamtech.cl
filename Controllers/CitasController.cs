@@ -49,7 +49,7 @@ namespace JAMTech.Controllers
         /// Delete cita
         /// </summary>
         /// <returns></returns>
-        [HttpDelete("{id}")]
+        [HttpDelete()]
         public async Task<IActionResult> DeleteCitas(string id)
         {
             if (AuthenticatedToken == null)
